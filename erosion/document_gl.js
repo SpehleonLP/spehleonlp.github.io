@@ -8,6 +8,35 @@ let glContext = null; // this will contain the gl context from the canvas
 let is_making_video = false;
 let textures = {};
 
+function UploadTexture(gl, texture, dropAreaId, textureUnit, image)
+{
+	if(typeof image === 'string' || image instanceof String)
+	{
+		const img = new Image();
+        img.onload = function() {
+        	UploadTexture(gl, texture, dropAreaId, textureUnit, image);
+        }
+
+		img.src = image;
+		img.crossOrigin = "anonymous"; // Allow cross-origin image loading if needed
+		return;
+	}
+
+    const dropArea = document.getElementById(dropAreaId);
+
+	if(textureUnit == 0)
+	{
+		recordCanvasWidth = image.width;
+		recordCanvasHeight = image.height;
+	}
+
+    gl.activeTexture(gl.TEXTURE0 + textureUnit);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+    gl.generateMipmap(gl.TEXTURE_2D);
+    dropArea.style.backgroundImage = `url(${image.src})`;;
+    dropArea.innerHTML = ''; // Remove the <p> text
+}
 
 /**
  * Initializes a texture with a default or placeholder image.
@@ -168,15 +197,9 @@ document.addEventListener('DOMContentLoaded', () => {
         setupTextureUpload(gl, textures.u_erosionTexture, 'erosionTextureDrop', 0);
         setupTextureUpload(gl, textures.u_gradient, 'gradientDrop', 1);
 
-		function GetImage(src) {
-			const image = new Image();
-			image.src = src;
-			image.crossOrigin = "anonymous"; // Allow cross-origin image loading if needed
-			return image;
-		}
 
-        UploadTexture(gl, textures.u_erosionTexture, 'erosionTextureDrop', 0, GetImage("fxMapInOut-boost.png"));
-        UploadTexture(gl, textures.u_gradient, 'gradientDrop', 1, GetImage("boom_ramp2D.png"));
+        UploadTexture(gl, textures.u_erosionTexture, 'erosionTextureDrop', 0, "fxMapInOut-boost.png");
+        UploadTexture(gl, textures.u_gradient, 'gradientDrop', 1, "boom_ramp2D.png");
 
         renderDelegate = render;
     })
@@ -290,23 +313,6 @@ function initBuffers(gl, attribLocations) {
 }
 
 
-function UploadTexture(gl, texture, dropAreaId, textureUnit, image)
-{
-    const dropArea = document.getElementById(dropAreaId);
-
-	if(textureUnit == 0)
-	{
-		recordCanvasWidth = image.width;
-		recordCanvasHeight = image.height;
-	}
-
-    gl.activeTexture(gl.TEXTURE0 + textureUnit);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-    gl.generateMipmap(gl.TEXTURE_2D);
-    dropArea.style.backgroundImage = `url(${image.src})`;;
-    dropArea.innerHTML = ''; // Remove the <p> text
-}
 
 /**
  * Sets up texture upload functionality for drag-and-drop and click-to-upload.

@@ -14,7 +14,7 @@ function UploadTexture(gl, texture, dropAreaId, textureUnit, image)
 	{
 		const img = new Image();
         img.onload = function() {
-        	UploadTexture(gl, texture, dropAreaId, textureUnit, image);
+        	UploadTexture(gl, texture, dropAreaId, textureUnit, img);
         }
 
 		img.src = image;

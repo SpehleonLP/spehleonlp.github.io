@@ -8,6 +8,27 @@ let glContext = null; // this will contain the gl context from the canvas
 let is_making_video = false;
 let textures = {};
 
+
+/**
+ * Initializes a texture with a default or placeholder image.
+ * @param {WebGLRenderingContext} gl - The WebGL context.
+ * @param {WebGLTexture} texture - The texture object.
+ * @param {string} url - The URL of the image to load.
+ */
+function initializeTexture(gl, texture, url) {
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+
+    // Set texture parameters
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT); // Wrap horizontally
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT); // Wrap vertically
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);    // Minification filter
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);    // Magnification filter
+
+    // Initialize with a 1x1 pixel if no image is provided
+    const defaultPixel = new Uint8Array([0, 0, 0, 255]); // Black pixel
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, defaultPixel);
+}
+
 // Wait for the DOM to load
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize WebGL
@@ -147,26 +168,15 @@ document.addEventListener('DOMContentLoaded', () => {
         setupTextureUpload(gl, textures.u_erosionTexture, 'erosionTextureDrop', 0);
         setupTextureUpload(gl, textures.u_gradient, 'gradientDrop', 1);
 
-function UploadTexture(gl, texture, dropAreaId, textureUnit, image)
-{
-    const dropArea = document.getElementById(dropAreaId);
+		function GetImage(src) {
+			const image = new Image();
+			image.src = src;
+			image.crossOrigin = "anonymous"; // Allow cross-origin image loading if needed
+			return image;
+		}
 
-	if(textureUnit == 0)
-	{
-		recordCanvasWidth = image.width;
-		recordCanvasHeight = image.height;
-	}
-
-    gl.activeTexture(gl.TEXTURE0 + textureUnit);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-    gl.generateMipmap(gl.TEXTURE_2D);
-    dropArea.style.backgroundImage = `url(${image.src})`;;
-    dropArea.innerHTML = ''; // Remove the <p> text
-}
-
-        UploadTexture(gl, textures.u_erosionTexture, 'erosionTextureDrop', 0, "fxMapOut-boost.png");
-        UploadTexture(gl, textures.u_gradient, 'gradientDrop', 1, "boom_ramp2D.png");
+        UploadTexture(gl, textures.u_erosionTexture, 'erosionTextureDrop', 0, GetImage("fxMapOut-boost.png"));
+        UploadTexture(gl, textures.u_gradient, 'gradientDrop', 1, GetImage("boom_ramp2D.png"));
 
         renderDelegate = render;
     })
@@ -277,26 +287,6 @@ function initBuffers(gl, attribLocations) {
     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
 	return buffer;
-}
-
-/**
- * Initializes a texture with a default or placeholder image.
- * @param {WebGLRenderingContext} gl - The WebGL context.
- * @param {WebGLTexture} texture - The texture object.
- * @param {string} url - The URL of the image to load.
- */
-function initializeTexture(gl, texture, url) {
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-
-    // Set texture parameters
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT); // Wrap horizontally
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT); // Wrap vertically
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);    // Minification filter
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);    // Magnification filter
-
-    // Initialize with a 1x1 pixel if no image is provided
-    const defaultPixel = new Uint8Array([0, 0, 0, 255]); // Black pixel
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, defaultPixel);
 }
 
 

@@ -196,6 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         LoadImageAndUpload(gl, textures.u_erosionTexture, 'erosionTextureDrop', 0, "fxMapInOut-boost.png");
         LoadImageAndUpload(gl, textures.u_gradient, 'gradientDrop', 1, "boom_ramp2D.png");
+        playPauseButton.click();
 
         renderDelegate = render;
     })

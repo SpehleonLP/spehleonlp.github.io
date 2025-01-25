@@ -10,18 +10,6 @@ let textures = {};
 
 function UploadTexture(gl, texture, dropAreaId, textureUnit, image)
 {
-	if(typeof image === 'string' || image instanceof String)
-	{
-		const img = new Image();
-        img.onload = function() {
-        	UploadTexture(gl, texture, dropAreaId, textureUnit, img);
-        }
-
-		img.src = image;
-		img.crossOrigin = "anonymous"; // Allow cross-origin image loading if needed
-		return;
-	}
-
     const dropArea = document.getElementById(dropAreaId);
 
 	if(textureUnit == 0)
@@ -36,6 +24,15 @@ function UploadTexture(gl, texture, dropAreaId, textureUnit, image)
     gl.generateMipmap(gl.TEXTURE_2D);
     dropArea.style.backgroundImage = `url(${image.src})`;;
     dropArea.innerHTML = ''; // Remove the <p> text
+}
+
+function LoadImageAndUpload(gl, texture, dropAreaId, textureUnit, src) {
+    const image = new Image();
+    image.crossOrigin = "anonymous"; // Allow cross-origin image loading if needed
+    image.onload = function () {
+        UploadTexture(gl, texture, dropAreaId, textureUnit, image);
+    };
+    image.src = src;
 }
 
 /**
@@ -197,9 +194,8 @@ document.addEventListener('DOMContentLoaded', () => {
         setupTextureUpload(gl, textures.u_erosionTexture, 'erosionTextureDrop', 0);
         setupTextureUpload(gl, textures.u_gradient, 'gradientDrop', 1);
 
-
-        UploadTexture(gl, textures.u_erosionTexture, 'erosionTextureDrop', 0, "fxMapInOut-boost.png");
-        UploadTexture(gl, textures.u_gradient, 'gradientDrop', 1, "boom_ramp2D.png");
+        LoadImageAndUpload(gl, textures.u_erosionTexture, 'erosionTextureDrop', 0, "fxMapInOut-boost.png");
+        LoadImageAndUpload(gl, textures.u_gradient, 'gradientDrop', 1, "boom_ramp2D.png");
 
         renderDelegate = render;
     })

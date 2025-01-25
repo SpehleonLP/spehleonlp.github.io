@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebGL Canvas with Controls</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- WebGL Canvas -->
+    <canvas id="glCanvas" width="800" height="600"></canvas>
+
+    <!-- Control Panel -->
+    <div id="control-panel">
+        <div class="slider-container">
+            <label for="fadeInDuration">Fade In Duration (s)</label>
+            <input type="range" id="fadeInDuration" min="0" max="10" step="0.1" value="0.5">
+            <span id="fadeInDurationValue">0.5</span>
+        </div>
+        <div class="slider-container">
+            <label for="fadeOutDuration">Fade Out Duration (s)</label>
+            <input type="range" id="fadeOutDuration" min="0" max="10" step="0.1" value="2.0">
+            <span id="fadeOutDurationValue">2.0</span>
+        </div>
+        <div class="slider-container">
+            <label for="lifetime">Lifetime (s)</label>
+            <input type="range" id="lifetime" min="1" max="10" step="0.1" value="2.0">
+            <span id="lifetimeValue">2.0</span>
+        </div>
+        <div class="slider-container">
+            <label for="rate">Rate</label>
+            <input type="range" id="rate" min="0" max="1" step="0.01" value="1">
+            <span id="rateValue">1</span>
+        </div>
+
+		<div>
+			<p>Erosion Texture</p>
+		    <div class="image-drop" id="erosionTextureDrop">
+		        <p>Drag & Drop</p>
+		    </div>
+        </div>
+
+		<div>
+			<p>Gradient</p>
+		    <div class="image-drop" id="gradientDrop">
+		        <p>Drag & Drop</p>
+		    </div>
+        </div>
+
+        <!-- Save Video Button -->
+        <div class="button-container">
+            <button id="load-video" class="video-button">
+                Load Video
+            </button>
+            <button id="save-video" class="video-button">
+                Save Video
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer">
+        <div id="time-label">Time:</div>
+        <input type="range" id="time-slider" min="0" max="10" step="0.001" value="0">
+        <button id="play-pause">Play</button>
+    </div>
+
+    <!-- Progress Modal -->
+    <div id="progress-modal">
+        <div class="modal-content">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+	<script type="text/javascript" src="webm-writer-0.3.0.js"></script>
+    <script src="progress.js"></script>
+    <script src="document_script.js"></script>
+    <script src="document_gl.js"></script>
+    <script src="create_video.js"></script>
+    <script src="create_textures.js"></script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+  /* Reset default margins and paddings */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Fullscreen WebGL canvas */
+canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* Floating control panel */
+#control-panel {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: rgba(0, 0, 0, 0.8);
+    border-radius: 10px;
+    padding: 20px;
+    color: #fff;
+    width: 300px;
+    z-index: 10;
+}
+
+/* Footer */
+#footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    color: #fff;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    z-index: 10;
+}
+
+/* Slider container */
+.slider-container {
+    margin-bottom: 15px;
+}
+
+.slider-container label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.slider-container input[type="range"] {
+    width: 100%;
+}
+
+/* Image drop areas */
+.image-drop {
+    width: 128px;
+    height: 128px;
+    border: 2px dashed #fff;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+    cursor: pointer;
+    background-size: cover;
+    background-position: center;
+}
+
+.image-drop p {
+    text-align: center;
+    pointer-events: none;
+}
+
+/* Footer elements */
+#time-label {
+    margin-right: 10px;
+    white-space: nowrap;
+}
+
+#time-slider {
+    flex: 1;
+    margin: 0 10px;
+}
+
+#play-pause {
+    background-color: #444;
+    border: none;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#play-pause:hover {
+    background-color: #555;
+}
+
+.button-container {
+    display: flex;
+    margin-bottom: 5px;
+    gap: 10px; /* space between buttons */
+}
+
+.video-button
+{
+	width: auto;
+	padding: 10px;
+	border: none;
+	border-radius: 5px;
+	background-color: #3498db;
+	color: #fff;
+	cursor: pointer;
+	display:inline-block;
+}
+
+
+/* Modal Overlay */
+#progress-modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+    align-items: center;
+    justify-content: center;
+    z-index: 1000; /* Ensure it's on top of other elements */
+}
+
+/* Modal Content */
+#progress-modal .modal-content {
+    background-color: #000; /* Black background */
+    padding: 20px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Spinner */
+#progress-modal .spinner {
+    width: 50px;
+    height: 50px;
+    border: 6px solid #f3f3f3; /* Light grey */
+    border-top: 6px solid #3498db; /* Blue */
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Spinner Animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

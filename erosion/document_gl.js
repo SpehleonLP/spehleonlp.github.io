@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			return image;
 		}
 
-        UploadTexture(gl, textures.u_erosionTexture, 'erosionTextureDrop', 0, GetImage("fxMapOut-boost.png"));
+        UploadTexture(gl, textures.u_erosionTexture, 'erosionTextureDrop', 0, GetImage("fxMapInOut-boost.png"));
         UploadTexture(gl, textures.u_gradient, 'gradientDrop', 1, GetImage("boom_ramp2D.png"));
 
         renderDelegate = render;

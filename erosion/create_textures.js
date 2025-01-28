@@ -2,36 +2,25 @@
 // Initialize the Web Worker
 const worker = new Worker('worker.js');
 
-// Placeholder for the WASM processor
-let wasmProcessor = null;
+let w_messageCounter = 0;
+const workerOperation = (type, data) => {
+    return new Promise((resolve, reject) => {
+        const messageId = `msg_${w_messageCounter++}`;
 
-// Listen for messages from the worker
-worker.onmessage = function(e) {
-    const { type, success, error, images } = e.data;
+        const handler = (e) => {
+            if (e.data.id === messageId) {
+                worker.removeEventListener('message', handler);
+                if (e.data.type === 'ERROR') {
+                    reject(new Error(e.data.data));
+                } else {
+                    resolve(e.data.data);
+                }
+            }
+        };
 
-    if (type === 'init') {
-        if (success) {
-            console.log('Worker initialized successfully.');
-        } else {
-            console.error('Worker failed to initialize:', error);
-            alert(`Worker initialization failed: ${error}`);
-        }
-    }
-    else if (type === 'initialize') {
-        if (success) {
-            console.log('Processor initialized.');
-        } else {
-            console.error('Processor initialization failed.');
-            alert('Processor initialization failed.');
-        }
-    }
-    else if (type === 'finished') {
-        const { erosion, gradient } = images;
-        // Upload textures
-        UploadTexture(glContext, textures.u_erosionTexture, 'erosionTextureDrop', 0, erosion);
-        UploadTexture(glContext, textures.u_gradient, 'gradientDrop', 1, gradient);
-        console.log('Processing completed successfully.');
-    }
+        worker.addEventListener('message', handler);
+        worker.postMessage({ id: messageId, type, data });
+    });
 };
 
 // Function to process the video
@@ -41,13 +30,14 @@ async function ProcessVideo(event, mimeType) {
         await runWithProgress(async () => {
             // 1. Extract the video file from the FileReader's result
             const arrayBuffer = event.target.result;
-            const blob = new Blob([arrayBuffer], { type: mimeType }); // Adjust MIME type if necessary
+            const blob = new Blob([arrayBuffer], { type: mimeType });
 
             // 2. Create a video element to load the video
             const video = document.createElement('video');
             video.src = URL.createObjectURL(blob);
-            video.muted = true; // Mute the video to allow autoplay
-            video.playsInline = true; // Ensure it plays inline on mobile
+            video.muted = true; // Mute the video to allow ays inline on mobile
+            video.loop = false;
+            video.preload = 'auto';
             video.crossOrigin = 'anonymous'; // Handle cross-origin if needed
 
             // 3. Wait for the video metadata to load
@@ -60,11 +50,9 @@ async function ProcessVideo(event, mimeType) {
             });
 
             // 4. Create a canvas to capture video frames
-            const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            const ctx = canvas.getContext('2d');
-
+            const canvas = new OffscreenCanvas(video.videoWidth, video.videoHeight);
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+/*
             // 5. Capture the first frame and validate the top-left pixel's transparency
             await new Promise((resolve, reject) => {
                 video.onseeked = () => {
@@ -80,74 +68,77 @@ async function ProcessVideo(event, mimeType) {
                     } catch (err) {
                         reject(new Error('Error capturing the first frame.'));
                     }
+                    finally {
+       					video.onseeked = null; // Remove the event handler
+    				}
                 };
                 video.onerror = () => reject(new Error('Error seeking video to the first frame.'));
                 video.currentTime = 0;
             });
-
-            // 6. Determine total frames
-            // This method approximates the total frames based on frame rate and duration
-            // For more accurate frame counts, you might need to parse the video file or use other techniques
-            const fps = 30; // Adjust as needed or extract from video metadata if possible
-            const duration = video.duration;
-            const totalFrames = Math.ceil(duration * fps);
-
+*/
             // 7. Initialize the worker processor
-            worker.postMessage({ type: 'initialize', data: { totalFrames, width: canvas.width, height: canvas.height } });
+            await workerOperation('initialize', { width: canvas.width, height: canvas.height });
 
-            // 8. Wait for the worker to initialize
-            await new Promise((resolve, reject) => {
-                const handleMessage = (e) => {
-                    if (e.data.type === 'initialize' && e.data.success) {
-                        worker.removeEventListener('message', handleMessage);
-                        resolve();
-                    }
-                    else if (e.data.type === 'initialize' && !e.data.success) {
-                        worker.removeEventListener('message', handleMessage);
-                        reject(new Error('Processor initialization failed.'));
-                    }
-                };
-                worker.addEventListener('message', handleMessage);
-            });
+            console.log("initialized worker")
 
-            // 9. Play the video
+			const drawFrame = async () => {
+                if (video.ended || video.paused) {
+                    return; // Stop if video has ended or is paused
+                }
+
+                try {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    const frameData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    await workerOperation('pushFrame', { frameData: frameData.data.buffer }, [frameData.data.buffer]); // Send ArrayBuffer
+                } catch (error) {
+                    console.error('Error processing frame:', error);
+                }
+
+                requestAnimationFrame(drawFrame);
+            };
+
+// Start processing frames
             video.play();
+            console.log("Started frame processing");
 
-            // 10. Capture frames as the video plays
-            await new Promise((resolve, reject) => {
-                video.onplay = () => {
-                    const captureFrame = () => {
-                        if (video.paused || video.ended) {
-                            resolve();
-                            return;
-                        }
+            drawFrame(); // Start the frame loop
 
-                        // Draw the current frame onto the canvas
-                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                        const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-                        // Send the frame data to the worker
-                        worker.postMessage({ type: 'pushFrame', data: { frameData: frame.data.buffer } }, [frame.data.buffer]);
-
-                        // Update progress (optional)
-                        // You can calculate progress based on currentTime and duration
-                        // For example:
-                        const progress = video.currentTime / duration;
-                        // Optionally, send progress updates to runWithProgress if needed
-
-                        // Schedule the next frame capture
-                        requestIdleCallback(captureFrame);
-                    };
-
-                    captureFrame();
-                };
-
-                video.onerror = () => reject(new Error('Error during video playback while capturing frames.'));
-                video.onended = () => resolve();
+            // Wait for the video to finish playing
+            await new Promise((resolve) => {
+                video.onended = resolve;
             });
 
-            // 11. Finish processing
-            worker.postMessage({ type: 'finish' });
+            console.log("Finished first pass");
+
+            await workerOperation('finishPass', {});
+
+
+            console.log("Beginning second pass");
+
+            // Reset video to start for second pass
+            video.currentTime = 0;
+
+            // Start processing frames again
+            video.play();
+            drawFrame(); // Start the frame loop again
+
+            // Wait for the second pass to finish
+            await new Promise((resolve) => {
+                video.onended = resolve;
+            });
+
+            console.log("Finished second pass");
+            // */
+
+            await workerOperation('finishPass', {});
+
+			let { erosion, gradient } = await workerOperation('finish');
+
+            console.log("finished; pushing textures")
+
+       		UploadTexture(glContext, textures.u_erosionTexture, 'erosionTextureDrop', 0, erosion);
+ 		    UploadTexture(glContext, textures.u_gradient, 'gradientDrop', 1, gradient);
         });
 
         // Optionally, handle success (e.g., hide progress screen if not handled by runWithProgress)

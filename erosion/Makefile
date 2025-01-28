@@ -4,14 +4,14 @@
 CC = emcc
 
 # Source files
-SRC = video_processor.c
+SRC = video_processor.c create_envelopes.c create_gradient.c
 
 # Output files
 OUT_JS = video_processor.js
 OUT_WASM = video_processor.wasm
 
 # Exported C functions (add or remove functions as needed)
-EXPORT_FUNCTIONS = _initialize,_push_frame,_finish_processing,_get_image,_shutdownAndRelease
+EXPORT_FUNCTIONS = _initialize,_push_frame,_finish_processing,_get_image,_shutdownAndRelease,_malloc,_free
 
 # Exported runtime methods (keep necessary methods only)
 EXPORT_RUNTIME_METHODS = ccall,cwrap,getValue,setValue
@@ -20,9 +20,11 @@ EXPORT_RUNTIME_METHODS = ccall,cwrap,getValue,setValue
 CFLAGS = -O3 \
          -s WASM=1 \
          -s MODULARIZE=1 \
+         -s ALLOW_MEMORY_GROWTH=1 \
+         -s MAXIMUM_MEMORY=1GB \
          -s 'EXPORT_NAME="createModule"' \
          -s EXPORTED_FUNCTIONS='[$(EXPORT_FUNCTIONS)]' \
-         -s EXPORTED_RUNTIME_METHODS='["$(EXPORT_RUNTIME_METHODS)"]' \
+         -s EXPORTED_RUNTIME_METHODS='[$(EXPORT_RUNTIME_METHODS)]' \
          -o $(OUT_JS)
 
 # Default target

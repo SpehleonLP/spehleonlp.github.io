@@ -1,5 +1,8 @@
 #version 300 es
 precision mediump float;
+uniform sampler2D u_erosionTexture;
+uniform sampler2D u_gradient;
+
 uniform vec2 u_viewportSize;
 uniform float u_fadeInDuration;
 uniform float u_fadeOutDuration;
@@ -14,6 +17,7 @@ in vec2 a_texCoord;
 out vec2 v_texCoord;
 out vec2 v_texCoordPx;
 out vec3 f_life;
+flat out float textureRatio;
 
 
 void main()
@@ -34,4 +38,8 @@ void main()
 	{
 		v_texCoord.y = 1.0 - v_texCoord.y;
 	}
+
+	ivec2 size = textureSize(u_gradient, 0);
+	textureRatio = float(size.y) / float(size.x);
+	textureRatio = textureRatio > 2.0? 32.0 : 1.0;
 }

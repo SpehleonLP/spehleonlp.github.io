@@ -44,6 +44,7 @@ if (typeof window === 'undefined') {
                         coepCredentialless ? "credentialless" : "require-corp"
                     );
                     newHeaders.set("Cross-Origin-Opener-Policy", "same-origin");
+                    newHeaders.set("Cross-Origin-Resource-Policy", "cross-origin");
 
                     return new Response(response.body, {
                         status: response.status,

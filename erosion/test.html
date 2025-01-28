@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Video on Canvas</title>
+    <style>
+        body {
+            background-color: #000; /* Ensure the page background is white */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="videoCanvas"></canvas>
+
+    <!-- Hidden video element -->
+    <video id="videoElement" src="recorded_video.webm" crossorigin="anonymous" playsinline></video>
+
+    <script>
+        const canvas = document.getElementById('videoCanvas');
+        const ctx = canvas.getContext('2d');
+        const video = document.getElementById('videoElement');
+
+        // Set video to autoplay, loop, and muted to avoid playback issues
+        video.autoplay = true;
+        video.loop = true;
+        video.muted = true;
+
+        // When the video metadata is loaded, set the canvas size
+        video.addEventListener('loadedmetadata', () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            requestAnimationFrame(drawFrame);
+        });
+
+        // Handle video play event
+        video.addEventListener('play', () => {
+            requestAnimationFrame(drawFrame);
+        });
+
+        // Function to draw each frame
+        function drawFrame() {
+            if (video.paused || video.ended) {
+                return;
+            }
+            // Fill the canvas with white to serve as background
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw the current video frame onto the canvas
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Continue the loop
+            requestAnimationFrame(drawFrame);
+        }
+
+        // Start playing the video
+        video.play().catch(error => {
+            console.error('Error attempting to play the video:', error);
+        });
+    </script>
+</body>
+</html>

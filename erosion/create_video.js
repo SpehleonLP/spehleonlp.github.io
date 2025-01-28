@@ -1,5 +1,29 @@
 // create_video.js
 
+let ffmpeg_worker = null;
+let ff_messageCounter = 0;
+
+const ffmpegOperation = (type, data) => {
+    return new Promise((resolve, reject) => {
+        const messageId = `msg_${ff_messageCounter++}`;
+
+        const handler = (e) => {
+            if (e.data.id === messageId) {
+                ffmpeg_worker.removeEventListener('message', handler);
+                if (e.data.type === 'ERROR') {
+                    reject(new Error(e.data.data));
+                } else {
+                    resolve(e.data.data);
+                }
+            }
+        };
+
+        ffmpeg_worker.addEventListener('message', handler);
+        ffmpeg_worker.postMessage({ id: messageId, type, data });
+    });
+};
+
+
 function assert(condition, message) {
     if (!condition) {
         throw message || "Assertion failed";
@@ -117,6 +141,12 @@ function initializeOffscreenFramebuffer(width, height) {
    	glContext.bindFramebuffer(glContext.FRAMEBUFFER, null);
 
     return {
+    	destroy : function()
+    	{
+       		glContext.deleteFramebuffer(framebuffer);
+       		glContext.deleteTexture(texture);
+        	glContext.deleteRenderbuffer(depthRenderbuffer);
+    	},
         framebuffer: framebuffer,
         texture: texture,
         depthRenderbuffer: depthRenderbuffer,
@@ -126,43 +156,6 @@ function initializeOffscreenFramebuffer(width, height) {
 }
 
 
-/**
- * Initializes and configures the VideoEncoder.
- * @returns {VideoEncoder} - The configured VideoEncoder instance.
- */
-function initializeVideoEncoder(width, height, fps, outputBuffer) {
-    const init = {
-	  output: (chunk, metadata) => {
-			outputBuffer.push(chunk.data);
-        },
-	  error: (e) => {
-		console.log(e.message);
-	  },
-	};
-
-    const config = {
-        codec: 'vp8', // VP8 supports alpha in WebM
-        width: width,
-        height: height,
-        framerate: fps,
-        bitrate: width*height * fps * 32 / 1000,
-        hardwareAcceleration: 'prefer-hardware',
-        alpha: "keep"
-    };
-
-	encoder = new VideoEncoder(init);
-
-	VideoEncoder.isConfigSupported(config).then(supported => {
-		if (supported) {
-		  encoder.configure(config);
-		} else {
-		  throw "config failed";
-		}
-	});
-
-    return encoder;
-}
-
 
 /**
  * Captures a single frame from the off-screen framebuffer.
@@ -170,9 +163,9 @@ function initializeVideoEncoder(width, height, fps, outputBuffer) {
  * @param {WebGLFramebuffer} framebuffer - The off-screen framebuffer.
  * @returns {ImageBitmap} - The captured frame as an ImageBitmap.
  */
-function captureFrame(frameNumber, framebuffer) {
+function captureFrame(frameNumber, framebuffer, fps) {
     // Calculate the current time in seconds
-    const currentTime = frameNumber / 30; // Assuming 30 FPS
+    const currentTime = frameNumber / fps; // Assuming 30 FPS
 
 
     // Bind the framebuffer for reading
@@ -188,7 +181,7 @@ function captureFrame(frameNumber, framebuffer) {
 	const id = ((recordCanvasHeight / 2) * recordCanvasWidth +  recordCanvasWidth / 2) * 4;
 
     // Log the first few pixel values for debugging
-    console.log(`Frame ${frameNumber + 1}: First pixel RGBA: ${pixels[id+0]}, ${pixels[id+1]}, ${pixels[id+2]}, ${pixels[id+3]}`);
+   // console.log(`Frame ${frameNumber + 1}: First pixel RGBA: ${pixels[id+0]}, ${pixels[id+1]}, ${pixels[id+2]}, ${pixels[id+3]}`);
 
     // Unbind the framebuffer
     glContext.bindFramebuffer(glContext.FRAMEBUFFER, null);
@@ -196,6 +189,28 @@ function captureFrame(frameNumber, framebuffer) {
     // Create ImageData from pixel data
     return new ImageData(new Uint8ClampedArray(pixels), recordCanvasWidth, recordCanvasHeight);;
 }
+
+
+// Function to delete the 'frames' directory and its contents
+async function deleteDirectoryWithContents(path) {
+    try {
+        // List all files in the directory
+        const files = await ffmpegOperation('LIST_DIR', { path });
+
+        // Delete each file
+        for (const file of files) {
+            await ffmpegOperation('DELETE_FILE', { path: `${path}/${file}` });
+        }
+
+        // Delete the directory itself
+        await ffmpegOperation('DELETE_DIR', { path });
+        console.log(`Successfully deleted directory: ${path}`);
+    } catch (error) {
+        console.error(`Error deleting directory ${path}:`, error);
+        throw error; // Re-throw for higher-level handling
+    }
+}
+
 
 /**
  * Creates the video by capturing frames and encoding them.
@@ -209,10 +224,18 @@ async function createVideo() {
         throw new Error('renderDelegate is not defined or not a function.');
     }
 
+	if(ffmpeg_worker == null)
+	{
+		ffmpeg_worker = new Worker('ffmpeg-worker.js');
+		// Load FFmpeg
+		await ffmpegOperation('LOAD', {});
+	}
+
     // Retrieve video settings
     const lifetimeSlider = document.getElementById('lifetime');
     const lifetime = parseFloat(lifetimeSlider.value); // in seconds
-    const fps = 30;
+    const fps = 120;
+    const save_fps = 30;
     const totalFrames = Math.floor(lifetime * fps);
 
     // Define video dimensions
@@ -222,63 +245,76 @@ async function createVideo() {
     // Initialize off-screen framebuffer
     const offscreenFramebuffer = initializeOffscreenFramebuffer(recordCanvasWidth, recordCanvasHeight);
 
-	var videoWriter = new WebMWriter({
-		quality: 0.99999,    // WebM image quality from 0.0 (worst) to 0.99999 (best), 1.00 (VP8L lossless) is not supported
-		fileWriter: null, // FileWriter in order to stream to a file instead of buffering to memory (optional)
-		fd: null,         // Node.js file handle to write to instead of buffering to memory (optional)
-
-		// You must supply one of:
-		frameDuration: null, // Duration of frames in milliseconds
-		frameRate: fps,     // Number of frames per second
-
-		transparent: true,      // True if an alpha channel should be included in the video
-		alphaQuality: 0.99999, // Allows you to set the quality level of the alpha channel separately.
-		                         // If not specified this defaults to the same value as `quality`.
-	});
-
-
-    // Start the encoder
-//    encoder.start();
 
     console.log('Video encoding started.');
 
-	const tempCanvas = document.createElement('canvas');
-	tempCanvas.width = recordCanvasWidth;
-	tempCanvas.height = recordCanvasHeight;
-	tempCanvas.style.display = 'none';
-
+	const tempCanvas = new OffscreenCanvas(recordCanvasWidth, recordCanvasHeight);
 	const tempCtx = tempCanvas.getContext('2d');
-	document.body.appendChild(tempCanvas);
+
+	await ffmpegOperation('CREATE_DIR', {
+            path: `frames`
+        });
 
     // Capture and encode each frame
     for (let frame = 0; frame < totalFrames; frame++) {
-        const imageData = await captureFrame(frame, offscreenFramebuffer.framebuffer);
+        const imageData = await captureFrame(frame, offscreenFramebuffer.framebuffer, fps);
 	   	tempCtx.putImageData(imageData, 0, 0);
 
-        videoWriter.addFrame(tempCanvas, { timestamp: (frame * 1000) / fps });
+        // Convert canvas to blob and write to FFmpeg virtual filesystem
+        const blob = await tempCanvas.convertToBlob({type: 'image/png'});
+        const frameData = new Uint8Array(await blob.arrayBuffer());
+
+        await ffmpegOperation('WRITE_FILE', {
+            path: `frames/frame_${frame.toString().padStart(6, '0')}.png`,
+            data: frameData
+        });
     }
+
+    offscreenFramebuffer.destroy();
 
     console.log('All frames captured and encoded. Flushing encoder.');
 
-    // Flush and close the encoder
 
-    videoWriter.complete().then(function(webMBlob) {
-		// Create a download link and trigger it
-		const downloadLink = document.createElement('a');
-		downloadLink.href = URL.createObjectURL(webMBlob);
-		downloadLink.download = 'recorded_video.webm';
-		downloadLink.textContent = 'Download Video';
+    // Run FFmpeg command
 
-		// Append the link to the body
-		document.body.appendChild(downloadLink);
-
-		// Automatically trigger the download
-		downloadLink.click();
-
-		// Clean up by removing the download link
-		document.body.removeChild(downloadLink);
-    	document.body.removeChild(tempCanvas);
-
-		console.log('Video download initiated.');
+    await ffmpegOperation('EXEC', {
+    args: [
+        '-framerate', `${save_fps}`,
+        '-i', 'frames/frame_%06d.png',
+        '-c:v', 'libvpx-vp9',  // Use libvpx-vp9 for VP9 encoding
+        '-lossless', '1',      // Enable lossless mode
+        'output.webm'          // Output file
+    ]
 	});
+/*
+    await ffmpegOperation('EXEC', {
+        args: [
+            '-framerate', `${save_fps}`,
+            '-i', 'frames/frame_%06d.png',
+            '-c:v', 'vp8',
+            '-b:v', '10M',
+            '-auto-alt-ref', '0',
+            'output.webm'
+        ]
+    });*/
+
+    console.log('encoded video, deleting temporary data.');
+
+//	await deleteDirectoryWithContents('frames');
+
+// doesn't reach this
+    console.log('fetching data.');
+
+    // Read the output file
+    const data = await ffmpegOperation('READ_FILE', {
+        path: 'output.webm'
+    });
+
+    const url = URL.createObjectURL(new Blob([data.buffer], { type: 'video/webm' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'recorded_video.webm';
+    a.click();
+
+	console.log('Video download initiated.');
 }

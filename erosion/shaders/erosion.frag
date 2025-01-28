@@ -14,6 +14,7 @@ uniform vec2 u_viewportSize;
 in vec2 v_texCoord;
 in vec2 v_texCoordPx;
 in vec3 f_life;
+flat in float textureRatio;
 
 out vec4 fragColor;
 
@@ -28,13 +29,30 @@ vec4 GetColorOriginal(vec2 texCoord)
 	float fadeOutEnd    = texEffect.g * u_fadeOutDuration + u_fadeOutStart;
 	float fadeProgress  = (u_time - fadeInStart) / (fadeOutEnd - fadeInStart);
 
-    vec2 rampUV_in = vec2(f_life.r * 0.5, 1.0 - fadeInFactor);
-    vec2 rampUV_out = vec2((0.5f + f_life.g * 0.5), fadeOutFactor);
+	vec4 texBLEND = vec4(texEffect.rg, fadeProgress, 1.0);
 
-    vec4 texIN = texture(u_gradient, rampUV_in);
-    vec4 texOUT= texture(u_gradient, rampUV_out);
+	if(textureRatio > 2.0)
+	{
+		float z = clamp(fadeProgress * (textureRatio - 1.0), 0.0, textureRatio - 1.0);
 
-    vec4 texBLEND = mix(texIN, texOUT, vec4(f_life.b));
+		vec2 rampUV_in = vec2(texEffect.rg / vec2(1, textureRatio)) + vec2(0, floor(z) / textureRatio);
+		vec2 rampUV_out = vec2(texEffect.rg / vec2(1, textureRatio)) + vec2(0, ceil(z) / textureRatio);
+
+		vec4 texIN = texture(u_gradient, rampUV_in);
+		vec4 texOUT= texture(u_gradient, rampUV_out);
+
+		texBLEND = mix(texIN, texOUT, fract(z));
+	}
+	else
+	{
+		vec2 rampUV_in = vec2(f_life.r * 0.5, 1.0 - fadeInFactor);
+		vec2 rampUV_out = vec2((0.5f + f_life.g * 0.5), fadeOutFactor);
+
+		vec4 texIN = texture(u_gradient, rampUV_in);
+		vec4 texOUT= texture(u_gradient, rampUV_out);
+
+		texBLEND = mix(texIN, texOUT, vec4(f_life.b));
+	}
 
 	fadeInFactor = clamp(fadeInFactor * 15.0 * (1.0 - texEffect.b), 0.0, 1.0);
 	fadeOutFactor = clamp(fadeOutFactor * 15.0 * (1.0 - texEffect.b), 0.0, 1.0);

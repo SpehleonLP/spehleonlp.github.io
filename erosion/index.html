@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Alpha Erosion</title>
-    <script src="coi-serviceworker.js"></script>
+    <script type="text/javascript" src="coi-serviceworker.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -32,16 +32,17 @@
             <input type="range" id="rate" min="0" max="1" step="0.01" value="1">
             <span id="rateValue">1</span>
         </div>
-
 		<div>
-			<p>Erosion Texture</p>
+            <label for="erosionTextureDrop_save">Erosion Texture</label>
+            <button id="erosionTextureDrop_save" class="video-button">Save</button>
 		    <div class="image-drop" id="erosionTextureDrop">
 		        <p>Drag & Drop</p>
 		    </div>
         </div>
 
 		<div>
-			<p>Gradient</p>
+			<label for="gradientDrop_save">Gradient Texture</label>
+            <button id="gradientDrop_save" class="video-button">Save</button>
 		    <div class="image-drop" id="gradientDrop">
 		        <p>Drag & Drop</p>
 		    </div>
@@ -72,11 +73,10 @@
         </div>
     </div>
 
-	<script type="text/javascript" src="webm-writer-0.3.0.js"></script>
-    <script src="progress.js"></script>
-    <script src="document_script.js"></script>
-    <script src="document_gl.js"></script>
-    <script src="create_video.js"></script>
-    <script src="create_textures.js"></script>
+    <script type="text/javascript" src="progress.js"></script>
+    <script type="text/javascript" src="document_script.js"></script>
+    <script type="text/javascript" src="document_gl.js"></script>
+    <script type="text/javascript" type="module" src="create_video.js"></script>
+    <script type="text/javascript" src="create_textures.js"></script>
 </body>
 </html>

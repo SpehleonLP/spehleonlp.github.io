@@ -3,6 +3,8 @@
 // these get overwritten when we load an image
 let recordCanvasWidth = 32;
 let recordCanvasHeight = 32;
+let gradientCanvasWidth = 32;
+let gradientCanvasHeight = 32;
 let renderDelegate = null; // this will be populated by function render(time, isInFrameBuffer) by the time you use it
 let glContext = null; // this will contain the gl context from the canvas
 let is_making_video = false;
@@ -17,13 +19,48 @@ function UploadTexture(gl, texture, dropAreaId, textureUnit, image)
 		recordCanvasWidth = image.width;
 		recordCanvasHeight = image.height;
 	}
+	else if(textureUnit == 1)
+	{
+		gradientCanvasWidth = image.width;
+		gradientCanvasHeight = image.height;
+	}
 
     gl.activeTexture(gl.TEXTURE0 + textureUnit);
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
     gl.generateMipmap(gl.TEXTURE_2D);
-    dropArea.style.backgroundImage = `url(${image.src})`;;
+
+
+    // Determine how to set the background image based on the type of `image`
+    if (image instanceof Image && image.src) {
+        // If `image` is an Image object with a `src` property
+        dropArea.style.backgroundImage = `url(${image.src})`;
+    } else if (image instanceof ImageData) {
+        // If `image` is an ImageData object, convert it to a Data URL
+        const dataURL = imageDataToDataURL(image);
+        dropArea.style.backgroundImage = `url(${dataURL})`;
+    } else {
+        // If `image` is neither, handle accordingly (optional)
+        dropArea.style.backgroundImage = 'none';
+        console.warn('Unsupported image type:', image);
+    }
+
     dropArea.innerHTML = ''; // Remove the <p> text
+}
+
+// Helper function to convert ImageData to Data URL using a regular canvas
+function imageDataToDataURL(imageData) {
+    // Create a temporary canvas element
+    const canvas = document.createElement('canvas');
+    canvas.width = imageData.width;
+    canvas.height = imageData.height;
+    const ctx = canvas.getContext('2d');
+
+    // Draw the ImageData onto the canvas
+    ctx.putImageData(imageData, 0, 0);
+
+    // Extract the Data URL from the canvas
+    return canvas.toDataURL();
 }
 
 function LoadImageAndUpload(gl, texture, dropAreaId, textureUnit, src) {
@@ -194,9 +231,9 @@ document.addEventListener('DOMContentLoaded', () => {
         setupTextureUpload(gl, textures.u_erosionTexture, 'erosionTextureDrop', 0);
         setupTextureUpload(gl, textures.u_gradient, 'gradientDrop', 1);
 
-        LoadImageAndUpload(gl, textures.u_erosionTexture, 'erosionTextureDrop', 0, "fxMapInOut-boost.png");
-        LoadImageAndUpload(gl, textures.u_gradient, 'gradientDrop', 1, "boom_ramp2D.png");
-        playPauseButton.click();
+   //     LoadImageAndUpload(gl, textures.u_erosionTexture, 'erosionTextureDrop', 0, "fxMapInOut-boost.png");
+   //     LoadImageAndUpload(gl, textures.u_gradient, 'gradientDrop', 1, "boom_ramp2D.png");
+   //     playPauseButton.click();
 
         renderDelegate = render;
     })
@@ -309,6 +346,59 @@ function initBuffers(gl, attribLocations) {
 	return buffer;
 }
 
+function saveGlImage(glContext, texture, texWidth, texHeight, filename) {
+    // Get the WebGL context
+    const gl = glContext;
+
+    // Create a temporary framebuffer
+    const framebuffer = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+
+    // Attach the texture to the framebuffer
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+
+    // Check if the framebuffer is complete
+    if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) {
+        console.error('Framebuffer is not complete.');
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.deleteFramebuffer(framebuffer);
+        return;
+    }
+
+    // Allocate buffer to read the pixels
+    const pixels = new Uint8Array(texWidth * texHeight * 4); // RGBA
+
+    // Read the pixels from the framebuffer
+    gl.readPixels(0, 0, texWidth, texHeight, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+
+    // Unbind and delete the framebuffer
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.deleteFramebuffer(framebuffer);
+
+    // Create a temporary canvas to draw the image
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = texWidth;
+    tempCanvas.height = texHeight;
+    const ctx = tempCanvas.getContext('2d');
+
+    // Create ImageData and populate it with the pixel data
+    const imageData = ctx.createImageData(texWidth, texHeight);
+    imageData.data.set(pixels);
+    ctx.putImageData(imageData, 0, 0);
+
+    // Convert the canvas to a data URL (PNG format)
+    tempCanvas.toBlob(function(blob) {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+
+        // Append the link, click it, and remove it
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }, 'image/png');
+}
+
 
 
 /**
@@ -375,4 +465,12 @@ function setupTextureUpload(gl, texture, dropAreaId, textureUnit) {
         }
         input.click();
     });
+
+     document.getElementById(dropAreaId + '_save').addEventListener('click', () => {
+     	if(textureUnit == 0)
+     		saveGlImage(gl, texture, recordCanvasWidth, recordCanvasHeight, dropAreaId + '.png');
+     	else
+     		saveGlImage(gl, texture, gradientCanvasWidth, gradientCanvasHeight, dropAreaId + '.png');
+
+     });
 }

@@ -8,23 +8,36 @@ class VideoProcessorWorker {
     constructor() {
         this.module = null;
         this.initialized = false;
-        this.totalFrames = 0;
         this.width = 0;
         this.height = 0;
+
+        console.log("created worker");
     }
 
     // Initialize the WASM module
     async init() {
         return new Promise((resolve, reject) => {
-            createModule({
-                onRuntimeInitialized: () => {
+            createModule(
+                {
+                    onError: (err) => {
+                        reject(err);
+                    }
+                }
+            ).then(Module => {
+                try {
+                    // Verify that Module is defined
+                    if (typeof Module === 'undefined') {
+                        throw new Error("Module is undefined after runtime initialization.");
+                    }
+
                     this.module = Module;
+                    // Initialize C functions
                     this.initializeCFunctions();
                     this.initialized = true;
                     resolve();
-                },
-                onError: (err) => {
-                    reject(err);
+                } catch (initError) {
+                    console.log(`Initialization Error: ${initError.message}`);
+                    reject(initError);
                 }
             });
         });
@@ -32,29 +45,71 @@ class VideoProcessorWorker {
 
     // Wrap exported C functions using cwrap
     initializeCFunctions() {
-        this.initialize = this.module.cwrap('initialize', null, ['number', 'number', 'number']);
+        if (typeof this.module.cwrap !== 'function') {
+            console.error("cwrap is not available. Ensure it's exported during compilation.");
+            return;
+        }
+
+        if (typeof this.module._malloc !== 'function' || typeof this.module._free !== 'function') {
+            console.log("module:", this.module);
+            console.error("malloc or free is not available. Ensure they're exported during compilation.");
+            return;
+        }
+
+        if (typeof this.module.getValue !== 'function' || typeof this.module.setValue !== 'function') {
+            console.log("module:", this.module);
+            console.error("getValue or setValue is not available. Ensure they're exported during compilation.");
+            return;
+        }
+
+
+        this.initialize = this.module.cwrap('initialize', null, ['number', 'number']);
         this.push_frame = this.module.cwrap('push_frame', null, ['number']);
+        this.finished_pass = this.module.cwrap('finish_pass', 'number', []);
         this.finish_processing = this.module.cwrap('finish_processing', null, []);
         this.get_image = this.module.cwrap('get_image', 'number', ['number']);
         this.shutdownAndRelease = this.module.cwrap('shutdownAndRelease', null, []);
+
+        console.log("push_frame function bound:", !!this.push_frame);
+        console.log("finished_pass function bound:", !!this.finished_pass);
+        console.log("finish_processing function bound:", !!this.finish_processing);
+        console.log("get_image function bound:", !!this.get_image);
+        console.log("shutdownAndRelease function bound:", !!this.shutdownAndRelease);
     }
 
     // Initialize the C processor
-    initializeProcessor(totalFrames, width, height) {
-        this.totalFrames = totalFrames;
+    initializeProcessor(width, height) {
         this.width = width;
         this.height = height;
-        this.initialize(totalFrames, width, height);
+        this.initialize(width, height);
     }
 
     // Push a frame to the C processor
-    pushFrame(data) {
-        const numBytes = data.length;
-        const ptr = this.module._malloc(numBytes);
-        this.module.HEAPU8.set(data, ptr);
-        this.push_frame(ptr);
-        this.module._free(ptr);
+	pushFrame(frameDataBuffer) {
+		// Ensure frameDataBuffer is an ArrayBuffer or Uint8Array
+		let data;
+		if (frameDataBuffer instanceof ArrayBuffer) {
+		    data = new Uint8Array(frameDataBuffer);
+		} else if (frameDataBuffer instanceof Uint8Array) {
+		    data = frameDataBuffer;
+		} else {
+		    throw new Error('Expected an ArrayBuffer or Uint8Array.');
+		}
+
+		const numBytes = data.length;
+
+		const ptr = this.module._malloc(numBytes); // Allocate memory in WebAssembly
+		this.module.HEAPU8.set(data, ptr);         // Copy data into WebAssembly memory
+		this.push_frame(ptr);                      // Call the C function
+		this.module._free(ptr);                    // Free allocated memory
+	}
+
+
+    // Finish processing and retrieve images
+    finishPass() {
+        this.finished_pass();
     }
+
 
     // Finish processing and retrieve images
     finishProcessing() {
@@ -77,11 +132,12 @@ class VideoProcessorWorker {
 
         const width = this.module.getValue(ptr, 'i32');
         const height = this.module.getValue(ptr + 4, 'i32');
-        const dataPtr = ptr + 8;
-        const dataLength = width * height * 4;
+        const depth = this.module.getValue(ptr + 8, 'i32');
+        const dataPtr = ptr + 16;
+        const dataLength = depth * width * height * 4;
         const data = new Uint8ClampedArray(this.module.HEAPU8.buffer, dataPtr, dataLength).slice();
 
-        return new ImageData(new Uint8ClampedArray(data), width, height);
+        return new ImageData(new Uint8ClampedArray(data), width, height * depth);
     }
 }
 
@@ -95,23 +151,32 @@ processor.init().then(() => {
     self.postMessage({ type: 'init', success: false, error: err.message });
 });
 
-// Listen for messages from the main thread
 self.onmessage = function(e) {
-    const { type, data } = e.data;
-
-    if (type === 'initialize') {
-        const { totalFrames, width, height } = data;
-        processor.initializeProcessor(totalFrames, width, height);
-        self.postMessage({ type: 'initialize', success: true });
+    const { id, type, data } = e.data;
+    try {
+        switch(type) {
+            case 'initialize':
+                // Initialize your processor with data.width and data.height
+                processor.initializeProcessor(data.width, data.height);
+                self.postMessage({ id, type: 'initialized' });
+                break;
+            case 'pushFrame':
+                // Assuming data.frameData is an ArrayBuffer
+                processor.pushFrame(data.frameData);
+                self.postMessage({ id, type: 'framePushed' });
+                break;
+            case 'finishPass':
+                processor.finishPass();
+                self.postMessage({ id, type: 'passFinished' });
+                break;
+            case 'finish':
+                const results = processor.finishProcessing();
+                self.postMessage({ id, type: 'finished', data: results });
+                break;
+            default:
+                throw new Error(`Unknown message type: ${type}`);
+        }
+    } catch (error) {
+        self.postMessage({ id, type: 'ERROR', data: error.message });
     }
-    else if (type === 'pushFrame') {
-        const { frameData } = data;
-        processor.pushFrame(frameData);
-        // Optionally, you can send progress updates here
-        // For simplicity, we're not tracking progress within the worker
-    }
-    else if (type === 'finish') {
-        const images = processor.finishProcessing();
-        self.postMessage({ type: 'finished', images });
-    }
-};
+}

@@ -7,17 +7,28 @@
 #include "create_envelopes.h"
 #include "create_gradient.h"
 
+struct Video
+{
+	uint32_t width;
+	uint32_t height;
+	uint32_t no_frames;
+	uint32_t allocated;
+	uint8_t * frames[];
+};
 
+struct Metadata
+{
+	float fadeInDuration;
+	float fadeOutDuration;
+};
 
 // Global variables to store images
 static ImageData* images[2] = { NULL, NULL };
-static int total_frames = 0;
-static int current_frame = 0;
-static int frame_width = 0;
-static int frame_height = 0;
-static int pass = 0;
 static EnvelopeBuilder * envelopeBuilder = 0;
 static GradientBuilder * gradientBuilder = 0;
+static struct Video * video = 0;
+static struct Metadata metadata;
+
 
 int max_i32(int, int);
 
@@ -86,6 +97,11 @@ void initUVCube(ImageData* image) {
     }
 }
 
+EMSCRIPTEN_KEEPALIVE
+struct Metadata * GetMetadata()
+{
+	return &metadata;
+}
 
 // Initialize the processor
 EMSCRIPTEN_KEEPALIVE
@@ -94,76 +110,107 @@ void initialize(int width, int height) {
 		e_Free(envelopeBuilder);
 
 	envelopeBuilder = e_Initialize(width, height);
+	video = calloc(sizeof(struct Video) + sizeof(uint8_t*)*8, 1);
+	video->width = width;
+	video->height = height;
+	video->allocated = 8;
 
-    frame_width = width;
-    frame_height = height;
-    current_frame = 0;
-    pass = 0;
+	printf("initialized with width of %d and height of %d\n", width, height);
 
 	images[0] = MakeImage(width, height, 1);
-	images[1] = MakeImage(64, 32, 32);
+	images[1] = MakeImage(128, 128, 1);
 
 	initUVCube(images[0]);
 	initUVCube(images[1]);
 }
 
 EMSCRIPTEN_KEEPALIVE
-int finish_pass()
+int finishPushingFrames()
 {
-	++pass;
-    if(pass == 1)
-    {
-        total_frames = current_frame;
+	fprintf(stdout, "done pushing frames\n");
 
+    if(envelopeBuilder)
+    {
         EnvelopeMetadata mta;
-    	e_Build(envelopeBuilder, images[0], &mta, current_frame);
+
+		fprintf(stdout, "building envelope\n");
+    	e_Build(envelopeBuilder, images[0], &mta, video->no_frames);
     	e_Free(envelopeBuilder);
     	envelopeBuilder = 0;
-		current_frame = 0;
+
+		metadata.fadeInDuration = mta.max_attack_frame / (float)mta.total_frames ;
+		metadata.fadeOutDuration = (mta.max_release_frame -  mta.min_release_frame) / (float)mta.total_frames ;
 
 	    gradientBuilder = g_Initialize(images[0], images[1], &mta);
 
     	return 1;
     }
 
-    if(pass == 2)
-    {
-    	g_Build(gradientBuilder, images[1], current_frame);
-    	g_Free(gradientBuilder);
-
-    	gradientBuilder = 0;
-		current_frame = 0;
-    }
-
-	return 0;
-
+	return -1;
 }
 
 // Push a frame into the processor
 EMSCRIPTEN_KEEPALIVE
-void push_frame(uint8_t* data) {
+void push_frame(uint8_t* data, uint32_t byteLength) {
 	ImageData img;
-	img.width = frame_width;
-	img.height = frame_height;
+	img.width = video->width;
+	img.height = video->height;
     img.depth = 1;
 	img.data = data;
 
-    if(pass == 0)
-    {
-      	e_ProcessFrame(envelopeBuilder, &img, current_frame);
-	}
-    if(pass == 1)
-    {
-      	g_ProcessFrame(gradientBuilder, &img, current_frame);
+
+	uint32_t expectedLength = img.width*img.height*img.depth*4;
+	if(byteLength != expectedLength)
+	{
+		fprintf(stderr, "got buffer of size %d expected %d\n", byteLength, expectedLength);
 	}
 
-    current_frame++;
+	if(video->no_frames == video->allocated)
+	{
+		fprintf(stdout, "realloced\n");
+
+		uint32_t size = video->allocated * 2;
+		video = realloc(video, sizeof(struct Video) + sizeof(uint8_t*)*size);
+		video->allocated = size;
+	}
+
+	video->frames[video->no_frames++] = data;
+
+    if(envelopeBuilder)
+    {
+      	e_ProcessFrame(envelopeBuilder, &img, video->no_frames);
+    }
 }
 
-// Finish processing
 EMSCRIPTEN_KEEPALIVE
-void finish_processing() {
+void computeGradient()
+{
+    if(!gradientBuilder)
+    	return;
+
+	ImageData img;
+	img.width = video->width;
+	img.height = video->height;
+	img.depth = 1;
+
+	if(g_BuildFinished(gradientBuilder) == 0)
+	{
+		fprintf(stdout, "computing gradient\n");
+
+		for(uint32_t i = 0u; i < video->no_frames; ++i)
+		{
+			img.data = video->frames[i];
+			g_ProcessFrame(gradientBuilder, &img, i);
+		}
+	}
+	else
+	{
+	//	g_FillIn(gradientBuilder);
+	}
+
+	g_Build(gradientBuilder, images[1], video->no_frames);
 }
+
 
 // Get the processed image
 EMSCRIPTEN_KEEPALIVE
@@ -179,6 +226,17 @@ void shutdownAndRelease() {
         g_Free(gradientBuilder);
     if(envelopeBuilder)
         e_Free(envelopeBuilder);
+
+	if(video)
+	{
+		for(int i = 0; i < video->no_frames; ++i)
+		{
+			free(video->frames[i]);
+		}
+
+		free(video);
+		video = 0L;
+	}
 
     for (int i = 0; i < 2; ++i) {
         if (images[i]) {

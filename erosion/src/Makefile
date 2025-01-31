@@ -7,11 +7,11 @@ CC = emcc
 SRC = video_processor.c create_envelopes.c create_gradient.c
 
 # Output files
-OUT_JS = video_processor.js
-OUT_WASM = video_processor.wasm
+OUT_JS = ../scripts/video_processor.js
+OUT_WASM = ../scripts/video_processor.wasm
 
 # Exported C functions (add or remove functions as needed)
-EXPORT_FUNCTIONS = _initialize,_push_frame,_finish_processing,_get_image,_shutdownAndRelease,_malloc,_free
+EXPORT_FUNCTIONS = _initialize,_GetMetadata,_push_frame,_finishPushingFrames,_computeGradient,_get_image,_shutdownAndRelease,_malloc,_free
 
 # Exported runtime methods (keep necessary methods only)
 EXPORT_RUNTIME_METHODS = ccall,cwrap,getValue,setValue

@@ -1,7 +1,11 @@
 #version 300 es
 precision mediump float;
+precision mediump sampler3D;
 uniform sampler2D u_erosionTexture;
 uniform sampler2D u_gradient;
+uniform sampler3D u_gradient3D;
+
+uniform float u_has3DGradient;
 
 uniform float u_fadeInDuration;
 uniform float u_fadeOutDuration;
@@ -18,6 +22,7 @@ flat in float textureRatio;
 
 out vec4 fragColor;
 
+
 vec4 GetColorOriginal(vec2 texCoord)
 {
 	vec4 texEffect = texture(u_erosionTexture, texCoord);
@@ -31,17 +36,9 @@ vec4 GetColorOriginal(vec2 texCoord)
 
 	vec4 texBLEND = vec4(texEffect.rg, fadeProgress, 1.0);
 
-	if(textureRatio > 2.0)
+	if(u_has3DGradient != 0.0)
 	{
-		float z = clamp(fadeProgress * (textureRatio - 1.0), 0.0, textureRatio - 1.0);
-
-		vec2 rampUV_in = vec2(texEffect.rg / vec2(1, textureRatio)) + vec2(0, floor(z) / textureRatio);
-		vec2 rampUV_out = vec2(texEffect.rg / vec2(1, textureRatio)) + vec2(0, ceil(z) / textureRatio);
-
-		vec4 texIN = texture(u_gradient, rampUV_in);
-		vec4 texOUT= texture(u_gradient, rampUV_out);
-
-		texBLEND = mix(texIN, texOUT, fract(z));
+		texBLEND = texture(u_gradient3D, vec3(texEffect.rg, fadeProgress));
 	}
 	else
 	{

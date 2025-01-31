@@ -1,6 +1,7 @@
 // create_video.js
 
 let ffmpeg_worker = null;
+let ff_logger = null;
 let ff_messageCounter = 0;
 
 const ffmpegOperation = (type, data) => {

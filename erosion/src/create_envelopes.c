@@ -22,19 +22,6 @@ enum
 };
 
 
-union Color
-{
-	struct
-	{
-		uint8_t r;
-		uint8_t g;
-		uint8_t b;
-		uint8_t a;
-	};
-
-	uint32_t c;
-};
-
 
 uint8_t GetAlpha(const union Color* key, const union Color* sample)
 {
@@ -146,8 +133,8 @@ EnvelopeBuilder * e_Initialize(int width, int height)
     return builder;
 }
 
-#define TEST_X (429)
-#define TEST_Y (75)
+#define TEST_X (317)
+#define TEST_Y (153)
 
 int e_ProcessFrame(EnvelopeBuilder * builder, ImageData const* src, int frame_id)
 {
@@ -228,6 +215,7 @@ int e_ProcessFrame(EnvelopeBuilder * builder, ImageData const* src, int frame_id
 		                pixel->current.min_release_alpha = current_alpha;
 		            	pixel->in_envelope = IN_RELEASE;
 
+		                PRINT_F("Process frame: entering release state, %d\n", frame_id);
 		                if(current_alpha == 0)
 		                {
 		                    pixel->in_envelope = NOT_IN_ENVELOPE;
@@ -235,7 +223,6 @@ int e_ProcessFrame(EnvelopeBuilder * builder, ImageData const* src, int frame_id
 		                    pixel->current.release_end = frame_id;
 		                    goto left_envelope;
 		                }
-		                PRINT_F("Process frame: entering release state, %d\n", frame_id);
 		            }
 		            break;
 		      case IN_RELEASE:
@@ -249,6 +236,7 @@ int e_ProcessFrame(EnvelopeBuilder * builder, ImageData const* src, int frame_id
 		                else
 		                {
 		            		pixel->in_envelope = NOT_IN_ENVELOPE;
+		               		pixel->current.release_end = frame_id-1;
 		                   PRINT_F("Process frame: exiting envelope, %d\n", frame_id);
 		                }
 		            }
@@ -287,6 +275,15 @@ int e_ProcessFrame(EnvelopeBuilder * builder, ImageData const* src, int frame_id
 		            // reset
 		                memset(&pixel->current, 0, sizeof(struct Envelope));
 		            }
+		            else
+		            {
+						PRINT_F("pixel->in_envelope = %d\npixel->current.release_end = %d\npixel->current.attack_start = %d\npixel->current.max_alpha=%d\n",
+								pixel->in_envelope,
+								pixel->current.release_end,
+								pixel->current.attack_start,
+								pixel->current.max_alpha
+							);
+					}
 		            break;
 		       default:
 		           break;
@@ -352,6 +349,7 @@ int e_Build(EnvelopeBuilder * builder, ImageData * dst, EnvelopeMetadata * out, 
     m.max_attack_frame = 0;
     m.min_release_frame = total_frames;
     m.max_release_frame = 0;
+    m.key = builder->key;
 
     for (int i = 0; i < builder->width * builder->height; i++) {
         if (builder->pixels[i].has_best) {

@@ -64,17 +64,19 @@ class VideoProcessorWorker {
 
 
         this.initialize = this.module.cwrap('initialize', null, ['number', 'number']);
-        this.push_frame = this.module.cwrap('push_frame', null, ['number']);
-        this.finished_pass = this.module.cwrap('finish_pass', 'number', []);
-        this.finish_processing = this.module.cwrap('finish_processing', null, []);
+        this.push_frame = this.module.cwrap('push_frame', null, ['number', 'number']);
+        this.finishPushingFrames = this.module.cwrap('finishPushingFrames', 'number', []);
+        this.computeGradient = this.module.cwrap('computeGradient', null, []);
         this.get_image = this.module.cwrap('get_image', 'number', ['number']);
+        this.GetMetadata = this.module.cwrap('GetMetadata', 'number', []);
         this.shutdownAndRelease = this.module.cwrap('shutdownAndRelease', null, []);
 
         console.log("push_frame function bound:", !!this.push_frame);
-        console.log("finished_pass function bound:", !!this.finished_pass);
-        console.log("finish_processing function bound:", !!this.finish_processing);
+        console.log("finishPushingFrames function bound:", !!this.finishPushingFrames);
         console.log("get_image function bound:", !!this.get_image);
+        console.log("GetMetadata function bound:", !!this.GetMetadata);
         console.log("shutdownAndRelease function bound:", !!this.shutdownAndRelease);
+        console.log("computeGradient function bound:", !!this.computeGradient);
     }
 
     // Initialize the C processor
@@ -90,7 +92,8 @@ class VideoProcessorWorker {
 		let data;
 		if (frameDataBuffer instanceof ArrayBuffer) {
 		    data = new Uint8Array(frameDataBuffer);
-		} else if (frameDataBuffer instanceof Uint8Array) {
+		} else if (frameDataBuffer instanceof Uint8Array
+		|| frameDataBuffer instanceof Uint8ClampedArray) {
 		    data = frameDataBuffer;
 		} else {
 		    throw new Error('Expected an ArrayBuffer or Uint8Array.');
@@ -100,31 +103,31 @@ class VideoProcessorWorker {
 
 		const ptr = this.module._malloc(numBytes); // Allocate memory in WebAssembly
 		this.module.HEAPU8.set(data, ptr);         // Copy data into WebAssembly memory
-		this.push_frame(ptr);                      // Call the C function
-		this.module._free(ptr);                    // Free allocated memory
+		this.push_frame(ptr, numBytes);                      // Call the C function
+	//	this.module._free(ptr);                    // Free allocated memory
 	}
 
+    finishPushingFrames() {
+        this.finishPushingFrames();
+    }
 
-    // Finish processing and retrieve images
-    finishPass() {
-        this.finished_pass();
+    FetchMetadata() {
+        const ptr = this.GetMetadata(1);
+        const fadeInDuration = this.module.getValue(ptr, 'float');
+        const fadeOutDuration = this.module.getValue(ptr + 4, 'float');
+        return { fadeInDuration, fadeOutDuration };
     }
 
 
-    // Finish processing and retrieve images
-    finishProcessing() {
-        this.finish_processing();
+	getGradient()
+	{
+        this.computeGradient();
 
-        const erosionPtr = this.get_image(0);
         const gradientPtr = this.get_image(1);
+        const gradient = this.extract3DTexture(gradientPtr);
 
-        const erosion = this.extractImageData(erosionPtr);
-        const gradient = this.extractImageData(gradientPtr);
-
-        this.shutdownAndRelease();
-
-        return { erosion, gradient };
-    }
+        return gradient;
+	}
 
     // Extract ImageData from a pointer
     extractImageData(ptr) {
@@ -133,11 +136,24 @@ class VideoProcessorWorker {
         const width = this.module.getValue(ptr, 'i32');
         const height = this.module.getValue(ptr + 4, 'i32');
         const depth = this.module.getValue(ptr + 8, 'i32');
-        const dataPtr = ptr + 16;
+        const dataPtr = this.module.getValue(ptr + 16, '*');
         const dataLength = depth * width * height * 4;
         const data = new Uint8ClampedArray(this.module.HEAPU8.buffer, dataPtr, dataLength).slice();
 
         return new ImageData(new Uint8ClampedArray(data), width, height * depth);
+    }
+
+    extract3DTexture(ptr) {
+        if (ptr === 0) return null;
+
+        const width = this.module.getValue(ptr, 'i32');
+        const height = this.module.getValue(ptr + 4, 'i32');
+        const depth = this.module.getValue(ptr + 8, 'i32');
+        const dataPtr = this.module.getValue(ptr + 16, '*');
+        const dataLength = depth * width * height * 4;
+        const data = new Uint8ClampedArray(this.module.HEAPU8.buffer, dataPtr, dataLength).slice();
+
+        return {buffer:new Uint8ClampedArray(data), width: width, height: height, depth: depth };
     }
 }
 
@@ -169,9 +185,27 @@ self.onmessage = function(e) {
                 processor.finishPass();
                 self.postMessage({ id, type: 'passFinished' });
                 break;
-            case 'finish':
-                const results = processor.finishProcessing();
-                self.postMessage({ id, type: 'finished', data: results });
+            case 'finishPushingFrames':
+            {
+                processor.finishPushingFrames();
+                const erosionPtr = processor.get_image(0);
+       		 	const erosion = processor.extractImageData(erosionPtr);
+
+                self.postMessage({ id, type: 'finished', data: erosion });
+            }   break;
+            case 'computeGradient':
+            {
+                const results = processor.getGradient();
+                self.postMessage({ id, type: 'computedGradient', data: results });
+            }   break;
+            case 'GetMetadata':
+            {
+                const results = processor.FetchMetadata();
+                self.postMessage({ id, type: 'GotMetadata', data: results });
+            }   break;
+            case 'shutdownAndRelease':
+                processor.shutdownAndRelease();
+                self.postMessage({ id, type: 'shutdown' });
                 break;
             default:
                 throw new Error(`Unknown message type: ${type}`);

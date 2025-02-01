@@ -75,7 +75,7 @@ void main()
 
 	if(texCoord.x < 1.0 && texCoord.y < 1.0)
 	{
-		object = GetColorOriginal(texCoord * 2.0);
+		object = GetColorOriginal(texCoord);
 	}
 	else if(texCoord.x < 1.0 && texCoord.y < 2.0)
 	{

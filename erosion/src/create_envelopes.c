@@ -8,6 +8,8 @@ int min_i32(int a, int b) { return a < b? a : b; }
 int max_i32(int a, int b) { return a > b? a : b; }
 float min_f32(float a, float b) { return a < b? a : b; }
 float max_f32(float a, float b) { return a > b? a : b; }
+int clamp_i32(int a, int b, int c);
+float clamp_f32(float a, float b, float c);
 
 
 enum
@@ -212,6 +214,7 @@ int e_ProcessFrame(EnvelopeBuilder * builder, ImageData const* src, int frame_id
 
 		            if (current_alpha  < pixel->current.max_alpha) {
 		                pixel->current.release_start = frame_id;
+		               	pixel->current.release_end = frame_id;
 		                pixel->current.min_release_alpha = current_alpha;
 		            	pixel->in_envelope = IN_RELEASE;
 
@@ -236,7 +239,6 @@ int e_ProcessFrame(EnvelopeBuilder * builder, ImageData const* src, int frame_id
 		                else
 		                {
 		            		pixel->in_envelope = NOT_IN_ENVELOPE;
-		               		pixel->current.release_end = frame_id-1;
 		                   PRINT_F("Process frame: exiting envelope, %d\n", frame_id);
 		                }
 		            }
@@ -380,6 +382,10 @@ int e_Build(EnvelopeBuilder * builder, ImageData * dst, EnvelopeMetadata * out, 
     float attack_duration = max_i32(1, m.max_attack_frame - m.min_attack_frame);
     float release_duration = max_i32(1, m.max_release_frame - m.min_release_frame);
 
+    const float fadeInDuration = attack_duration / (float)m.total_frames ;
+    const float fadeOutDuration = release_duration / (float)m.total_frames ;
+    const float fadeOutStart = m.min_release_frame / (float)m.total_frames ;
+
     int H = min_i32(builder->height, dst->height);
     int W = min_i32(builder->width, dst->width);
 
@@ -406,11 +412,15 @@ int e_Build(EnvelopeBuilder * builder, ImageData * dst, EnvelopeMetadata * out, 
                 delta_alpha = (pixel->best.max_alpha - pixel->best.min_release_alpha);
                 float release_speed = delta_alpha / (pixel->best.release_end - pixel->best.release_start);
 
-                float hardness = min_f32(attack_speed, release_speed);
+				float attack_softenss  = 1.0 - (attack_speed * (m.max_attack_frame - m.min_attack_frame) / (15.0 * m.total_frames));
+				float release_softenss = 1.0 - (release_speed * (m.max_release_frame - m.min_release_frame) / (15.0 * m.total_frames));
+
+// normalized alpha per fade
+                float softness = min_f32(attack_softenss, release_softenss );
 
                 dst->data[dst_idx + 0] = (uint8_t)((1.0f - attack_norm) * 255);
                 dst->data[dst_idx + 1] = (uint8_t)(release_norm * 255);
-                dst->data[dst_idx + 2] = 0; //TEST_X == x || TEST_Y == y? 255 : 0; //(uint8_t)(hardness * 255);
+                dst->data[dst_idx + 2] = clamp_i32(softness*255, 0, 255);
 
                 // A: Full opacity for valid pixels
                 dst->data[dst_idx + 3] = 255;

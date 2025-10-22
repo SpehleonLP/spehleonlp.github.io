@@ -27,6 +27,7 @@
         <div class="button-container">
             <button id="start-sensors" class="btn btn-primary">Enable Sensors</button>
             <button id="enable-gps" class="btn btn-secondary">Enable GPS</button>
+            <button id="reset-integration" class="btn btn-danger">Reset Integration</button>
         </div>
 
         <div class="sensor-grid">
@@ -80,6 +81,42 @@
                     <div class="data-row">
                         <span class="data-label">Z:</span>
                         <span id="gyro-z" class="data-value">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sensor-card">
+                <h3>Integrated Velocity</h3>
+                <div class="sensor-data">
+                    <div class="data-row">
+                        <span class="data-label">X:</span>
+                        <span id="vel-x" class="data-value">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Y:</span>
+                        <span id="vel-y" class="data-value">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Z:</span>
+                        <span id="vel-z" class="data-value">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sensor-card">
+                <h3>Integrated Position</h3>
+                <div class="sensor-data">
+                    <div class="data-row">
+                        <span class="data-label">X:</span>
+                        <span id="pos-x" class="data-value">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Y:</span>
+                        <span id="pos-y" class="data-value">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Z:</span>
+                        <span id="pos-z" class="data-value">-</span>
                     </div>
                 </div>
             </div>
@@ -141,9 +178,12 @@
                     <li><strong>Orientation:</strong> Device rotation in 3D space (mobile only)</li>
                     <li><strong>Acceleration:</strong> Linear movement of the device (mobile only)</li>
                     <li><strong>Gyroscope:</strong> Rotational velocity (mobile only)</li>
-                    <li><strong>GPS Velocity:</strong> Speed and heading from GPS (requires movement)</li>
-                    <li><strong>GPS Position:</strong> Latitude, longitude, and accuracy</li>
+                    <li><strong>Integrated Velocity:</strong> Velocity calculated by integrating acceleration over time</li>
+                    <li><strong>Integrated Position:</strong> Position calculated by integrating velocity over time</li>
+                    <li><strong>GPS Velocity:</strong> Speed and heading from GPS Doppler (requires movement)</li>
+                    <li><strong>GPS Position:</strong> Latitude, longitude, and accuracy from GPS</li>
                 </ul>
+                <p><strong>Note on Integration:</strong> Accelerometer-based position tracking accumulates errors over time (drift). Click "Reset Integration" to zero out the integrated velocity and position. Compare with GPS velocity to see the difference!</p>
             </div>
         </footer>
     </div>

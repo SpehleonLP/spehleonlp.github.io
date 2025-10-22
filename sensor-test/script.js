@@ -3,6 +3,8 @@ const sensorData = {
     orientation: { alpha: 0, beta: 0, gamma: 0 },
     acceleration: { x: 0, y: 0, z: 0 },
     gyroscope: { x: 0, y: 0, z: 0 },
+    velocity: { x: 0, y: 0, z: 0 },
+    position: { x: 0, y: 0, z: 0 },
     gps: {
         speed: null,
         heading: null,
@@ -13,9 +15,14 @@ const sensorData = {
     }
 };
 
+// Integration tracking
+let lastTimestamp = null;
+let integrationActive = false;
+
 // DOM elements
 const startButton = document.getElementById('start-sensors');
 const gpsButton = document.getElementById('enable-gps');
+const resetButton = document.getElementById('reset-integration');
 const sensorStatus = document.getElementById('sensor-status');
 const gpsStatus = document.getElementById('gps-status');
 
@@ -111,10 +118,18 @@ function handleOrientation(event) {
 
 // Handle device motion
 function handleMotion(event) {
+    const currentTimestamp = Date.now();
+
     if (event.acceleration) {
         sensorData.acceleration.x = event.acceleration.x || 0;
         sensorData.acceleration.y = event.acceleration.y || 0;
         sensorData.acceleration.z = event.acceleration.z || 0;
+
+        // Perform integration if we have a previous timestamp
+        if (lastTimestamp !== null && integrationActive) {
+            const deltaTime = (currentTimestamp - lastTimestamp) / 1000; // Convert to seconds
+            integrateAcceleration(deltaTime);
+        }
     }
 
     if (event.rotationRate) {
@@ -123,7 +138,38 @@ function handleMotion(event) {
         sensorData.gyroscope.z = event.rotationRate.gamma || 0;
     }
 
+    lastTimestamp = currentTimestamp;
     updateSensorDisplay();
+}
+
+// Integrate acceleration to get velocity, then integrate velocity to get position
+function integrateAcceleration(deltaTime) {
+    // Velocity integration: v = v0 + a * dt
+    sensorData.velocity.x += sensorData.acceleration.x * deltaTime;
+    sensorData.velocity.y += sensorData.acceleration.y * deltaTime;
+    sensorData.velocity.z += sensorData.acceleration.z * deltaTime;
+
+    // Position integration: p = p0 + v * dt
+    sensorData.position.x += sensorData.velocity.x * deltaTime;
+    sensorData.position.y += sensorData.velocity.y * deltaTime;
+    sensorData.position.z += sensorData.velocity.z * deltaTime;
+
+    // Update integrated displays
+    updateIntegratedDisplay();
+}
+
+// Reset integrated velocity and position
+function resetIntegration() {
+    console.log('Resetting integration...');
+    sensorData.velocity.x = 0;
+    sensorData.velocity.y = 0;
+    sensorData.velocity.z = 0;
+    sensorData.position.x = 0;
+    sensorData.position.y = 0;
+    sensorData.position.z = 0;
+    lastTimestamp = null;
+    integrationActive = true;
+    updateIntegratedDisplay();
 }
 
 // Update sensor display
@@ -134,14 +180,27 @@ function updateSensorDisplay() {
     updateElement('gamma', sensorData.orientation.gamma);
 
     // Acceleration
-    updateElement('accel-x', sensorData.acceleration.x);
-    updateElement('accel-y', sensorData.acceleration.y);
-    updateElement('accel-z', sensorData.acceleration.z);
+    updateElement('accel-x', sensorData.acceleration.x, ' m/s²');
+    updateElement('accel-y', sensorData.acceleration.y, ' m/s²');
+    updateElement('accel-z', sensorData.acceleration.z, ' m/s²');
 
     // Gyroscope
     updateElement('gyro-x', sensorData.gyroscope.x);
     updateElement('gyro-y', sensorData.gyroscope.y);
     updateElement('gyro-z', sensorData.gyroscope.z);
+}
+
+// Update integrated velocity and position display
+function updateIntegratedDisplay() {
+    // Integrated Velocity
+    updateElement('vel-x', sensorData.velocity.x, ' m/s');
+    updateElement('vel-y', sensorData.velocity.y, ' m/s');
+    updateElement('vel-z', sensorData.velocity.z, ' m/s');
+
+    // Integrated Position
+    updateElement('pos-x', sensorData.position.x, ' m');
+    updateElement('pos-y', sensorData.position.y, ' m');
+    updateElement('pos-z', sensorData.position.z, ' m');
 }
 
 // Enable GPS tracking
@@ -344,10 +403,22 @@ if (gpsButton) {
     console.error('GPS button not found!');
 }
 
+if (resetButton) {
+    console.log('Adding click listener to reset button');
+    resetButton.addEventListener('click', () => {
+        console.log('Reset button clicked!');
+        resetIntegration();
+    });
+} else {
+    console.error('Reset button not found!');
+}
+
 // Initialize on load
 window.addEventListener('load', () => {
     console.log('Page loaded, initializing...');
     checkSensorSupport();
+    // Initialize integration as active
+    integrationActive = true;
 });
 
 // Handle visibility change

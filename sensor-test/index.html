@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebXR Sensor Demo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>WebXR Sensor Access Demo</h1>
+            <p class="subtitle">Experience real-time device sensors through WebXR</p>
+        </header>
+
+        <div class="status-panel">
+            <div class="status-item">
+                <span class="label">WebXR Support:</span>
+                <span id="webxr-status" class="value">Checking...</span>
+            </div>
+            <div class="status-item">
+                <span class="label">Session Status:</span>
+                <span id="session-status" class="value">Not Started</span>
+            </div>
+        </div>
+
+        <div class="button-container">
+            <button id="start-ar" class="btn btn-primary">Start AR Session</button>
+            <button id="start-vr" class="btn btn-secondary">Start VR Session</button>
+            <button id="stop-session" class="btn btn-danger" disabled>Stop Session</button>
+        </div>
+
+        <div class="sensor-grid">
+            <div class="sensor-card">
+                <h3>Orientation</h3>
+                <div class="sensor-data">
+                    <div class="data-row">
+                        <span class="data-label">Alpha (Z):</span>
+                        <span id="alpha" class="data-value">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Beta (X):</span>
+                        <span id="beta" class="data-value">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Gamma (Y):</span>
+                        <span id="gamma" class="data-value">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sensor-card">
+                <h3>Acceleration</h3>
+                <div class="sensor-data">
+                    <div class="data-row">
+                        <span class="data-label">X:</span>
+                        <span id="accel-x" class="data-value">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Y:</span>
+                        <span id="accel-y" class="data-value">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Z:</span>
+                        <span id="accel-z" class="data-value">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sensor-card">
+                <h3>Gyroscope</h3>
+                <div class="sensor-data">
+                    <div class="data-row">
+                        <span class="data-label">X:</span>
+                        <span id="gyro-x" class="data-value">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Y:</span>
+                        <span id="gyro-y" class="data-value">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Z:</span>
+                        <span id="gyro-z" class="data-value">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sensor-card">
+                <h3>Position</h3>
+                <div class="sensor-data">
+                    <div class="data-row">
+                        <span class="data-label">X:</span>
+                        <span id="pos-x" class="data-value">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Y:</span>
+                        <span id="pos-y" class="data-value">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Z:</span>
+                        <span id="pos-z" class="data-value">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="xr-canvas"></canvas>
+        </div>
+
+        <footer>
+            <div class="info-box">
+                <h3>About This Demo</h3>
+                <p>This demo uses WebXR Device API to access device sensors. On iOS, use the
+                <a href="https://apps.apple.com/us/app/webxr-viewer/id1295998056" target="_blank">Mozilla WebXR Viewer</a>
+                for full compatibility.</p>
+                <ul>
+                    <li><strong>AR Mode:</strong> Uses device camera and sensors for augmented reality</li>
+                    <li><strong>VR Mode:</strong> Immersive virtual reality experience</li>
+                    <li><strong>Sensors:</strong> Orientation, acceleration, gyroscope, and position tracking</li>
+                </ul>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/webxr-polyfill@latest/build/webxr-polyfill.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

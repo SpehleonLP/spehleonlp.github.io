@@ -25,29 +25,41 @@ let gpsActive = false;
 
 // Check sensor availability
 function checkSensorSupport() {
+    console.log('Checking sensor support...');
+    console.log('DeviceOrientationEvent:', typeof DeviceOrientationEvent);
+    console.log('DeviceMotionEvent:', typeof DeviceMotionEvent);
+
     if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceMotionEvent !== 'undefined') {
         sensorStatus.textContent = 'Ready';
         sensorStatus.style.color = '#10b981';
 
         // Auto-start if no permission needed
         if (typeof DeviceOrientationEvent.requestPermission !== 'function') {
+            console.log('No permission needed, auto-starting sensors');
             startSensors();
+        } else {
+            console.log('Permission required, waiting for user click');
         }
     } else {
         sensorStatus.textContent = 'Not Supported';
         sensorStatus.style.color = '#ef4444';
-        startButton.disabled = true;
+        if (startButton) {
+            startButton.disabled = true;
+        }
     }
 }
 
 // Request sensor permissions and start tracking
 async function startSensors() {
+    console.log('startSensors() called');
     try {
         // Request permission for iOS 13+
         if (typeof DeviceOrientationEvent !== 'undefined' &&
             typeof DeviceOrientationEvent.requestPermission === 'function') {
 
+            console.log('Requesting device orientation permission...');
             const orientationPermission = await DeviceOrientationEvent.requestPermission();
+            console.log('Permission result:', orientationPermission);
 
             if (orientationPermission !== 'granted') {
                 sensorStatus.textContent = 'Permission Denied';
@@ -57,14 +69,19 @@ async function startSensors() {
         }
 
         // Start listening to sensors
+        console.log('Adding sensor event listeners...');
         window.addEventListener('deviceorientation', handleOrientation);
         window.addEventListener('devicemotion', handleMotion);
 
         sensorsActive = true;
         sensorStatus.textContent = 'Active';
         sensorStatus.style.color = '#10b981';
-        startButton.textContent = 'Sensors Active';
-        startButton.disabled = true;
+        if (startButton) {
+            startButton.textContent = 'Sensors Active';
+            startButton.disabled = true;
+        }
+
+        console.log('Sensors activated successfully');
 
     } catch (error) {
         console.error('Error requesting sensor permissions:', error);
@@ -75,10 +92,21 @@ async function startSensors() {
 
 // Handle device orientation
 function handleOrientation(event) {
-    sensorData.orientation.alpha = event.alpha || 0;
-    sensorData.orientation.beta = event.beta || 0;
-    sensorData.orientation.gamma = event.gamma || 0;
-    updateSensorDisplay();
+    // Check if we're getting real sensor data (not null)
+    if (event.alpha !== null || event.beta !== null || event.gamma !== null) {
+        sensorData.orientation.alpha = event.alpha || 0;
+        sensorData.orientation.beta = event.beta || 0;
+        sensorData.orientation.gamma = event.gamma || 0;
+        updateSensorDisplay();
+
+        // Update status on first real data
+        if (sensorStatus.textContent === 'Ready' || sensorStatus.textContent === 'Active') {
+            sensorStatus.textContent = 'Active';
+            sensorStatus.style.color = '#10b981';
+        }
+    } else {
+        console.log('No orientation data (device may not have sensors)');
+    }
 }
 
 // Handle device motion
@@ -118,35 +146,70 @@ function updateSensorDisplay() {
 
 // Enable GPS tracking
 async function enableGPS() {
+    console.log('enableGPS() called');
+
     if (!navigator.geolocation) {
+        console.log('Geolocation not supported');
         gpsStatus.textContent = 'Not Supported';
         gpsStatus.style.color = '#ef4444';
-        gpsButton.disabled = true;
+        if (gpsButton) {
+            gpsButton.disabled = true;
+        }
         return;
     }
 
+    // On iOS, we need to use getCurrentPosition first to trigger permission prompt
+    // watchPosition doesn't always trigger the prompt on iOS Safari
+    console.log('Requesting initial position to trigger permission...');
+
     try {
-        // Request location permission and start watching
-        gpsWatchId = navigator.geolocation.watchPosition(
-            handleGPSSuccess,
-            handleGPSError,
+        // First, get current position to trigger permission prompt
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                console.log('Initial position acquired, starting watch...');
+                // Now start watching for continuous updates
+                startGPSWatch();
+            },
+            (error) => {
+                console.error('Initial GPS error:', error);
+                handleGPSError(error);
+            },
             {
-                enableHighAccuracy: true,  // Use GPS for best accuracy
-                maximumAge: 0,              // Don't use cached position
-                timeout: 5000               // 5 second timeout
+                enableHighAccuracy: true,
+                maximumAge: 0,
+                timeout: 10000
             }
         );
 
-        gpsStatus.textContent = 'Acquiring...';
+        gpsStatus.textContent = 'Requesting Permission...';
         gpsStatus.style.color = '#f59e0b';
-        gpsButton.textContent = 'GPS Acquiring...';
-        gpsButton.disabled = true;
+        if (gpsButton) {
+            gpsButton.textContent = 'GPS Acquiring...';
+            gpsButton.disabled = true;
+        }
 
     } catch (error) {
         console.error('Error enabling GPS:', error);
         gpsStatus.textContent = 'Error';
         gpsStatus.style.color = '#ef4444';
     }
+}
+
+// Start continuous GPS watching
+function startGPSWatch() {
+    console.log('Starting GPS watch...');
+    gpsWatchId = navigator.geolocation.watchPosition(
+        handleGPSSuccess,
+        handleGPSError,
+        {
+            enableHighAccuracy: true,  // Use GPS for best accuracy
+            maximumAge: 0,              // Don't use cached position
+            timeout: 10000              // 10 second timeout
+        }
+    );
+
+    gpsStatus.textContent = 'Acquiring...';
+    gpsStatus.style.color = '#f59e0b';
 }
 
 // Handle successful GPS position
@@ -179,25 +242,38 @@ function handleGPSSuccess(position) {
 // Handle GPS error
 function handleGPSError(error) {
     let errorMsg = 'Error';
+    let errorDetail = '';
 
     switch(error.code) {
         case error.PERMISSION_DENIED:
             errorMsg = 'Permission Denied';
+            errorDetail = 'Location access was denied. On iOS: Settings > Safari > Location > Ask';
             break;
         case error.POSITION_UNAVAILABLE:
             errorMsg = 'Position Unavailable';
+            errorDetail = 'Location information is unavailable. Try going outside.';
             break;
         case error.TIMEOUT:
             errorMsg = 'Timeout';
+            errorDetail = 'Location request timed out. Try again.';
             break;
     }
 
     gpsStatus.textContent = errorMsg;
     gpsStatus.style.color = '#ef4444';
-    gpsButton.disabled = false;
-    gpsButton.textContent = 'Enable GPS';
+
+    if (gpsButton) {
+        gpsButton.disabled = false;
+        gpsButton.textContent = 'Enable GPS';
+    }
 
     console.error('GPS Error:', error.message);
+    console.error('Error details:', errorDetail);
+
+    // Show alert with helpful message on permission denial
+    if (error.code === error.PERMISSION_DENIED) {
+        alert('Location access denied.\n\nOn iOS:\n1. Go to Settings > Safari > Location\n2. Choose "Ask" or "Allow"\n3. Refresh this page and try again');
+    }
 }
 
 // Update GPS display
@@ -248,11 +324,29 @@ function updateElement(id, value, suffix = '') {
 }
 
 // Event listeners
-startButton.addEventListener('click', startSensors);
-gpsButton.addEventListener('click', enableGPS);
+if (startButton) {
+    console.log('Adding click listener to start button');
+    startButton.addEventListener('click', () => {
+        console.log('Start button clicked!');
+        startSensors();
+    });
+} else {
+    console.error('Start button not found!');
+}
+
+if (gpsButton) {
+    console.log('Adding click listener to GPS button');
+    gpsButton.addEventListener('click', () => {
+        console.log('GPS button clicked!');
+        enableGPS();
+    });
+} else {
+    console.error('GPS button not found!');
+}
 
 // Initialize on load
 window.addEventListener('load', () => {
+    console.log('Page loaded, initializing...');
     checkSensorSupport();
 });
 

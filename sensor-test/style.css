@@ -238,6 +238,17 @@ footer {
     color: #667eea;
 }
 
+.info-box h4 {
+    color: #667eea;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.info-box ol {
+    color: #555;
+}
+
 @media (max-width: 768px) {
     h1 {
         font-size: 1.8rem;

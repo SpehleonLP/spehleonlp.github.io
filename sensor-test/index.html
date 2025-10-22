@@ -125,14 +125,23 @@
         <footer>
             <div class="info-box">
                 <h3>About This Demo</h3>
-                <p>This demo displays real-time sensor data from your device. On iOS, you may need to use the
-                <a href="https://apps.apple.com/us/app/webxr-viewer/id1295998056" target="_blank">Mozilla WebXR Viewer</a>
-                for full sensor access.</p>
+                <p>This demo displays real-time sensor data from your device. <strong>Note:</strong> Desktop computers typically don't have motion sensors - you'll need a smartphone or tablet to see orientation, acceleration, and gyroscope data.</p>
+
+                <h4>iOS Setup</h4>
+                <p>For GPS location on iPhone:</p>
+                <ol style="margin-left: 20px; line-height: 1.8;">
+                    <li>Go to <strong>Settings → Safari → Location</strong></li>
+                    <li>Set to <strong>"Ask"</strong> or <strong>"Allow"</strong></li>
+                    <li>Refresh this page and click "Enable GPS"</li>
+                    <li>Tap "Allow" when Safari prompts for location access</li>
+                </ol>
+
+                <h4>Sensor Types</h4>
                 <ul>
-                    <li><strong>Orientation:</strong> Device rotation in 3D space</li>
-                    <li><strong>Acceleration:</strong> Linear movement of the device</li>
-                    <li><strong>Gyroscope:</strong> Rotational velocity</li>
-                    <li><strong>GPS Velocity:</strong> Speed and heading from GPS (Doppler effect)</li>
+                    <li><strong>Orientation:</strong> Device rotation in 3D space (mobile only)</li>
+                    <li><strong>Acceleration:</strong> Linear movement of the device (mobile only)</li>
+                    <li><strong>Gyroscope:</strong> Rotational velocity (mobile only)</li>
+                    <li><strong>GPS Velocity:</strong> Speed and heading from GPS (requires movement)</li>
                     <li><strong>GPS Position:</strong> Latitude, longitude, and accuracy</li>
                 </ul>
             </div>

@@ -1,128 +1,104 @@
-# WebXR Sensor Demo
+# Device Sensor Demo
 
-A WebXR-enabled website that demonstrates real-time access to device sensors including orientation, acceleration, gyroscope, and position tracking.
+A simple web app that displays real-time sensor data from your device including orientation, acceleration, and gyroscope readings.
 
 ## Features
 
-- **WebXR Support**: Full AR and VR session support
-- **Real-time Sensor Data**: Display orientation, acceleration, gyroscope, and position data
-- **iOS Compatibility**: Works with Mozilla's WebXR Viewer for iOS devices
-- **Fallback Support**: Uses Device Orientation/Motion APIs when WebXR is unavailable
+- **Real-time Sensor Data**: Display orientation, acceleration, and gyroscope data
+- **iOS Compatible**: Works with Device Orientation/Motion APIs
 - **Responsive Design**: Works on desktop and mobile devices
+- **No AR/VR Popups**: Simple sensor reading without immersive mode
 
-## iOS Setup (iPhone/iPad)
+## How to Use
 
-Since Safari on iOS doesn't natively support WebXR yet, you'll need to use Mozilla's WebXR Viewer:
+### On Any Device
 
-1. **Install WebXR Viewer**:
-   - Download from the App Store: [WebXR Viewer](https://apps.apple.com/us/app/webxr-viewer/id1295998056)
+1. Open the page (must be HTTPS for sensor access)
+2. Click "Enable Sensors" button
+3. Grant sensor permissions when prompted (iOS only)
+4. View live sensor data updating in real-time
 
-2. **Open the App**:
-   - Launch WebXR Viewer on your iOS device
-   - Navigate to your website URL (must be HTTPS)
+### iOS Specific
 
-3. **Grant Permissions**:
-   - Allow camera access when prompted (for AR)
-   - Allow motion & orientation access when prompted
-
-## Desktop/Android Setup
-
-1. **Chrome/Edge (Windows, Mac, Linux, Android)**:
-   - Ensure you're using a recent version (Chrome 79+)
-   - Navigate to your site (HTTPS required)
-   - Click "Start AR" or "Start VR"
-
-2. **Firefox Reality (VR Headsets)**:
-   - Open the browser on your VR device
-   - Navigate to your site
-   - Enter VR mode
+On iOS 13+, you'll need to:
+1. Click the "Enable Sensors" button
+2. Tap "Allow" when prompted for motion & orientation access
+3. If Safari doesn't work, try the [Mozilla WebXR Viewer](https://apps.apple.com/us/app/webxr-viewer/id1295998056)
 
 ## Running Locally
 
-### Option 1: Python Server (HTTPS)
+### Simple HTTP Server
 
 ```bash
-# Generate self-signed certificate (one-time setup)
-openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes
-
-# Start HTTPS server
-python3 -m http.server 8000 --bind 0.0.0.0
-# Then use ngrok or similar for HTTPS access
-```
-
-### Option 2: Node.js with HTTPS
-
-```bash
-npm install -g http-server
-http-server -S -C cert.pem -K key.pem -p 8000
-```
-
-### Option 3: Use ngrok for HTTPS
-
-```bash
-# Start a local server
+# Python 3
 python3 -m http.server 8000
 
-# In another terminal
-ngrok http 8000
-# Use the HTTPS URL provided by ngrok
+# Python 2
+python -m SimpleHTTPServer 8000
 ```
 
-## Technology Stack
+### HTTPS Required for Production
 
-- **WebXR Device API**: For immersive AR/VR experiences
-- **WebXR Polyfill**: Provides compatibility layer for browsers without native WebXR
-- **Device Orientation/Motion APIs**: Fallback sensor access
-- **WebGL**: Rendering context for XR sessions
+For sensor access to work on mobile devices, you need HTTPS. Options:
 
-## Browser Compatibility
-
-| Browser | Platform | AR | VR | Notes |
-|---------|----------|----|----|-------|
-| Chrome/Edge | Desktop | ⚠️ | ✅ | AR requires ARCore-compatible device |
-| Chrome | Android | ✅ | ✅ | Requires ARCore |
-| Safari | iOS | ❌ | ❌ | Use WebXR Viewer instead |
-| WebXR Viewer | iOS | ✅ | ❌ | Mozilla's iOS app |
-| Firefox Reality | VR Headsets | - | ✅ | VR headsets only |
+1. **Deploy to GitHub Pages** (automatic HTTPS)
+2. **Use ngrok for testing:**
+   ```bash
+   python3 -m http.server 8000
+   # In another terminal:
+   ngrok http 8000
+   ```
+3. **Local HTTPS server:**
+   ```bash
+   npm install -g http-server
+   http-server -S -C cert.pem -K key.pem -p 8000
+   ```
 
 ## Sensor Data Explained
 
 - **Orientation**: Device rotation (alpha, beta, gamma) in degrees
+  - Alpha: Rotation around Z-axis (0-360°)
+  - Beta: Rotation around X-axis (-180 to 180°)
+  - Gamma: Rotation around Y-axis (-90 to 90°)
+
 - **Acceleration**: Linear acceleration (x, y, z) in m/s²
+  - Measures device movement speed
+
 - **Gyroscope**: Rotation rate (x, y, z) in degrees/s
-- **Position**: 3D position (x, y, z) in meters (WebXR only)
+  - Measures how fast the device is rotating
 
-## Security Notes
+## Browser Compatibility
 
-- HTTPS is **required** for sensor and camera access
-- Users must grant permission for camera (AR) and sensors
-- Motion sensors may require explicit permission on iOS 13+
+| Browser | Platform | Support | Notes |
+|---------|----------|---------|-------|
+| Chrome/Edge | Desktop | ✅ | May need HTTPS |
+| Chrome | Android | ✅ | Full support |
+| Safari | iOS | ✅ | Requires permission prompt |
+| Firefox | All | ✅ | Full support |
 
 ## Troubleshooting
 
-### "WebXR Not Supported" Message
+### Sensors Show "-" or Zero
 
-- Ensure you're using HTTPS (not HTTP)
-- Update your browser to the latest version
-- On iOS, use WebXR Viewer app instead of Safari
-- Check if your device supports ARCore (Android) or ARKit (iOS)
+- Ensure you've clicked "Enable Sensors"
+- Grant permission when prompted (iOS)
+- Check that you're using HTTPS (required on mobile)
+- Make sure your device has accelerometer/gyroscope sensors
 
-### Sensor Data Shows "-" or Zeros
+### Permission Denied on iOS
 
-- Grant sensor permissions when prompted
-- Ensure device has motion sensors (accelerometer, gyroscope)
-- Try starting an XR session first
-- On iOS, ensure you've granted motion & orientation access
+- Go to Settings > Safari > Motion & Orientation Access
+- Enable for your website
+- Refresh the page
 
-### AR Mode Not Available
+### Still Not Working?
 
-- Verify your device supports AR (ARCore on Android, ARKit on iOS)
-- On iOS, must use WebXR Viewer app
-- Camera permission must be granted
+- Try using Mozilla WebXR Viewer on iOS
+- Check browser console for errors
+- Ensure you're not blocking motion sensors in browser settings
 
 ## References
 
-- [WebXR Device API Specification](https://immersive-web.github.io/webxr/)
-- [Mozilla WebXR Viewer](https://github.com/mozilla-mobile/webxr-ios)
-- [WebXR Polyfill](https://github.com/immersive-web/webxr-polyfill)
-- [Device Orientation Events](https://developer.mozilla.org/en-US/docs/Web/API/DeviceOrientationEvent)
+- [Device Orientation Events API](https://developer.mozilla.org/en-US/docs/Web/API/DeviceOrientationEvent)
+- [Device Motion Events API](https://developer.mozilla.org/en-US/docs/Web/API/DeviceMotionEvent)
+- [Sensor-JS Research](https://sensor-js.xyz/)

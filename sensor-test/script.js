@@ -120,16 +120,28 @@ function handleOrientation(event) {
 function handleMotion(event) {
     const currentTimestamp = Date.now();
 
-    if (event.acceleration) {
-        sensorData.acceleration.x = event.acceleration.x || 0;
-        sensorData.acceleration.y = event.acceleration.y || 0;
-        sensorData.acceleration.z = event.acceleration.z || 0;
+    // Try to use acceleration (without gravity), fall back to accelerationIncludingGravity
+    let accel = event.acceleration;
+    if (!accel || (accel.x === null && accel.y === null && accel.z === null)) {
+        accel = event.accelerationIncludingGravity;
+        console.log('Using accelerationIncludingGravity');
+    }
+
+    if (accel && (accel.x !== null || accel.y !== null || accel.z !== null)) {
+        sensorData.acceleration.x = accel.x || 0;
+        sensorData.acceleration.y = accel.y || 0;
+        sensorData.acceleration.z = accel.z || 0;
 
         // Perform integration if we have a previous timestamp
         if (lastTimestamp !== null && integrationActive) {
             const deltaTime = (currentTimestamp - lastTimestamp) / 1000; // Convert to seconds
             integrateAcceleration(deltaTime);
+        } else if (lastTimestamp === null) {
+            // First time - just set timestamp, don't integrate yet
+            console.log('First motion event, initializing timestamp');
         }
+    } else {
+        console.log('No acceleration data available');
     }
 
     if (event.rotationRate) {
@@ -140,6 +152,9 @@ function handleMotion(event) {
 
     lastTimestamp = currentTimestamp;
     updateSensorDisplay();
+
+    // Always update integrated display, even if values are zero
+    updateIntegratedDisplay();
 }
 
 // Integrate acceleration to get velocity, then integrate velocity to get position
@@ -153,6 +168,9 @@ function integrateAcceleration(deltaTime) {
     sensorData.position.x += sensorData.velocity.x * deltaTime;
     sensorData.position.y += sensorData.velocity.y * deltaTime;
     sensorData.position.z += sensorData.velocity.z * deltaTime;
+
+    console.log('Velocity:', sensorData.velocity);
+    console.log('Position:', sensorData.position);
 
     // Update integrated displays
     updateIntegratedDisplay();

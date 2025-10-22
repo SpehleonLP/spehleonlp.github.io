@@ -2,14 +2,26 @@
 const sensorData = {
     orientation: { alpha: 0, beta: 0, gamma: 0 },
     acceleration: { x: 0, y: 0, z: 0 },
-    gyroscope: { x: 0, y: 0, z: 0 }
+    gyroscope: { x: 0, y: 0, z: 0 },
+    gps: {
+        speed: null,
+        heading: null,
+        altitude: null,
+        latitude: null,
+        longitude: null,
+        accuracy: null
+    }
 };
 
 // DOM elements
 const startButton = document.getElementById('start-sensors');
+const gpsButton = document.getElementById('enable-gps');
 const sensorStatus = document.getElementById('sensor-status');
+const gpsStatus = document.getElementById('gps-status');
 
 let sensorsActive = false;
+let gpsWatchId = null;
+let gpsActive = false;
 
 // Check sensor availability
 function checkSensorSupport() {
@@ -104,11 +116,132 @@ function updateSensorDisplay() {
     updateElement('gyro-z', sensorData.gyroscope.z);
 }
 
+// Enable GPS tracking
+async function enableGPS() {
+    if (!navigator.geolocation) {
+        gpsStatus.textContent = 'Not Supported';
+        gpsStatus.style.color = '#ef4444';
+        gpsButton.disabled = true;
+        return;
+    }
+
+    try {
+        // Request location permission and start watching
+        gpsWatchId = navigator.geolocation.watchPosition(
+            handleGPSSuccess,
+            handleGPSError,
+            {
+                enableHighAccuracy: true,  // Use GPS for best accuracy
+                maximumAge: 0,              // Don't use cached position
+                timeout: 5000               // 5 second timeout
+            }
+        );
+
+        gpsStatus.textContent = 'Acquiring...';
+        gpsStatus.style.color = '#f59e0b';
+        gpsButton.textContent = 'GPS Acquiring...';
+        gpsButton.disabled = true;
+
+    } catch (error) {
+        console.error('Error enabling GPS:', error);
+        gpsStatus.textContent = 'Error';
+        gpsStatus.style.color = '#ef4444';
+    }
+}
+
+// Handle successful GPS position
+function handleGPSSuccess(position) {
+    gpsActive = true;
+
+    // Update GPS data
+    sensorData.gps.latitude = position.coords.latitude;
+    sensorData.gps.longitude = position.coords.longitude;
+    sensorData.gps.accuracy = position.coords.accuracy;
+
+    // Speed in m/s (from GPS Doppler effect)
+    sensorData.gps.speed = position.coords.speed;
+
+    // Heading in degrees (0-360, true north)
+    sensorData.gps.heading = position.coords.heading;
+
+    // Altitude in meters
+    sensorData.gps.altitude = position.coords.altitude;
+
+    // Update status
+    gpsStatus.textContent = 'Active';
+    gpsStatus.style.color = '#10b981';
+    gpsButton.textContent = 'GPS Active';
+
+    // Update display
+    updateGPSDisplay();
+}
+
+// Handle GPS error
+function handleGPSError(error) {
+    let errorMsg = 'Error';
+
+    switch(error.code) {
+        case error.PERMISSION_DENIED:
+            errorMsg = 'Permission Denied';
+            break;
+        case error.POSITION_UNAVAILABLE:
+            errorMsg = 'Position Unavailable';
+            break;
+        case error.TIMEOUT:
+            errorMsg = 'Timeout';
+            break;
+    }
+
+    gpsStatus.textContent = errorMsg;
+    gpsStatus.style.color = '#ef4444';
+    gpsButton.disabled = false;
+    gpsButton.textContent = 'Enable GPS';
+
+    console.error('GPS Error:', error.message);
+}
+
+// Update GPS display
+function updateGPSDisplay() {
+    // Speed (convert to km/h if available)
+    if (sensorData.gps.speed !== null) {
+        const speedKmh = sensorData.gps.speed * 3.6;
+        updateElement('gps-speed', speedKmh, ' km/h');
+    } else {
+        document.getElementById('gps-speed').textContent = 'N/A';
+    }
+
+    // Heading
+    if (sensorData.gps.heading !== null) {
+        updateElement('gps-heading', sensorData.gps.heading, '°');
+    } else {
+        document.getElementById('gps-heading').textContent = 'N/A';
+    }
+
+    // Altitude
+    if (sensorData.gps.altitude !== null) {
+        updateElement('gps-altitude', sensorData.gps.altitude, ' m');
+    } else {
+        document.getElementById('gps-altitude').textContent = 'N/A';
+    }
+
+    // Position
+    if (sensorData.gps.latitude !== null) {
+        updateElement('gps-lat', sensorData.gps.latitude, '°');
+    }
+    if (sensorData.gps.longitude !== null) {
+        updateElement('gps-lon', sensorData.gps.longitude, '°');
+    }
+    if (sensorData.gps.accuracy !== null) {
+        updateElement('gps-accuracy', sensorData.gps.accuracy, ' m');
+    }
+}
+
 // Update individual element
-function updateElement(id, value) {
+function updateElement(id, value, suffix = '') {
     const element = document.getElementById(id);
     if (element) {
-        element.textContent = typeof value === 'number' ? value.toFixed(2) : value;
+        const displayValue = typeof value === 'number' ? value.toFixed(2) : value;
+        element.textContent = displayValue + suffix;
         element.classList.add('updating');
         setTimeout(() => element.classList.remove('updating'), 500);
     }
@@ -116,6 +249,7 @@ function updateElement(id, value) {
 
 // Event listeners
 startButton.addEventListener('click', startSensors);
+gpsButton.addEventListener('click', enableGPS);
 
 // Initialize on load
 window.addEventListener('load', () => {
@@ -127,5 +261,12 @@ document.addEventListener('visibilitychange', () => {
     if (!document.hidden && !sensorsActive) {
         // Re-check sensors when page becomes visible
         checkSensorSupport();
+    }
+});
+
+// Clean up GPS watch when page unloads
+window.addEventListener('beforeunload', () => {
+    if (gpsWatchId !== null) {
+        navigator.geolocation.clearWatch(gpsWatchId);
     }
 });

@@ -18,10 +18,15 @@
                 <span class="label">Sensor Access:</span>
                 <span id="sensor-status" class="value">Checking...</span>
             </div>
+            <div class="status-item">
+                <span class="label">GPS/Location:</span>
+                <span id="gps-status" class="value">Not Enabled</span>
+            </div>
         </div>
 
         <div class="button-container">
             <button id="start-sensors" class="btn btn-primary">Enable Sensors</button>
+            <button id="enable-gps" class="btn btn-secondary">Enable GPS</button>
         </div>
 
         <div class="sensor-grid">
@@ -79,6 +84,42 @@
                 </div>
             </div>
 
+            <div class="sensor-card">
+                <h3>GPS Velocity</h3>
+                <div class="sensor-data">
+                    <div class="data-row">
+                        <span class="data-label">Speed:</span>
+                        <span id="gps-speed" class="data-value">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Heading:</span>
+                        <span id="gps-heading" class="data-value">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Altitude:</span>
+                        <span id="gps-altitude" class="data-value">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sensor-card">
+                <h3>GPS Position</h3>
+                <div class="sensor-data">
+                    <div class="data-row">
+                        <span class="data-label">Latitude:</span>
+                        <span id="gps-lat" class="data-value">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Longitude:</span>
+                        <span id="gps-lon" class="data-value">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Accuracy:</span>
+                        <span id="gps-accuracy" class="data-value">-</span>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <footer>
@@ -91,6 +132,8 @@
                     <li><strong>Orientation:</strong> Device rotation in 3D space</li>
                     <li><strong>Acceleration:</strong> Linear movement of the device</li>
                     <li><strong>Gyroscope:</strong> Rotational velocity</li>
+                    <li><strong>GPS Velocity:</strong> Speed and heading from GPS (Doppler effect)</li>
+                    <li><strong>GPS Position:</strong> Latitude, longitude, and accuracy</li>
                 </ul>
             </div>
         </footer>

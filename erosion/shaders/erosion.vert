@@ -33,7 +33,8 @@ void main()
 
 	f_life.r = u_time / u_fadeInDuration;
 	f_life.g = (u_time - u_fadeOutStart) / u_fadeOutDuration;
-	f_life.b = u_time / max(u_fadeInDuration, u_fadeOutStart + u_fadeOutDuration);
+	f_life.b = (u_time) / (u_animationDuration);
+	//f_life.b = u_time / max(u_fadeInDuration, u_fadeOutStart + u_fadeOutDuration);
 	//f_life.b = (u_time - FadeTransitionStart) / FadeOffsetDuration;
 
 	f_life = clamp(f_life, vec3(0), vec3(1));

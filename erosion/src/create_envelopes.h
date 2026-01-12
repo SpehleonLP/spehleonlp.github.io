@@ -25,13 +25,18 @@ union Color
 
 ImageData * MakeImage(int width, int height, int depth);
 
+typedef struct MinMax
+{
+	int min, max;
+} MinMax;
+
 typedef struct EnvelopeMetadata
 {
 	int total_frames;
-	int min_attack_frame;
-	int max_attack_frame;
-	int min_release_frame;
-	int max_release_frame;
+	MinMax start_attack_frame;
+	MinMax end_attack_frame;
+	MinMax start_release_frame;
+	MinMax end_release_frame;
 	union Color key;
 } EnvelopeMetadata;
 

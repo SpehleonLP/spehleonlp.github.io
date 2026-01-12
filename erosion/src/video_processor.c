@@ -138,8 +138,12 @@ int finishPushingFrames()
     	e_Free(envelopeBuilder);
     	envelopeBuilder = 0;
 
-		metadata.fadeInDuration = mta.max_attack_frame / (float)mta.total_frames ;
-		metadata.fadeOutDuration = (mta.max_release_frame -  mta.min_release_frame) / (float)mta.total_frames ;
+		// Calculate durations from MinMax ranges
+		int attack_duration = mta.end_attack_frame.max - mta.start_attack_frame.min;
+		int release_duration = mta.end_release_frame.max - mta.start_release_frame.min;
+
+		metadata.fadeInDuration = attack_duration / (float)mta.total_frames;
+		metadata.fadeOutDuration = release_duration / (float)mta.total_frames;
 
 	    gradientBuilder = g_Initialize(images[0], images[1], &mta);
 

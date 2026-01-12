@@ -44,18 +44,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveVideoButton = document.getElementById('save-video');
 
     if (saveVideoButton) {
-        saveVideoButton.addEventListener('click', async () => {
-            try {
-            	is_making_video = true;
-                await runWithProgress(createVideo);
-          //      alert('Video saved successfully!');
-            } catch (error) {
-                alert('An error occurred while saving the video.');
-                console.error(error);
-            }
+        // Detect iOS devices
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
-            is_making_video = false;
-        });
+        // Check if cross-origin isolation is available (required for FFmpeg)
+        const canExportVideo = window.crossOriginIsolated !== false;
+
+        if (isIOS || !canExportVideo) {
+            saveVideoButton.disabled = true;
+            saveVideoButton.title = 'Video export not available on iOS or without cross-origin isolation';
+            saveVideoButton.style.opacity = '0.5';
+            saveVideoButton.style.cursor = 'not-allowed';
+            console.warn('Video export disabled:', isIOS ? 'iOS detected' : 'Cross-origin isolation not available');
+        } else {
+            saveVideoButton.addEventListener('click', async () => {
+                try {
+                	is_making_video = true;
+                    await runWithProgress(createVideo);
+              //      alert('Video saved successfully!');
+                } catch (error) {
+                    alert('An error occurred while saving the video.');
+                    console.error(error);
+                }
+
+                is_making_video = false;
+            });
+        }
     } else {
         console.error('Save Video button not found.');
     }

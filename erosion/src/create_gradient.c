@@ -83,9 +83,9 @@ int g_ProcessFrame(GradientBuilder * g,  ImageData const* src, int frame_id)
     const float toDepth =  g->depth;
 
     const float time = frame_id / (float)g->m.total_frames;
-    const float fadeInDuration = (g->m.max_attack_frame - g->m.min_attack_frame) / (float)g->m.total_frames ;
-    const float fadeOutDuration = (g->m.max_release_frame -  g->m.min_release_frame) / (float)g->m.total_frames ;
-    const float fadeOutStart = g->m.min_release_frame / (float)g->m.total_frames ;
+    const float fadeInDuration = (g->m.end_attack_frame.max - g->m.start_attack_frame.min) / (float)g->m.total_frames;
+    const float fadeOutDuration = (g->m.end_release_frame.max - g->m.start_release_frame.min) / (float)g->m.total_frames;
+    const float fadeOutStart = g->m.start_release_frame.min / (float)g->m.total_frames;
 
 	const float f_life_r = clamp_f32(time / fadeInDuration, 0.0, 1.0);
 	const float f_life_g = clamp_f32((time - fadeOutStart) / fadeOutDuration, 0.0, 1.0);

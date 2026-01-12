@@ -4,7 +4,7 @@
 CC = emcc
 
 # Source files
-SRC = video_processor.c create_envelopes.c create_gradient.c
+SRC = video_processor.c create_envelopes.c create_gradient.c smart_blur.c
 
 # Output files
 OUT_JS = ../scripts/video_processor.js

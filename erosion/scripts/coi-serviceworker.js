@@ -58,12 +58,29 @@ if (typeof window === 'undefined') {
 
 } else {
     (() => {
+        // Detect iOS devices
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+        // Check reload count to prevent infinite loops
+        const RELOAD_KEY = 'coi_reload_count';
+        const MAX_RELOADS = 2;
+        let reloadCount = parseInt(sessionStorage.getItem(RELOAD_KEY) || '0');
+
         // You can customize the behavior of this script through a global `coi` variable.
         const coi = {
-            shouldRegister: () => true,
+            shouldRegister: () => !isIOS, // Don't register on iOS
             shouldDeregister: () => false,
             coepCredentialless: () => false,
-            doReload: () => window.location.reload(),
+            doReload: () => {
+                if (reloadCount < MAX_RELOADS) {
+                    sessionStorage.setItem(RELOAD_KEY, String(reloadCount + 1));
+                    window.location.reload();
+                } else {
+                    console.warn("Maximum reload attempts reached. Cross-origin isolation may not be available on this browser.");
+                    sessionStorage.removeItem(RELOAD_KEY);
+                }
+            },
             quiet: false,
             ...window.coi
         };
@@ -83,7 +100,18 @@ if (typeof window === 'undefined') {
 
         // If we're already coi: do nothing. Perhaps it's due to this script doing its job, or COOP/COEP are
         // already set from the origin server. Also if the browser has no notion of crossOriginIsolated, just give up here.
-        if (window.crossOriginIsolated !== false || !coi.shouldRegister()) return;
+        if (window.crossOriginIsolated !== false || !coi.shouldRegister()) {
+            // Clear reload counter on success
+            sessionStorage.removeItem(RELOAD_KEY);
+            return;
+        }
+
+        // iOS Safari doesn't support cross-origin isolation properly
+        if (isIOS) {
+            console.warn("iOS detected: Cross-origin isolation not available. Video export will be disabled.");
+            sessionStorage.removeItem(RELOAD_KEY);
+            return;
+        }
 
         if (!window.isSecureContext) {
             !coi.quiet && console.log("COOP/COEP Service Worker not registered, a secure context is required.");

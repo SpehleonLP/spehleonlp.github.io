@@ -1,4 +1,5 @@
 #include "create_envelopes.h"
+#include "smart_blur.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -27,34 +28,49 @@ enum
 
 uint8_t GetAlpha(const union Color* key, const union Color* sample)
 {
-    // Convert colors to [0,1) range
-    float kr = key->r / 255.0f;
-    float kg = key->g / 255.0f;
-    float kb = key->b / 255.0f;
+    // Check if key is greyscale (for luminance-based alpha)
+    int key_grey_delta = abs(key->r - key->g) + abs(key->g - key->b) + abs(key->b - key->r);
+    int is_greyscale_key = (key_grey_delta < 10);
 
-    float sr = sample->r / 255.0f;
-    float sg = sample->g / 255.0f;
-    float sb = sample->b / 255.0f;
+    if (is_greyscale_key) {
+        // Luminance-based mode for greyscale keys
+        // Key luminance
+        float key_lum = (key->r * 0.299f + key->g * 0.587f + key->b * 0.114f) / 255.0f;
 
-    // Normalize vectors
-    float k_len = sqrtf(kr*kr + kg*kg + kb*kb);
-    float s_len = sqrtf(sr*sr + sg*sg + sb*sb);
+        // Sample luminance
+        float sample_lum = (sample->r * 0.299f + sample->g * 0.587f + sample->b * 0.114f) / 255.0f;
 
-    // Avoid division by zero
-    if (k_len < 0.001f || s_len < 0.001f) {
-        return 255;
+        // Compute alpha based on luminance difference from key
+        // If key is white (lum≈1): white→transparent, black→opaque
+        // If key is black (lum≈0): black→transparent, white→opaque
+        float lum_diff = fabsf(sample_lum - key_lum);
+
+        // Apply smooth falloff
+        float alpha = lum_diff;
+        alpha = powf(alpha, 0.8f); // Slight gamma to soften the transition
+
+        uint8_t alpha_8 = (uint8_t)clamp_i32(roundf(alpha * 255.0f), 0, 255);
+        return alpha_8;
+    } else {
+        // Color chromakey mode using Euclidean distance
+        float dr = (sample->r - key->r) / 255.0f;
+        float dg = (sample->g - key->g) / 255.0f;
+        float db = (sample->b - key->b) / 255.0f;
+
+        // Euclidean distance in RGB space
+        float distance = sqrtf(dr*dr + dg*dg + db*db);
+
+        // Normalize distance (max distance in RGB cube is sqrt(3) ≈ 1.732)
+        float normalized_dist = distance / 1.732f;
+
+        // Apply steeper falloff for cleaner keying
+        float alpha = powf(normalized_dist, 0.6f);
+
+        uint8_t alpha_8 = (uint8_t)clamp_i32(roundf(alpha * 255.0f), 0, 255);
+
+        // Apply threshold to eliminate near-key colors
+        return alpha_8 < 32 ? 0 : alpha_8;
     }
-
-    // Get normalized dot product
-    float dot = (kr*sr + kg*sg + kb*sb) / (k_len * s_len);
-
-    // Convert similarity to alpha (1 = identical colors, 0 = orthogonal colors)
-    float alpha = 1.0f - dot;
-
-    // Scale to 0-255 range and clamp
-    uint8_t alpha_8 = (uint8_t)(fminf(fmaxf(alpha * 255.0f, 0.0f), 255.0f));
-
-    return alpha_8 < 128? 0 : alpha_8;
 }
 
 struct Envelope
@@ -89,12 +105,10 @@ struct EnvelopeBuilder {
     struct PixelState* pixels;  // Array of width * height
 };
 
-
 int compare_env(struct Envelope * a, struct Envelope * b)
 {
 	return a->area - b->area;
 }
-
 
 void PrintEnvelope(struct Envelope * e)
 {
@@ -306,38 +320,52 @@ int e_ProcessFrame(EnvelopeBuilder * builder, ImageData const* src, int frame_id
     return 0;
 }
 
-int e_Build(EnvelopeBuilder * builder, ImageData * dst, EnvelopeMetadata * out, int total_frames)
-{
 /*
-#if LOOP == 0
-    int idx = (TEST_Y * builder->width + TEST_X);
-  	PrintEnvelope( &builder->pixels[idx].best);
-
-#else
-#define IDX(x, y) ((y) * builder->width + (x))
-  	PrintEnvelope( &builder->pixels[IDX(TEST_X, TEST_Y)].best);
-  	PrintEnvelope( &builder->pixels[IDX(TEST_X-1, TEST_Y)].best);
-  	PrintEnvelope( &builder->pixels[IDX(TEST_X+1, TEST_Y)].best);
-  	PrintEnvelope( &builder->pixels[IDX(TEST_X, TEST_Y-1)].best);
-  	PrintEnvelope( &builder->pixels[IDX(TEST_X, TEST_Y+1)].best);
-
-#endif
+typedef struct EnvelopeMetadata
+{
+	int total_frames;
+	int min_attack_frame;
+	int max_attack_frame;
+	int min_release_frame;
+	int max_release_frame;
+	union Color key;
+} EnvelopeMetadata;
 */
 
+/*
+typedef struct NormalizedPixelData
+{
+	float attack_start;
+	float attack_end;
+	float decay_start;
+	float decay_end;
+} EnvelopeMetadata;
+*/
 
+static void update_minmax(MinMax * m, int v)
+{
+	m->min = min_i32(m->min, v);
+	m->max = max_i32(m->max, v);
+}
 
-
-	float delta_alpha;
-
-	if (!builder || !dst || !dst->data)
-    {
-        printf("Build failed (invalid argument)\n");
-    	return -1;
+int e_GetBuilderMetadata(EnvelopeMetadata * out, EnvelopeBuilder * builder, int total_frames)
+{
+	if(builder == 0L || out == 0L)
+	{
+       printf("Build failed (invalid argument)\n");
+       return -1;
     }
 
 // add black frame at the end to finish any unifinished business.
     {
         ImageData * last_frame = MakeImage(builder->width, builder->height, 1);
+       
+        uint32_t N = builder->width * builder->height;
+		for(uint32_t i = 0u; i < N; ++i)
+		{
+			((union Color*)(last_frame->data))[i] = builder->key;
+		} 
+        
         e_ProcessFrame(builder, last_frame, total_frames);
         free(last_frame->data);
         free(last_frame);
@@ -347,87 +375,209 @@ int e_Build(EnvelopeBuilder * builder, ImageData * dst, EnvelopeMetadata * out, 
     EnvelopeMetadata m;
 
     m.total_frames = total_frames;
-    m.min_attack_frame = total_frames;
-    m.max_attack_frame = 0;
-    m.min_release_frame = total_frames;
-    m.max_release_frame = 0;
-    m.key = builder->key;
-
+    
+    m.start_attack_frame.min=total_frames;
+    m.end_attack_frame.min=total_frames;
+    m.start_release_frame.min=total_frames;
+    m.end_release_frame.min=total_frames;
+    
+    m.start_attack_frame.max=0;
+    m.end_attack_frame.max=0;
+    m.start_release_frame.max=0;
+    m.end_release_frame.max=0;
+    
     for (int i = 0; i < builder->width * builder->height; i++) {
         if (builder->pixels[i].has_best) {
-            m.min_attack_frame = min_i32(m.min_attack_frame,    builder->pixels[i].best.attack_start);
-            m.max_attack_frame = max_i32(m.max_attack_frame,  builder->pixels[i].best.attack_end);
-
-            m.min_release_frame = min_i32(m.min_release_frame,    builder->pixels[i].best.release_start);
-            m.max_release_frame = max_i32(m.max_release_frame,  builder->pixels[i].best.release_end);
+           update_minmax(&m.start_attack_frame,    builder->pixels[i].best.attack_start);
+           update_minmax(&m.end_attack_frame,    builder->pixels[i].best.attack_end);
+           
+           update_minmax(&m.start_release_frame,    builder->pixels[i].best.release_start);
+           update_minmax(&m.end_release_frame,    builder->pixels[i].best.release_end);
         }
     }
 
-    if(m.min_attack_frame > m.max_attack_frame
-    && m.min_release_frame > m.max_release_frame)
+	if(out) *out = m;
+	
+    if(m.start_attack_frame.min > m.start_attack_frame.max
+    && m.start_release_frame.min > m.start_release_frame.max)
     {
         printf("Build failed (no envelopes)\n");
   		return -1;
     }
 
-#if LOOP == 0
-	printf("attack range %d to %d", m.min_attack_frame, m.max_attack_frame);
-	printf("release range %d to %d", m.min_release_frame, m.max_release_frame);
-#endif
-    if(out)
+	return 0;
+}
+
+// error bars is ratio of target quantization to current quantization. 
+// we want to use a memoization to get the area of contigous bands
+// banding is in terms of non-color data. 
+// Large Widths + Minimum Riser: This is definitive banding.
+// Short Widths + Random Risers: This is noise or legitimate high-frequency data.
+//
+float e_MeasureBanding(EnvelopeBuilder * builder, int channel, float error_bars)
+{
+	uint32_t W = builder->width;
+	uint32_t H = builder->height;
+	
+	for(uint32_t y = 0; y < H; ++y)
+	{
+		for(uint32_t x = 0; x < W; ++x)
+		{
+			uint32_t i = y*W+x;
+			uint32_t sample = (&(builder->pixels[i].best.attack_start))[channel];
+			
+			
+		}
+	}
+	
+
+
+}
+
+int e_NormalizeBuilder(float * dst, EnvelopeBuilder * builder, EnvelopeMetadata * m)
+{
+	static const char * layer_names[4] =
+	{
+		"attack start", "attack end", "release start", "release end"
+	};
+
+	MinMax * ranges = &m->start_attack_frame;
+	int durations[4];
+	float error_bars[4];
+	
+	uint32_t N = builder->width*builder->height;
+	SmartBlurContext* blur = 0L;
+	
+	for(int i = 0; i < 4; ++i)
+	{
+		durations[i]  = max_i32(1, ranges[i].max - ranges[i].min);
+		error_bars[i] =  256.0 / durations[i];
+		
+		float inv = 1.0 / durations[i];
+		
+		if(durations[i] > 255) // high res enough that we don't need to blur
+		{
+			for(uint32_t j = 0u; j < N; ++j)
+			{
+				if(builder->pixels[j].has_best)
+				{
+					dst[j*4 + i] = (&(builder->pixels[j].best.attack_start))[i] * inv;
+				}
+				else
+				{
+					dst[j*4+i] = 0.f;
+				}
+			}
+		} 
+		else
+		{
+		    if(blur == 0L)
+				blur = sb_Initialize(builder->width, builder->height);
+		
+			int W = builder->width;
+			
+			for(uint32_t j = 0u; j < N; ++j)
+			{
+				if(builder->pixels[j].has_best)
+				{
+					float value =  (&(builder->pixels[j].best.attack_start))[i] * inv;
+                   sb_SetConstraints(blur, j % W, j / W, value - error_bars[i], value + error_bars[i], value);
+                }
+                else
+                {
+                    // No envelope - interpret as always fully transparent.
+                    sb_SetConstraints(blur, j % W, j / W, 0.0f, 0.0f, 0.0f);
+                }
+			}
+			
+            int iters = sb_RunUntilConverged(blur, 0.01f, 1000);
+			printf("Smart blur converged: %s in %d iterations\n", layer_names[i], iters);
+			
+			for(uint32_t j = 0u; j < N; ++j)
+			{
+				dst[j*4 + i] = blur->values[j];
+			}
+		}
+	}
+	
+	if(blur)
+		sb_Free(blur);
+	
+	return 0;	
+}
+
+
+int e_Build(EnvelopeBuilder * builder, ImageData * dst, EnvelopeMetadata * out, int total_frames)
+{
+	float delta_alpha;
+
+	if (!builder || !dst || !dst->data)
     {
-        *out = m;
+        printf("Build failed (invalid argument)\n");
+    	return -1;
     }
 
-    float attack_duration = max_i32(1, m.max_attack_frame - m.min_attack_frame);
-    float release_duration = max_i32(1, m.max_release_frame - m.min_release_frame);
+	EnvelopeMetadata m;
+	memset(&m, 0, sizeof(m));
 
-    const float fadeInDuration = attack_duration / (float)m.total_frames ;
-    const float fadeOutDuration = release_duration / (float)m.total_frames ;
-    const float fadeOutStart = m.min_release_frame / (float)m.total_frames ;
+	int r = e_GetBuilderMetadata(&m, builder, total_frames);
+
+	if(out) *out = m;
+	if(r == -1) return -1;
+
+	float * tmp = malloc(sizeof(float)*4*builder->width*builder->height);
+	e_NormalizeBuilder(tmp, builder, &m);
+
+  // float attack_duration = max_i32(1, m.end_attack_frame.max - m.start_attack_frame.min);
+  //  float release_duration = max_i32(1, m.end_release_frame.max - m.start_release_frame.min);
 
     int H = min_i32(builder->height, dst->height);
     int W = min_i32(builder->width, dst->width);
 
-    // Second pass: build texture
-     for (int y = 0; y < H; y++) {
+    // Write texture using normalized values from e_NormalizeBuilder
+    for (int y = 0; y < H; y++) {
         for (int x = 0; x < W; x++) {
             int idx = (y * builder->width + x);
             struct PixelState* pixel = &builder->pixels[idx];
 
             int dst_idx = (y * dst->width + x) * 4;
 
-            if (pixel->has_best == 0)
-            	*(uint32_t*)(&dst->data[dst_idx]) = 0xFF000000;
-            else
-            {
-                // R: Normalized attack start (inverted as per shader)
-                float attack_norm = (float)(pixel->best.attack_start - m.min_attack_frame) / attack_duration;
-                float release_norm = (float)(pixel->best.release_end -  m.min_release_frame) / release_duration;
+            if (pixel->has_best == 0) {
+                *(uint32_t*)(&dst->data[dst_idx]) = 0xFF000000;
+            } else {
+                // Get normalized values from tmp array
+                // tmp[idx*4 + 0] = attack_start (normalized)
+                // tmp[idx*4 + 1] = attack_end (normalized)
+                // tmp[idx*4 + 2] = release_start (normalized)
+                // tmp[idx*4 + 3] = release_end (normalized)
+                float attack_norm = tmp[idx*4 + 0];
+                float release_norm = tmp[idx*4 + 3];
 
                 // B: Edge hardness based on attack/release speed
                 delta_alpha = (pixel->best.max_alpha - pixel->best.min_attack_alpha);
-                float attack_speed  = delta_alpha / (pixel->best.attack_end - pixel->best.attack_start);
+                float attack_speed = delta_alpha / max_f32(1.0f, pixel->best.attack_end - pixel->best.attack_start);
 
                 delta_alpha = (pixel->best.max_alpha - pixel->best.min_release_alpha);
-                float release_speed = delta_alpha / (pixel->best.release_end - pixel->best.release_start);
+                float release_speed = delta_alpha / max_f32(1.0f, pixel->best.release_end - pixel->best.release_start);
 
-				float attack_softenss  = 1.0 - (attack_speed * (m.max_attack_frame - m.min_attack_frame) / (15.0 * m.total_frames));
-				float release_softenss = 1.0 - (release_speed * (m.max_release_frame - m.min_release_frame) / (15.0 * m.total_frames));
+                float attack_softness = 1.0f - (attack_speed * (m.end_attack_frame.max - m.start_attack_frame.min) / (15.0f * m.total_frames));
+                float release_softness = 1.0f - (release_speed * (m.end_release_frame.max - m.start_release_frame.min) / (15.0f * m.total_frames));
 
-// normalized alpha per fade
-                float softness = min_f32(attack_softenss, release_softenss );
+                float softness = min_f32(attack_softness, release_softness);
 
-                dst->data[dst_idx + 0] = (uint8_t)((1.0f - attack_norm) * 255);
-                dst->data[dst_idx + 1] = (uint8_t)(release_norm * 255);
-                dst->data[dst_idx + 2] = clamp_i32(softness*255, 0, 255);
-
+                // R: Inverted normalized attack timing (for shader)
+                dst->data[dst_idx + 0] = (uint8_t)clamp_i32((1.0f - attack_norm) * 255, 0, 255);
+                // G: Normalized release timing
+                dst->data[dst_idx + 1] = (uint8_t)clamp_i32(release_norm * 255, 0, 255);
+                // B: Edge softness
+                dst->data[dst_idx + 2] = (uint8_t)clamp_i32(softness * 255, 0, 255);
                 // A: Full opacity for valid pixels
                 dst->data[dst_idx + 3] = 255;
             }
         }
-   }
+    }
 
+    free(tmp);
     return 0;
 }
 

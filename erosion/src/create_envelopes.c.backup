@@ -1,0 +1,658 @@
+#include "create_envelopes.h"
+#include "smart_blur.h"
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <math.h>
+
+int min_i32(int a, int b) { return a < b? a : b; }
+int max_i32(int a, int b) { return a > b? a : b; }
+float min_f32(float a, float b) { return a < b? a : b; }
+float max_f32(float a, float b) { return a > b? a : b; }
+int clamp_i32(int a, int b, int c);
+float clamp_f32(float a, float b, float c);
+
+
+enum
+{
+	NOT_IN_ENVELOPE,
+	IN_ATTACK,
+	IN_SUSTAIN,
+	IN_RELEASE,
+	ALPHA_THRESHOLD = 16,
+	NOISE_FRAMES = 4,
+	NOISE_ALPHA = 32,
+};
+
+
+
+uint8_t GetAlpha(const union Color* key, const union Color* sample)
+{
+    // Check if key is greyscale (for luminance-based alpha)
+    int key_grey_delta = abs(key->r - key->g) + abs(key->g - key->b) + abs(key->b - key->r);
+    int is_greyscale_key = (key_grey_delta < 10);
+
+    if (is_greyscale_key) {
+        // Luminance-based mode for greyscale keys
+        // Key luminance
+        float key_lum = (key->r * 0.299f + key->g * 0.587f + key->b * 0.114f) / 255.0f;
+
+        // Sample luminance
+        float sample_lum = (sample->r * 0.299f + sample->g * 0.587f + sample->b * 0.114f) / 255.0f;
+
+        // Compute alpha based on luminance difference from key
+        // If key is white (lum≈1): white→transparent, black→opaque
+        // If key is black (lum≈0): black→transparent, white→opaque
+        float lum_diff = fabsf(sample_lum - key_lum);
+
+        // Apply smooth falloff
+        float alpha = lum_diff;
+        alpha = powf(alpha, 0.8f); // Slight gamma to soften the transition
+
+        uint8_t alpha_8 = (uint8_t)clamp_i32(roundf(alpha * 255.0f), 0, 255);
+        return alpha_8;
+    } else {
+        // Color chromakey mode using Euclidean distance
+        float dr = (sample->r - key->r) / 255.0f;
+        float dg = (sample->g - key->g) / 255.0f;
+        float db = (sample->b - key->b) / 255.0f;
+
+        // Euclidean distance in RGB space
+        float distance = sqrtf(dr*dr + dg*dg + db*db);
+
+        // Normalize distance (max distance in RGB cube is sqrt(3) ≈ 1.732)
+        float normalized_dist = distance / 1.732f;
+
+        // Apply steeper falloff for cleaner keying
+        float alpha = powf(normalized_dist, 0.6f);
+
+        uint8_t alpha_8 = (uint8_t)clamp_i32(roundf(alpha * 255.0f), 0, 255);
+
+        // Apply threshold to eliminate near-key colors
+        return alpha_8 < 32 ? 0 : alpha_8;
+    }
+}
+
+struct Envelope
+{
+    int attack_start;
+    int attack_end;
+    int release_start;
+    int release_end;
+	int area;
+
+    uint8_t min_attack_alpha;
+    uint8_t min_release_alpha;
+    uint8_t max_alpha;
+};
+
+struct PixelState {
+    // Current envelope being built
+    struct Envelope current;
+    uint8_t in_envelope;  // Are we currently tracking an envelope?
+    uint8_t last_alpha;  // Previous frame's alpha value
+
+
+    // Best envelope found so far
+    struct Envelope best;
+    uint8_t has_best;    // Have we found any valid envelope?
+};
+
+struct EnvelopeBuilder {
+    int width;
+    int height;
+    union Color key;
+    struct PixelState* pixels;  // Array of width * height
+};
+
+// Enum for which envelope field to extract
+typedef enum {
+    FIELD_ATTACK_START,
+    FIELD_ATTACK_END,
+    FIELD_RELEASE_START,
+    FIELD_RELEASE_END
+} EnvelopeField;
+
+// Edge grid structure - (width+1) x (height+1)
+// edge[i][j] represents position [i-0.5, j-0.5] in pixel coordinates
+struct EdgeGrid {
+    int width;   // W+1
+    int height;  // H+1
+    float* data; // Stores edge values
+};
+
+int compare_env(struct Envelope * a, struct Envelope * b)
+{
+	return a->area - b->area;
+}
+
+// Extract envelope field value from a pixel
+static int GetEnvelopeField(struct PixelState* pixel, EnvelopeField field)
+{
+    if (!pixel->has_best) return -1;
+
+    switch (field) {
+        case FIELD_ATTACK_START:  return pixel->best.attack_start;
+        case FIELD_ATTACK_END:    return pixel->best.attack_end;
+        case FIELD_RELEASE_START: return pixel->best.release_start;
+        case FIELD_RELEASE_END:   return pixel->best.release_end;
+        default: return -1;
+    }
+}
+
+// Compute edge grid for a given envelope field
+// Edge grid is (W+1) x (H+1), where edge[i][j] represents position [i-0.5, j-0.5]
+// Returns NULL on allocation failure
+struct EdgeGrid* ComputeEdgeGrid(EnvelopeBuilder* builder, EnvelopeField field)
+{
+    struct EdgeGrid* grid = malloc(sizeof(struct EdgeGrid));
+    if (!grid) return NULL;
+
+    int W = builder->width;
+    int H = builder->height;
+
+    grid->width = W + 1;
+    grid->height = H + 1;
+    grid->data = calloc(grid->width * grid->height, sizeof(float));
+
+    if (!grid->data) {
+        free(grid);
+        return NULL;
+    }
+
+    // For each edge point [i,j] (representing position [i-0.5, j-0.5])
+    for (int j = 0; j < grid->height; j++) {
+        for (int i = 0; i < grid->width; i++) {
+            // Collect values from surrounding pixels
+            float sum = 0;
+            int count = 0;
+            int has_transition = 0;
+            int min_val = 999999;
+            int max_val = -1;
+
+            // Check 4 adjacent pixels that share this edge point
+            for (int dy = 0; dy <= 1; dy++) {
+                for (int dx = 0; dx <= 1; dx++) {
+                    int px = i - 1 + dx;
+                    int py = j - 1 + dy;
+
+                    if (px >= 0 && px < W && py >= 0 && py < H) {
+                        struct PixelState* pixel = &builder->pixels[py * W + px];
+                        int val = GetEnvelopeField(pixel, field);
+
+                        if (val >= 0) {
+                            sum += val;
+                            count++;
+                            if (val < min_val) min_val = val;
+                            if (val > max_val) max_val = val;
+                        }
+                    }
+                }
+            }
+
+            // If we have values and they differ, this is a transition edge
+            if (count > 0 && max_val > min_val) {
+                has_transition = 1;
+            }
+
+            // Store the edge value
+            // Use the average if we have values, otherwise -1
+            int edge_idx = j * grid->width + i;
+            if (count > 0) {
+                grid->data[edge_idx] = sum / count;
+            } else {
+                grid->data[edge_idx] = -1.0f;
+            }
+        }
+    }
+
+    return grid;
+}
+
+void FreeEdgeGrid(struct EdgeGrid* grid)
+{
+    if (grid) {
+        free(grid->data);
+        free(grid);
+    }
+}
+
+void PrintEnvelope(struct Envelope * e)
+{
+    printf(
+    	"attack_start %d\n"
+    	"attack_end %d\n"
+    	"release_start %d\n"
+    	"release_end %d\n"
+    	"area %d\n"
+    	"min_attack_alpha %d\n"
+    	"min_release_alpha %d\n"
+    	"max_alpha %d\n",
+    	e->attack_start,
+    	e->attack_end,
+    	e->release_start,
+    	e->release_end,
+    	e->area,
+    	e->min_attack_alpha,
+    	e->min_release_alpha,
+    	e->max_alpha
+);
+}
+
+EnvelopeBuilder * e_Initialize(int width, int height)
+{
+    EnvelopeBuilder* builder = malloc(sizeof(EnvelopeBuilder));
+    if (!builder) return NULL;
+
+    builder->width = width;
+    builder->height = height;
+    builder->pixels = calloc(width * height, sizeof(struct PixelState));
+
+    if (!builder->pixels) {
+        free(builder);
+        return NULL;
+    }
+
+    return builder;
+}
+
+#define TEST_X (317)
+#define TEST_Y (153)
+
+int e_ProcessFrame(EnvelopeBuilder * builder, ImageData const* src, int frame_id)
+{
+ 	if (!builder || !src || !src->data)
+    {
+        printf("Process frame failed (invalid argument)\n");
+        return -1;
+    }
+
+	if(frame_id == 0)
+	{
+		builder->key = *(union Color const*)(src->data);
+	}
+
+	int x = TEST_X;
+	int y = TEST_Y;
+
+#define LOOP 1
+#if LOOP
+#define PRINT_F(...)
+    for (y = 0; y < builder->height; y++) {
+        for (x = 0; x < builder->width; x++) {
+#else
+#define PRINT_F(...) printf(__VA_ARGS__)
+#define PRINT_X(...) printf(__VA_ARGS__)
+#endif
+            int idx = (y * builder->width + x);
+            struct PixelState* pixel = &builder->pixels[idx];
+
+            // Get current alpha from RGBA data
+            int src_idx = (y * src->width + x) * 4;
+            uint8_t current_alpha = src->data[src_idx + 3];
+
+            if(builder->key.a > 32)
+            {
+            	current_alpha = GetAlpha(&builder->key, (union Color const*)(&src->data[src_idx])) * current_alpha / 255;
+            }
+
+            PRINT_F("current alpha: %i\n", (int)current_alpha);
+
+			int check_it_again = 0;
+			do {
+        	    check_it_again = 0;
+
+				switch(pixel->in_envelope)
+				{
+				case NOT_IN_ENVELOPE:
+		            if (current_alpha > 4) {
+		                PRINT_F("Process frame: entering attack state, %d\n", frame_id);
+		                pixel->in_envelope = IN_ATTACK;
+		                pixel->current.attack_start = frame_id;
+		                pixel->current.min_attack_alpha = current_alpha;
+		                pixel->current.max_alpha = current_alpha;
+		            }
+		            break;
+		        case IN_ATTACK:
+		            if (current_alpha > pixel->current.max_alpha) {
+		                pixel->current.max_alpha = current_alpha;
+		                pixel->current.attack_end = frame_id;
+		        	    break;
+		            }
+		            else
+		            {
+		                PRINT_F("Process frame: entering sustain state, %d\n", frame_id);
+		            	pixel->in_envelope = IN_SUSTAIN;
+		            }
+		        case IN_SUSTAIN:
+		            if (current_alpha > pixel->current.max_alpha) {
+		                pixel->current.max_alpha = current_alpha;
+		                pixel->current.attack_end = frame_id;
+		            	pixel->in_envelope = IN_ATTACK;
+		            	PRINT_F("Process frame: backtracking to attack state %d\n", frame_id);
+		            	break;
+		            }
+
+		            if (current_alpha  < pixel->current.max_alpha) {
+		                pixel->current.release_start = frame_id;
+		               	pixel->current.release_end = frame_id;
+		                pixel->current.min_release_alpha = current_alpha;
+		            	pixel->in_envelope = IN_RELEASE;
+
+		                PRINT_F("Process frame: entering release state, %d\n", frame_id);
+		                if(current_alpha == 0)
+		                {
+		                    pixel->in_envelope = NOT_IN_ENVELOPE;
+		                    pixel->current.min_release_alpha = 0;
+		                    pixel->current.release_end = frame_id;
+		                    goto left_envelope;
+		                }
+		            }
+		            break;
+		      case IN_RELEASE:
+		            if (current_alpha < pixel->current.min_release_alpha)
+		            {
+		                if(current_alpha)
+		                {
+		                	pixel->current.min_release_alpha = current_alpha;
+		               		pixel->current.release_end = frame_id;
+		               	}
+		                else
+		                {
+		            		pixel->in_envelope = NOT_IN_ENVELOPE;
+		                   PRINT_F("Process frame: exiting envelope, %d\n", frame_id);
+		                }
+		            }
+
+		            if (current_alpha > pixel->current.min_release_alpha)
+		            {
+						check_it_again = 1;
+
+						if((frame_id - pixel->current.attack_end) < NOISE_FRAMES)
+		            		pixel->in_envelope = NOT_IN_ENVELOPE;
+		            	else
+		            		pixel->in_envelope = IN_SUSTAIN;
+		            }
+
+	left_envelope:
+		            if(pixel->in_envelope == NOT_IN_ENVELOPE
+		            && (pixel->current.release_end - pixel->current.attack_start) > NOISE_FRAMES
+		            && (pixel->current.max_alpha > NOISE_ALPHA) )
+		            {
+		            	if(!pixel->has_best || compare_env(&pixel->current, &pixel->best) > 0)
+		            	{
+		            	/*
+		            		if(pixel->has_best)
+		            		{
+		            			printf("REPLACING:\n");
+		            			PrintEnvelope(&builder->pixels[idx].best);
+		            			printf("WITH:\n");
+		            			PrintEnvelope(&builder->pixels[idx].current);
+		            		}*/
+
+
+		                    pixel->best = pixel->current;
+		                    pixel->has_best = 1;
+		            	}
+
+		            // reset
+		                memset(&pixel->current, 0, sizeof(struct Envelope));
+		            }
+		            else
+		            {
+						PRINT_F("pixel->in_envelope = %d\npixel->current.release_end = %d\npixel->current.attack_start = %d\npixel->current.max_alpha=%d\n",
+								pixel->in_envelope,
+								pixel->current.release_end,
+								pixel->current.attack_start,
+								pixel->current.max_alpha
+							);
+					}
+		            break;
+		       default:
+		           break;
+				};
+			} while(check_it_again);
+			if(pixel->in_envelope != NOT_IN_ENVELOPE)
+			{
+				pixel->current.area += current_alpha;
+			}
+
+            pixel->last_alpha = current_alpha;
+
+#if LOOP
+        }
+    }
+#endif
+
+    return 0;
+}
+
+int e_Build(EnvelopeBuilder * builder, ImageData * dst, EnvelopeMetadata * out, int total_frames)
+{
+/*
+#if LOOP == 0
+    int idx = (TEST_Y * builder->width + TEST_X);
+  	PrintEnvelope( &builder->pixels[idx].best);
+
+#else
+#define IDX(x, y) ((y) * builder->width + (x))
+  	PrintEnvelope( &builder->pixels[IDX(TEST_X, TEST_Y)].best);
+  	PrintEnvelope( &builder->pixels[IDX(TEST_X-1, TEST_Y)].best);
+  	PrintEnvelope( &builder->pixels[IDX(TEST_X+1, TEST_Y)].best);
+  	PrintEnvelope( &builder->pixels[IDX(TEST_X, TEST_Y-1)].best);
+  	PrintEnvelope( &builder->pixels[IDX(TEST_X, TEST_Y+1)].best);
+
+#endif
+*/
+
+
+
+
+	float delta_alpha;
+
+	if (!builder || !dst || !dst->data)
+    {
+        printf("Build failed (invalid argument)\n");
+    	return -1;
+    }
+
+// add black frame at the end to finish any unifinished business.
+    {
+        ImageData * last_frame = MakeImage(builder->width, builder->height, 1);
+        e_ProcessFrame(builder, last_frame, total_frames);
+        free(last_frame->data);
+        free(last_frame);
+    }
+
+    // First pass: find global timing bounds
+    EnvelopeMetadata m;
+
+    m.total_frames = total_frames;
+    m.min_attack_frame = total_frames;
+    m.max_attack_frame = 0;
+    m.min_release_frame = total_frames;
+    m.max_release_frame = 0;
+    m.key = builder->key;
+
+    for (int i = 0; i < builder->width * builder->height; i++) {
+        if (builder->pixels[i].has_best) {
+            m.min_attack_frame = min_i32(m.min_attack_frame,    builder->pixels[i].best.attack_start);
+            m.max_attack_frame = max_i32(m.max_attack_frame,  builder->pixels[i].best.attack_end);
+
+            m.min_release_frame = min_i32(m.min_release_frame,    builder->pixels[i].best.release_start);
+            m.max_release_frame = max_i32(m.max_release_frame,  builder->pixels[i].best.release_end);
+        }
+    }
+
+    if(m.min_attack_frame > m.max_attack_frame
+    && m.min_release_frame > m.max_release_frame)
+    {
+        printf("Build failed (no envelopes)\n");
+  		return -1;
+    }
+
+#if LOOP == 0
+	printf("attack range %d to %d", m.min_attack_frame, m.max_attack_frame);
+	printf("release range %d to %d", m.min_release_frame, m.max_release_frame);
+#endif
+    if(out)
+    {
+        *out = m;
+    }
+
+    float attack_duration = max_i32(1, m.max_attack_frame - m.min_attack_frame);
+    float release_duration = max_i32(1, m.max_release_frame - m.min_release_frame);
+
+    const float fadeInDuration = attack_duration / (float)m.total_frames ;
+    const float fadeOutDuration = release_duration / (float)m.total_frames ;
+    const float fadeOutStart = m.min_release_frame / (float)m.total_frames ;
+
+    int H = min_i32(builder->height, dst->height);
+    int W = min_i32(builder->width, dst->width);
+
+    // Second pass: build texture
+     for (int y = 0; y < H; y++) {
+        for (int x = 0; x < W; x++) {
+            int idx = (y * builder->width + x);
+            struct PixelState* pixel = &builder->pixels[idx];
+
+            int dst_idx = (y * dst->width + x) * 4;
+
+            if (pixel->has_best == 0)
+            	*(uint32_t*)(&dst->data[dst_idx]) = 0xFF000000;
+            else
+            {
+                // R: Normalized attack start (inverted as per shader)
+                float attack_norm = (float)(pixel->best.attack_start - m.min_attack_frame) / attack_duration;
+                float release_norm = (float)(pixel->best.release_end -  m.min_release_frame) / release_duration;
+
+                // B: Edge hardness based on attack/release speed
+                delta_alpha = (pixel->best.max_alpha - pixel->best.min_attack_alpha);
+                float attack_speed  = delta_alpha / (pixel->best.attack_end - pixel->best.attack_start);
+
+                delta_alpha = (pixel->best.max_alpha - pixel->best.min_release_alpha);
+                float release_speed = delta_alpha / (pixel->best.release_end - pixel->best.release_start);
+
+				float attack_softenss  = 1.0 - (attack_speed * (m.max_attack_frame - m.min_attack_frame) / (15.0 * m.total_frames));
+				float release_softenss = 1.0 - (release_speed * (m.max_release_frame - m.min_release_frame) / (15.0 * m.total_frames));
+
+// normalized alpha per fade
+                float softness = min_f32(attack_softenss, release_softenss );
+
+                dst->data[dst_idx + 0] = (uint8_t)((1.0f - attack_norm) * 255);
+                dst->data[dst_idx + 1] = (uint8_t)(release_norm * 255);
+                dst->data[dst_idx + 2] = clamp_i32(softness*255, 0, 255);
+
+                // A: Full opacity for valid pixels
+                dst->data[dst_idx + 3] = 255;
+            }
+        }
+   }
+
+    // Third pass: edge-aware smoothing to reduce banding from low frame rates
+    // Allocate temporary buffers for original R and G channels
+    uint8_t* temp_r = malloc(W * H);
+    uint8_t* temp_g = malloc(W * H);
+
+    if (!temp_r || !temp_g) {
+        free(temp_r);
+        free(temp_g);
+        printf("Warning: Could not allocate memory for smoothing pass, skipping\n");
+        return 0;
+    }
+
+    // Copy original R and G values
+    for (int y = 0; y < H; y++) {
+        for (int x = 0; x < W; x++) {
+            int dst_idx = (y * dst->width + x) * 4;
+            temp_r[y * W + x] = dst->data[dst_idx + 0];
+            temp_g[y * W + x] = dst->data[dst_idx + 1];
+        }
+    }
+
+    // Apply edge-aware smoothing
+    for (int y = 1; y < H - 1; y++) {
+        for (int x = 1; x < W - 1; x++) {
+            int dst_idx = (y * dst->width + x) * 4;
+
+            // Skip pixels with no envelope
+            if (dst->data[dst_idx + 3] == 0) continue;
+
+            // Sobel operator for gradient magnitude on R channel
+            float gx_r = (-(float)temp_r[(y-1)*W + (x-1)] + (float)temp_r[(y-1)*W + (x+1)] +
+                          -2.0f*(float)temp_r[y*W + (x-1)] + 2.0f*(float)temp_r[y*W + (x+1)] +
+                          -(float)temp_r[(y+1)*W + (x-1)] + (float)temp_r[(y+1)*W + (x+1)]) / 8.0f;
+
+            float gy_r = (-(float)temp_r[(y-1)*W + (x-1)] - 2.0f*(float)temp_r[(y-1)*W + x] - (float)temp_r[(y-1)*W + (x+1)] +
+                          (float)temp_r[(y+1)*W + (x-1)] + 2.0f*(float)temp_r[(y+1)*W + x] + (float)temp_r[(y+1)*W + (x+1)]) / 8.0f;
+
+            float grad_mag_r = sqrtf(gx_r*gx_r + gy_r*gy_r) / 255.0f;
+
+            // Sobel operator for gradient magnitude on G channel
+            float gx_g = (-(float)temp_g[(y-1)*W + (x-1)] + (float)temp_g[(y-1)*W + (x+1)] +
+                          -2.0f*(float)temp_g[y*W + (x-1)] + 2.0f*(float)temp_g[y*W + (x+1)] +
+                          -(float)temp_g[(y+1)*W + (x-1)] + (float)temp_g[(y+1)*W + (x+1)]) / 8.0f;
+
+            float gy_g = (-(float)temp_g[(y-1)*W + (x-1)] - 2.0f*(float)temp_g[(y-1)*W + x] - (float)temp_g[(y-1)*W + (x+1)] +
+                          (float)temp_g[(y+1)*W + (x-1)] + 2.0f*(float)temp_g[(y+1)*W + x] + (float)temp_g[(y+1)*W + (x+1)]) / 8.0f;
+
+            float grad_mag_g = sqrtf(gx_g*gx_g + gy_g*gy_g) / 255.0f;
+
+            // Average gradient magnitude across both channels
+            float grad_mag = (grad_mag_r + grad_mag_g) / 2.0f;
+
+            // Smoothing weight: low gradient = likely banding = more smoothing
+            // High gradient = real edge = preserve
+            float smooth_weight = 1.0f - clamp_f32(grad_mag * 4.0f, 0.0f, 1.0f);
+
+            // Only apply smoothing if weight is significant
+            if (smooth_weight > 0.1f) {
+                // Compute box blur average of neighbors
+                float sum_r = 0, sum_g = 0;
+                int count = 0;
+
+                for (int dy = -1; dy <= 1; dy++) {
+                    for (int dx = -1; dx <= 1; dx++) {
+                        int ny = y + dy;
+                        int nx = x + dx;
+                        if (ny >= 0 && ny < H && nx >= 0 && nx < W) {
+                            int check_idx = (ny * dst->width + nx) * 4;
+                            // Only include neighbors with valid envelopes
+                            if (dst->data[check_idx + 3] > 0) {
+                                sum_r += temp_r[ny * W + nx];
+                                sum_g += temp_g[ny * W + nx];
+                                count++;
+                            }
+                        }
+                    }
+                }
+
+                if (count > 0) {
+                    float avg_r = sum_r / count;
+                    float avg_g = sum_g / count;
+
+                    // Blend between original and smoothed based on gradient magnitude
+                    dst->data[dst_idx + 0] = (uint8_t)clamp_i32(
+                        temp_r[y * W + x] * (1.0f - smooth_weight) + avg_r * smooth_weight,
+                        0, 255);
+                    dst->data[dst_idx + 1] = (uint8_t)clamp_i32(
+                        temp_g[y * W + x] * (1.0f - smooth_weight) + avg_g * smooth_weight,
+                        0, 255);
+                }
+            }
+        }
+    }
+
+    free(temp_r);
+    free(temp_g);
+
+    return 0;
+}
+
+void e_Free(EnvelopeBuilder* builder)
+{
+    if (builder) {
+        free(builder->pixels);
+        free(builder);
+    }
+}

@@ -1,0 +1,3 @@
+/home/anyuser/websites/spehleonlp.github.io/erosion/src/build/Clone_of_Desktop_Qt_6_7_0-Debug/CMakeFiles/video_processor_lib.dir
+/home/anyuser/websites/spehleonlp.github.io/erosion/src/build/Clone_of_Desktop_Qt_6_7_0-Debug/CMakeFiles/edit_cache.dir
+/home/anyuser/websites/spehleonlp.github.io/erosion/src/build/Clone_of_Desktop_Qt_6_7_0-Debug/CMakeFiles/rebuild_cache.dir

@@ -200,6 +200,112 @@ async function ProcessVideo_new(event, mimeType) {
     }
 }
 
+// Function to process GIF files
+async function ProcessGIF(event) {
+    try {
+        await runWithProgress(async () => {
+            const arrayBuffer = event.target.result;
+            const byteArray = new Uint8Array(arrayBuffer);
+
+            // Parse GIF using omggif
+            const gifReader = new GifReader(byteArray);
+            const numFrames = gifReader.numFrames();
+            const width = gifReader.width;
+            const height = gifReader.height;
+
+            console.log(`GIF: ${width}x${height}, ${numFrames} frames`);
+
+            if (numFrames === 0) {
+                throw new Error('GIF has no frames');
+            }
+
+            // Calculate duration based on frame delays
+            let totalDelay = 0;
+            for (let i = 0; i < numFrames; i++) {
+                const frameInfo = gifReader.frameInfo(i);
+                totalDelay += frameInfo.delay || 10; // Default 10 centiseconds if no delay
+            }
+            const duration = totalDelay / 100; // Convert centiseconds to seconds
+
+            console.log(`Total duration: ${duration}s`);
+
+            // Create canvas for frame composition
+            const canvas = new OffscreenCanvas(width, height);
+            const ctx = canvas.getContext('2d');
+
+            // Buffer to store the current composed frame
+            let previousFrameData = new Uint8ClampedArray(width * height * 4);
+            previousFrameData.fill(0); // Start with transparent
+
+            const pass_callback = async () => {
+                for (let frameIndex = 0; frameIndex < numFrames; frameIndex++) {
+                    const frameInfo = gifReader.frameInfo(frameIndex);
+
+                    // Decode frame to RGBA pixels
+                    const frameRGBA = new Uint8ClampedArray(width * height * 4);
+                    gifReader.decodeAndBlitFrameRGBA(frameIndex, frameRGBA);
+
+                    // Handle frame disposal method
+                    if (frameIndex > 0) {
+                        const prevFrameInfo = gifReader.frameInfo(frameIndex - 1);
+
+                        // Disposal method 2: restore to background (transparent)
+                        if (prevFrameInfo.disposal === 2) {
+                            previousFrameData.fill(0);
+                        }
+                        // Disposal method 3: restore to previous (keep previousFrameData as is)
+                        // Disposal method 0 or 1: no disposal (overlay on previous)
+                    }
+
+                    // Composite this frame onto the previous frame
+                    const x = frameInfo.x || 0;
+                    const y = frameInfo.y || 0;
+                    const frameWidth = frameInfo.width || width;
+                    const frameHeight = frameInfo.height || height;
+
+                    // If this frame covers the entire canvas, just use it
+                    if (x === 0 && y === 0 && frameWidth === width && frameHeight === height) {
+                        for (let i = 0; i < frameRGBA.length; i++) {
+                            previousFrameData[i] = frameRGBA[i];
+                        }
+                    } else {
+                        // Composite partial frame
+                        for (let py = 0; py < frameHeight; py++) {
+                            for (let px = 0; px < frameWidth; px++) {
+                                const srcIdx = (py * width + px) * 4;
+                                const dstIdx = ((y + py) * width + (x + px)) * 4;
+
+                                if (dstIdx >= 0 && dstIdx < previousFrameData.length) {
+                                    const alpha = frameRGBA[srcIdx + 3];
+                                    if (alpha > 0) {
+                                        previousFrameData[dstIdx] = frameRGBA[srcIdx];
+                                        previousFrameData[dstIdx + 1] = frameRGBA[srcIdx + 1];
+                                        previousFrameData[dstIdx + 2] = frameRGBA[srcIdx + 2];
+                                        previousFrameData[dstIdx + 3] = frameRGBA[srcIdx + 3];
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Send the composed frame to the worker
+                    const frameDataCopy = new Uint8Array(previousFrameData);
+                    await workerOperation('pushFrame', {
+                        frameData: frameDataCopy.buffer
+                    }, [frameDataCopy.buffer]);
+                }
+            };
+
+            await CreateTextures(duration, width, height, pass_callback);
+        });
+
+        console.log('GIF processing completed successfully.');
+    } catch (error) {
+        console.error('Error processing GIF:', error);
+        alert(`Error processing GIF: ${error.message}`);
+    }
+}
+
 
 document.addEventListener('DOMContentLoaded', () => {
     const videoButton = document.getElementById('load-video');
@@ -220,14 +326,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const files = e.dataTransfer.files;
         if (files.length > 0) {
             const file = files[0];
+            const reader = new FileReader();
+
             if (file.type.startsWith('video/')) {
-                const reader = new FileReader();
                 reader.onload = function(event) {
                   	ProcessVideo(event, file.type);
                 };
                 reader.readAsArrayBuffer(file);
+            } else if (file.type === 'image/gif') {
+                reader.onload = function(event) {
+                  	ProcessGIF(event);
+                };
+                reader.readAsArrayBuffer(file);
             } else {
-                alert('Please drop an video file.');
+                alert('Please drop a video or GIF file.');
             }
         }
     });
@@ -235,17 +347,25 @@ document.addEventListener('DOMContentLoaded', () => {
     videoButton.addEventListener('click', () => {
         const input = document.createElement('input');
         input.type = 'file';
-        input.accept = 'video/*';
+        input.accept = 'video/*,image/gif';
         input.onchange = e => {
             const file = e.target.files[0];
-            if (file && file.type.startsWith('video/')) {
-                const reader = new FileReader();
+            if (!file) return;
+
+            const reader = new FileReader();
+
+            if (file.type.startsWith('video/')) {
                 reader.onload = function(event) {
                   	ProcessVideo(event, file.type);
                 };
                 reader.readAsArrayBuffer(file);
+            } else if (file.type === 'image/gif') {
+                reader.onload = function(event) {
+                  	ProcessGIF(event);
+                };
+                reader.readAsArrayBuffer(file);
             } else {
-                alert('Please select an video file.');
+                alert('Please select a video or GIF file.');
             }
         }
         input.click();

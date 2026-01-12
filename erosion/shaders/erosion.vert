@@ -29,10 +29,12 @@ void main()
 	// 0 = use fade-in colors, 1 = use fade-out colors
 	// Transition happens during the sustain period (between fade-in and fade-out)
 	float FadeOffsetDuration = abs(u_fadeOutStart - u_fadeInDuration);
+	float FadeTransitionStart = u_fadeInDuration + (u_fadeOutStart - u_fadeInDuration) * 0.5f;
 
 	f_life.r = u_time / u_fadeInDuration;
 	f_life.g = (u_time - u_fadeOutStart) / u_fadeOutDuration;
-	f_life.b = (u_time - u_fadeInDuration) / FadeOffsetDuration;
+	f_life.b = u_time / max(u_fadeInDuration, u_fadeOutStart + u_fadeOutDuration);
+	//f_life.b = (u_time - FadeTransitionStart) / FadeOffsetDuration;
 
 	f_life = clamp(f_life, vec3(0), vec3(1));
 

@@ -28,7 +28,7 @@ void main()
 	// TransitionRatio: blend between fade-in and fade-out colors
 	// 0 = use fade-in colors, 1 = use fade-out colors
 	// Transition happens during the sustain period (between fade-in and fade-out)
-	float FadeOffsetDuration = u_fadeOutStart - u_fadeInDuration;
+	float FadeOffsetDuration = abs(u_fadeOutStart - u_fadeInDuration);
 
 	f_life.r = u_time / u_fadeInDuration;
 	f_life.g = (u_time - u_fadeOutStart) / u_fadeOutDuration;

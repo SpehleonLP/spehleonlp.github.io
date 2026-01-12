@@ -17,7 +17,6 @@ in vec2 a_texCoord;
 out vec2 v_texCoord;
 out vec2 v_texCoordPx;
 out vec3 f_life;
-flat out float textureRatio;
 
 
 void main()
@@ -26,11 +25,14 @@ void main()
 	v_texCoord = a_texCoord * u_viewportSize / min(u_viewportSize.x, u_viewportSize.y);
 	v_texCoordPx = a_texCoord * u_viewportSize;
 
-	float FadeTransitionStart = u_fadeInDuration + (u_fadeOutStart - u_fadeInDuration) * 0.5f;
+	// TransitionRatio: blend between fade-in and fade-out colors
+	// 0 = use fade-in colors, 1 = use fade-out colors
+	// Transition happens during the sustain period (between fade-in and fade-out)
+	float FadeOffsetDuration = u_fadeOutStart - u_fadeInDuration;
 
-	f_life.r  = u_time / u_fadeInDuration;
+	f_life.r = u_time / u_fadeInDuration;
 	f_life.g = (u_time - u_fadeOutStart) / u_fadeOutDuration;
-	f_life.b = u_time / u_animationDuration;
+	f_life.b = (u_time - u_fadeInDuration) / FadeOffsetDuration;
 
 	f_life = clamp(f_life, vec3(0), vec3(1));
 
@@ -38,8 +40,4 @@ void main()
 	{
 		v_texCoord.y = 1.0 - v_texCoord.y;
 	}
-
-	ivec2 size = textureSize(u_gradient, 0);
-	textureRatio = float(size.y) / float(size.x);
-	textureRatio = textureRatio > 2.0? 32.0 : 1.0;
 }

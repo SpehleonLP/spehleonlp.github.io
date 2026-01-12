@@ -1,11 +1,7 @@
 #version 300 es
 precision mediump float;
-precision mediump sampler3D;
 uniform sampler2D u_erosionTexture;
 uniform sampler2D u_gradient;
-uniform sampler3D u_gradient3D;
-
-uniform float u_has3DGradient;
 
 uniform float u_fadeInDuration;
 uniform float u_fadeOutDuration;
@@ -18,7 +14,6 @@ uniform vec2 u_viewportSize;
 in vec2 v_texCoord;
 in vec2 v_texCoordPx;
 in vec3 f_life;
-flat in float textureRatio;
 
 out vec4 fragColor;
 
@@ -30,26 +25,17 @@ vec4 GetColorOriginal(vec2 texCoord)
     float fadeInFactor = clamp(f_life.r - (1.0 - texEffect.r), 0.0, 1.0);
     float fadeOutFactor = clamp(texEffect.g - f_life.g, 0.0, 1.0);
 
-	float fadeInStart   = (1.0 - texEffect.r) * u_fadeInDuration;
-	float fadeOutEnd    = texEffect.g * u_fadeOutDuration + u_fadeOutStart;
-	float fadeProgress  = (u_time - fadeInStart) / (fadeOutEnd - fadeInStart);
+	// Sample 2D color ramp for fade-in and fade-out
+	// Left half (U: 0-0.5) is fade-in, right half (U: 0.5-1.0) is fade-out
+	// V coordinate is the fadeInFactor/fadeOutFactor (gradient along visible edge)
+	vec2 rampUV_in = vec2(f_life.r * 0.5, 1.0 - fadeInFactor);
+	vec2 rampUV_out = vec2(0.5 + f_life.g * 0.5, fadeOutFactor);
 
-	vec4 texBLEND = vec4(texEffect.rg, fadeProgress, 1.0);
+	vec4 texIN = texture(u_gradient, rampUV_in);
+	vec4 texOUT = texture(u_gradient, rampUV_out);
 
-	if(u_has3DGradient != 0.0)
-	{
-		texBLEND = texture(u_gradient3D, vec3(texEffect.rg, fadeProgress));
-	}
-	else
-	{
-		vec2 rampUV_in = vec2(f_life.r * 0.5, 1.0 - fadeInFactor);
-		vec2 rampUV_out = vec2((0.5f + f_life.g * 0.5), fadeOutFactor);
-
-		vec4 texIN = texture(u_gradient, rampUV_in);
-		vec4 texOUT= texture(u_gradient, rampUV_out);
-
-		texBLEND = mix(texIN, texOUT, vec4(f_life.b));
-	}
+	// Blend between fade-in and fade-out colors using TransitionRatio
+	vec4 texBLEND = mix(texIN, texOUT, vec4(f_life.b));
 
 	fadeInFactor = clamp(fadeInFactor * 15.0 * (1.0 - texEffect.b), 0.0, 1.0);
 	fadeOutFactor = clamp(fadeOutFactor * 15.0 * (1.0 - texEffect.b), 0.0, 1.0);

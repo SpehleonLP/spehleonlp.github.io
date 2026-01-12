@@ -5,7 +5,6 @@ let recordCanvasWidth = 32;
 let recordCanvasHeight = 32;
 let gradientCanvasWidth = 32;
 let gradientCanvasHeight = 32;
-let using3DGradient = false;
 let renderDelegate = null; // this will be populated by function render(time, isInFrameBuffer) by the time you use it
 let glContext = null; // this will contain the gl context from the canvas
 let is_making_video = false;
@@ -24,7 +23,6 @@ function UploadTexture(gl, texture, dropAreaId, textureUnit, image)
 	{
 		gradientCanvasWidth = image.width;
 		gradientCanvasHeight = image.height;
-		using3DGradient = false;
 	}
 
     gl.activeTexture(gl.TEXTURE0 + textureUnit);
@@ -49,75 +47,6 @@ function UploadTexture(gl, texture, dropAreaId, textureUnit, image)
 
     dropArea.innerHTML = ''; // Remove the <p> text
 }
-
-function UploadTexture3D(gl, texture_2d, texture_3d, dropAreaId, textureUnit_2d, textureUnit_3D, frameDataBuffer, width, height, depth) {
-
-	if (frameDataBuffer instanceof Image)
-	{
-    	const canvas = document.createElement('canvas');
-		canvas.width = frameDataBuffer.width;
-		canvas.height = frameDataBuffer.height;
-		const ctx = canvas.getContext('2d');
-
-		ctx.drawImage(frameDataBuffer, 0, 0);
-
-		const imageData = ctx.getImageData(0, 0, frameDataBuffer.width, frameDataBuffer.height);
-		return UploadTexture3D(gl, texture_2d, texture_3d, dropAreaId, textureUnit_2d, textureUnit_3D, imageData.data.buffer, width, height, depth);
-	}
-
-	let buffer;
-	if (frameDataBuffer instanceof ArrayBuffer) {
-	    buffer = new Uint8Array(frameDataBuffer);
-	} else if (frameDataBuffer instanceof Uint8Array
-	|| frameDataBuffer instanceof Uint8ClampedArray) {
-	    buffer = frameDataBuffer;
-	} else {
-	    throw new Error('Expected an ArrayBuffer or Uint8Array.');
-	}
-
-	if(depth == 1)
-	{
-	    // Extract the first slice from the 3D buffer
-		// Assuming buffer is a Uint8Array or similar with RGBA data
-		const sliceSize = width * height * depth * 4; // 4 bytes per pixel (RGBA)
-		const firstSliceBuffer = buffer.slice(0, sliceSize);
-
-		// Create ImageData from the first slice
-		const firstSliceImageData = new ImageData(new Uint8ClampedArray(firstSliceBuffer), width, height * depth);
-
-		// Forward the first slice to the UploadTexture function as a 2D texture
-		return UploadTexture(gl, texture_2d, dropAreaId, textureUnit_2d, firstSliceImageData);
-	}
-
-	// Ensure frameDataBuffer is an ArrayBuffer or Uint8Array
-	console.log("using 3d texture...");
-
-
-    // Ensure WebGL2 is available for 3D textures
-    if (!(gl instanceof WebGL2RenderingContext)) {
-        console.error('WebGL2 is required for 3D textures.');
-        return;
-    }
-
-    // Upload the 3D texture
-    gl.activeTexture(gl.TEXTURE0 + textureUnit_3D);
-    gl.bindTexture(gl.TEXTURE_3D, texture_3d);
-    gl.texImage3D(gl.TEXTURE_3D, 0, gl.RGBA, width, height, depth, 0, gl.RGBA, gl.UNSIGNED_BYTE, buffer);
-    gl.generateMipmap(gl.TEXTURE_3D);
-
-    // Extract the first slice from the 3D buffer
-    // Assuming buffer is a Uint8Array or similar with RGBA data
-    const sliceSize = width * height * depth * 4; // 4 bytes per pixel (RGBA)
-    const firstSliceBuffer = buffer.slice(0, sliceSize);
-
-    // Create ImageData from the first slice
-    const firstSliceImageData = new ImageData(new Uint8ClampedArray(firstSliceBuffer), width, height * depth);
-
-    // Forward the first slice to the UploadTexture function as a 2D texture
-    UploadTexture(gl, texture_2d, dropAreaId, textureUnit_2d, firstSliceImageData);
-    using3DGradient = true;
-}
-
 
 // Helper function to convert ImageData to Data URL using a regular canvas
 function imageDataToDataURL(imageData) {
@@ -163,22 +92,6 @@ function initializeTexture(gl, texture, url) {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, defaultPixel);
 }
 
-function initializeTexture3D(gl, texture, url) {
-    gl.bindTexture(gl.TEXTURE_3D, texture);
-
-    // Set texture parameters
-    gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_WRAP_R, gl.CLAMP_TO_EDGE); // Wrap horizontally
-    gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); // Wrap horizontally
-    gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE); // Wrap vertically
-    gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);    // Minification filter
-    gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);    // Magnification filter
-
-    // Initialize with a 1x1 pixel if no image is provided
-    const defaultPixel = new Uint8Array([0, 0, 0, 255]); // Black pixel
-    gl.texImage3D(gl.TEXTURE_3D, 0, gl.RGBA, 1, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, defaultPixel);
-}
-
-
 // Wait for the DOM to load
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize WebGL
@@ -220,11 +133,9 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const uniformLocations = {
-        	u_has3DGradient: gl.getUniformLocation(shaderProgram, 'u_has3DGradient'),
         	u_viewportSize: gl.getUniformLocation(shaderProgram, 'u_viewportSize'),
             u_erosionTexture: gl.getUniformLocation(shaderProgram, 'u_erosionTexture'),
             u_gradient: gl.getUniformLocation(shaderProgram, 'u_gradient'),
-        	u_gradient3D: gl.getUniformLocation(shaderProgram, 'u_gradient3D'),
             u_fadeInDuration: gl.getUniformLocation(shaderProgram, 'u_fadeInDuration'),
             u_fadeOutDuration: gl.getUniformLocation(shaderProgram, 'u_fadeOutDuration'),
             u_animationDuration: gl.getUniformLocation(shaderProgram, 'u_animationDuration'),
@@ -238,18 +149,15 @@ document.addEventListener('DOMContentLoaded', () => {
         textures = {
             u_erosionTexture: gl.createTexture(),
             u_gradient: gl.createTexture(),
-            u_gradient3D: gl.createTexture(),
         };
 
         // Initially load default textures or placeholders
         initializeTexture(gl, textures.u_erosionTexture, ''); // Empty or default
         initializeTexture(gl, textures.u_gradient, ''); // Empty or default
-        initializeTexture3D(gl, textures.u_gradient3D, ''); // Empty or default
 
         // Set texture units
         gl.uniform1i(uniformLocations.u_erosionTexture, 0); // Texture unit 0
         gl.uniform1i(uniformLocations.u_gradient, 1);       // Texture unit 1
-        gl.uniform1i(uniformLocations.u_gradient3D, 2);       // Texture unit 1
 
         // Main render loop
         function render(time, isInFrameBuffer) {
@@ -290,9 +198,6 @@ document.addEventListener('DOMContentLoaded', () => {
             gl.uniform1f(uniformLocations.u_fadeOutDuration, fadeOutDuration);
             gl.uniform1f(uniformLocations.u_animationDuration, animationDuration);
             gl.uniform1f(uniformLocations.u_time, time);
-        	gl.uniform1f(uniformLocations.u_has3DGradient, using3DGradient? 1.0 : 0.0);
-
-
 
             // Bind textures
             gl.activeTexture(gl.TEXTURE0);
@@ -300,9 +205,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             gl.activeTexture(gl.TEXTURE1);
             gl.bindTexture(gl.TEXTURE_2D, textures.u_gradient);
-
-            gl.activeTexture(gl.TEXTURE2);
-            gl.bindTexture(gl.TEXTURE_3D, textures.u_gradient3D);
 
             // Draw the quad
             gl.bindBuffer(gl.ARRAY_BUFFER, buffers);
@@ -528,23 +430,7 @@ function setupTextureUpload(gl, texture, dropAreaId, textureUnit) {
                 reader.onload = function(event) {
                     const image = new Image();
                     image.onload = function() {
-                    	if(image.height == image.width*image.width
-                    	&& textureUnit == 1)
-                    	{
-                    	   UploadTexture3D(gl,
-                    	   	textures.u_gradient,
-                    	   	textures.u_gradient3D,
-                    	   	dropAreaId,
-                    	   	1, 2,
-                    	   	image,
-                    	   	image.width,
-                    	   	image.width,
-                    	   	image.width);
-                    	}
-                    	else
-                    	{
-                    		UploadTexture(gl, texture, dropAreaId, textureUnit, image);
-                    	}
+                    	UploadTexture(gl, texture, dropAreaId, textureUnit, image);
                     }
                     image.src = event.target.result;
                 }
@@ -566,23 +452,7 @@ function setupTextureUpload(gl, texture, dropAreaId, textureUnit) {
                 reader.onload = function(event) {
                     const image = new Image();
                     image.onload = function() {
-                    	if(image.height == image.width*image.width
-                    	&& textureUnit == 1)
-                    	{
-                    	   UploadTexture3D(gl,
-                    	   	textures.u_gradient,
-                    	   	textures.u_gradient3D,
-                    	   	dropAreaId,
-                    	   	1, 2,
-                    	   	image,
-                    	   	image.width,
-                    	   	image.width,
-                    	   	image.width);
-                    	}
-                    	else
-                    	{
-                    		UploadTexture(gl, texture, dropAreaId, textureUnit, image);
-                    	}
+                    	UploadTexture(gl, texture, dropAreaId, textureUnit, image);
                     }
                     image.src = event.target.result;
                 }

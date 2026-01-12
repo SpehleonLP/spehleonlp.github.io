@@ -3,6 +3,8 @@
         const fadeInValue = document.getElementById('fadeInDurationValue');
         const fadeOutSlider = document.getElementById('fadeOutDuration');
         const fadeOutValue = document.getElementById('fadeOutDurationValue');
+        const transitionSlider = document.getElementById('transitionDuration');
+        const transitionValue = document.getElementById('transitionDurationValue');
         const lifetimeSlider = document.getElementById('lifetime');
         const lifetimeValue = document.getElementById('lifetimeValue');
         const rateSlider = document.getElementById('rate');
@@ -31,6 +33,10 @@
 
         fadeOutSlider.addEventListener('input', () => {
             updateSliderDisplay(fadeOutSlider, fadeOutValue);
+        });
+
+        transitionSlider.addEventListener('input', () => {
+            updateSliderDisplay(transitionSlider, transitionValue);
         });
 
         lifetimeSlider.addEventListener('input', () => {

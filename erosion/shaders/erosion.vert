@@ -6,6 +6,7 @@ uniform sampler2D u_gradient;
 uniform vec2 u_viewportSize;
 uniform float u_fadeInDuration;
 uniform float u_fadeOutDuration;
+uniform float u_transitionDuration;
 uniform float u_animationDuration;
 uniform float u_time;
 
@@ -25,17 +26,14 @@ void main()
 	v_texCoord = a_texCoord * u_viewportSize / min(u_viewportSize.x, u_viewportSize.y);
 	v_texCoordPx = a_texCoord * u_viewportSize;
 
-	// TransitionRatio: blend between fade-in and fade-out colors
-	// 0 = use fade-in colors, 1 = use fade-out colors
-	// Transition happens during the sustain period (between fade-in and fade-out)
-	float FadeOffsetDuration = abs(u_fadeOutStart - u_fadeInDuration);
-	float FadeTransitionStart = u_fadeInDuration + (u_fadeOutStart - u_fadeInDuration) * 0.5f;
-
 	f_life.r = u_time / u_fadeInDuration;
 	f_life.g = (u_time - u_fadeOutStart) / u_fadeOutDuration;
-	f_life.b = (u_time) / (u_animationDuration);
-	//f_life.b = u_time / max(u_fadeInDuration, u_fadeOutStart + u_fadeOutDuration);
-	//f_life.b = (u_time - FadeTransitionStart) / FadeOffsetDuration;
+
+	// TransitionRatio: blend between fade-in and fade-out colors (matches Alkemi)
+	// Transition starts when fade-in completes, transitions over FadeTransitionDuration
+	float FadeOffsetDuration = u_fadeOutStart - u_fadeInDuration;
+	float FadeTransitionStart = u_fadeInDuration + FadeOffsetDuration * 0.5;
+	f_life.b = (u_time - FadeTransitionStart) / u_transitionDuration;
 
 	f_life = clamp(f_life, vec3(0), vec3(1));
 

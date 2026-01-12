@@ -278,7 +278,7 @@ function resizeCanvas(gl, canvas) {
  * @returns {Promise<WebGLShader>} - A promise that resolves to the compiled shader.
  */
 async function loadShader(gl, type, url) {
-    const response = await fetch(url);
+    const response = await fetch(url, { cache: 'no-cache' });
     if (!response.ok) {
         throw new Error(`Failed to load shader from ${url}: ${response.statusText}`);
     }

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gradient Mapping Texture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="scripts/grapick.min.css">
+<link rel="stylesheet" href="scripts/coloris.min.css">
+<script src="scripts/grapick.min.js"></script>
+<script src="scripts/coloris.min.js"></script>
+</head>
+<body>
+
+<!-- ============================================
+     TOOLBAR
+     ============================================ -->
+<header class="toolbar">
+  <div class="toolbar-brand">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+      <rect x="2" y="2" width="16" height="16" rx="3"/>
+      <path d="M2 14l5-5 3 3 4-6 4 4"/>
+    </svg>
+    <span>Gradient Mapping</span>
+  </div>
+  <button class="btn-icon" id="shareBtn" title="Copy shareable link">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="3" r="2"/>
+      <circle cx="4" cy="8" r="2"/>
+      <circle cx="12" cy="13" r="2"/>
+      <path d="M6 9l4 3M6 7l4-3"/>
+    </svg>
+  </button>
+</header>
+
+<!-- ============================================
+     WORKSPACE
+     ============================================ -->
+<main class="workspace">
+
+  <!-- LEFT PANEL: Gradient Ramp -->
+  <aside class="panel panel-left">
+    <div class="panel-header">
+      <h2>Gradient Ramp</h2>
+      <div class="panel-header-actions">
+        <button class="btn-icon" title="Import source image" data-import="gradient">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M8 10V2M8 2l3 3M8 2L5 5"/>
+            <path d="M2 10v3a1 1 0 001 1h10a1 1 0 001-1v-3"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="effect-stack" id="gradientStack">
+      <div class="add-effect-wrap">
+        <div class="add-effect-menu" id="gradientEffectMenu">
+          <button data-effect="colorBalance">Color Balance</button>
+          <button data-effect="brightnessContrast">Brightness / Contrast</button>
+          <button data-effect="hueShift">Hue Shift</button>
+          <button data-effect="posterize">Posterize</button>
+        </div>
+        <button class="add-effect-btn" data-menu="gradientEffectMenu">+ Add Effect</button>
+      </div>
+    </div>
+
+    <div class="panel-preview">
+      <div class="preview-image" id="gradientPreview">
+        <div class="preview-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="2"/><path d="M3 16l5-4 3 3 4-5 6 5v3a3 3 0 01-3 3H6a3 3 0 01-3-3z"/></svg>
+          <div>2D gradient ramp</div>
+        </div>
+        <div class="preview-actions">
+          <button class="btn-icon" title="Download texture"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 2v8M8 10l3-3M8 10L5 7"/><path d="M2 12v1a1 1 0 001 1h10a1 1 0 001-1v-1"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CENTER: Viewport -->
+  <section class="viewport-wrap">
+    <div class="viewport" id="viewport">
+      <div class="viewport-badge">WebGL</div>
+      <div class="gl-canvas-frame">
+        <canvas id="glCanvas"></canvas>
+      </div>
+      <button class="btn btn-accent copy-shader-float" id="copyShader">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="5" y="5" width="9" height="9" rx="1.5"/>
+          <path d="M11 5V3.5A1.5 1.5 0 009.5 2h-6A1.5 1.5 0 002 3.5v6A1.5 1.5 0 003.5 11H5"/>
+        </svg>
+        Copy Shader
+      </button>
+    </div>
+
+    <div class="playback-bar">
+      <button class="btn-icon" id="playPause" title="Play">
+        <svg viewBox="0 0 16 16" fill="currentColor" id="playIcon"><path d="M4 2.5v11l9-5.5z"/></svg>
+        <svg viewBox="0 0 16 16" fill="currentColor" id="pauseIcon" style="display:none"><rect x="3" y="2" width="3.5" height="12" rx="1"/><rect x="9.5" y="2" width="3.5" height="12" rx="1"/></svg>
+      </button>
+
+      <div class="timeline-container" id="timelineContainer">
+        <!-- Flags -->
+        <div class="timeline-flag flag-in" id="flagIn" style="left:25%">
+          <div class="flag-tooltip" id="flagInTip">0.50s</div>
+          <div class="flag-tag">In</div>
+          <div class="flag-stem"></div>
+        </div>
+        <div class="timeline-flag flag-out" id="flagOut" style="left:75%">
+          <div class="flag-tooltip" id="flagOutTip">0.50s</div>
+          <div class="flag-tag">Out</div>
+          <div class="flag-stem"></div>
+        </div>
+
+        <!-- Track -->
+        <div class="timeline-track" id="timelineTrack">
+          <div class="track-zone track-zone-in" id="zoneIn"></div>
+          <div class="track-zone track-zone-active" id="zoneActive"></div>
+          <div class="track-zone track-zone-out" id="zoneOut"></div>
+          <div class="track-playhead" id="playhead" style="left:0%"></div>
+        </div>
+      </div>
+
+      <div class="time-info">
+        <span class="time-current" id="timeCurrent">0.00</span>
+        <span class="time-sep">/</span>
+        <div class="duration-wrap">
+          <button class="time-duration" id="durationBtn">
+            <span id="durationText">2.00s</span>
+            <svg class="duration-edit-icon" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 1l2 2-5.5 5.5H1.5V6.5z"/>
+            </svg>
+          </button>
+          <div class="duration-popover" id="durationPopover">
+            <div class="param">
+              <div class="param-label">
+                <label>Duration (s)</label>
+                <span class="param-value" id="durationVal">2.00</span>
+              </div>
+              <input type="range" id="durationSlider" min="0.5" max="30" step="0.1" value="2.0">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="viewport-links">
+      <a href="about.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="8" cy="8" r="6.5"/>
+          <path d="M8 11V7M8 5.5v-.01" stroke-linecap="round"/>
+        </svg>
+        About This Tool
+      </a>
+      <a href="../index.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M2 8l6-5 6 5M4 7v6a1 1 0 001 1h6a1 1 0 001-1V7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Main App
+      </a>
+      <a href="https://github.com/SpehleonLP/spehleonlp.github.io/tree/main/erosion" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+        </svg>
+        Source Code
+      </a>
+    </nav>
+  </section>
+
+  <!-- RIGHT PANEL: Erosion Texture -->
+  <aside class="panel panel-right">
+    <div class="panel-header">
+      <h2>Erosion Texture</h2>
+      <div class="panel-header-actions">
+        <button class="btn-icon" title="Import source image" data-import="erosion">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M8 10V2M8 2l3 3M8 2L5 5"/>
+            <path d="M2 10v3a1 1 0 001 1h10a1 1 0 001-1v-3"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="effect-stack" id="erosionStack">
+      <div class="add-effect-wrap">
+        <div class="add-effect-menu" id="erosionEffectMenu">
+          <button data-effect="smartBlur">Smart Blur</button>
+          <button data-effect="fluidInterp">Fluid Interpolation</button>
+          <button data-effect="edgeDetect">Edge Detect</button>
+          <button data-effect="threshold">Threshold</button>
+          <button data-effect="levels">Levels</button>
+        </div>
+        <button class="add-effect-btn" data-menu="erosionEffectMenu">+ Add Effect</button>
+      </div>
+    </div>
+
+    <div class="panel-preview">
+      <div class="preview-image" id="erosionPreview">
+        <div class="preview-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 12h18M12 3v18"/><path d="M3 3l18 18" opacity="0.4"/></svg>
+          <div>Erosion texture</div>
+        </div>
+        <div class="preview-actions">
+          <button class="btn-icon" title="Download texture"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 2v8M8 10l3-3M8 10L5 7"/><path d="M2 12v1a1 1 0 001 1h10a1 1 0 001-1v-1"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="progressModal">
+  <div class="modal-spinner"></div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

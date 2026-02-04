@@ -1,0 +1,27 @@
+CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.c.o: \
+  /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_from_eigen_cmd.c \
+  /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_from_eigen_cmd.h \
+  /usr/lib/llvm-15/lib/clang/15.0.7/include/stdint.h \
+  /usr/share/emscripten/cache/sysroot/include/stdint.h \
+  /usr/share/emscripten/cache/sysroot/include/bits/alltypes.h \
+  /usr/share/emscripten/cache/sysroot/include/bits/stdint.h \
+  /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/eigen_cmd.h \
+  /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_cmd.h \
+  /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/../effect_stack_api.h \
+  /usr/share/emscripten/cache/sysroot/include/compat/math.h \
+  /usr/share/emscripten/cache/sysroot/include/math.h \
+  /usr/share/emscripten/cache/sysroot/include/features.h \
+  /usr/share/emscripten/cache/sysroot/include/emscripten/emscripten.h \
+  /usr/share/emscripten/cache/sysroot/include/emscripten/em_asm.h \
+  /usr/share/emscripten/cache/sysroot/include/emscripten/em_macros.h \
+  /usr/share/emscripten/cache/sysroot/include/emscripten/em_types.h \
+  /usr/share/emscripten/cache/sysroot/include/emscripten/em_js.h \
+  /usr/share/emscripten/cache/sysroot/include/emscripten/wget.h \
+  /usr/share/emscripten/cache/sysroot/include/emscripten/version.h \
+  /usr/share/emscripten/cache/sysroot/include/compat/stdlib.h \
+  /usr/share/emscripten/cache/sysroot/include/stdlib.h \
+  /usr/share/emscripten/cache/sysroot/include/alloca.h \
+  /usr/share/emscripten/cache/sysroot/include/stdio.h \
+  /usr/share/emscripten/cache/sysroot/include/wasi/api.h \
+  /usr/lib/llvm-15/lib/clang/15.0.7/include/stddef.h \
+  /usr/lib/llvm-15/lib/clang/15.0.7/include/__stddef_max_align_t.h

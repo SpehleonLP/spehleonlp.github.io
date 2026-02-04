@@ -1,0 +1,138 @@
+{
+  "stacks": {
+    "gradient": {
+      "id": 0,
+      "name": "Gradient Ramp",
+      "standalone": [
+        {
+          "id": 16,
+          "name": "Linear Gradient",
+          "category": "source",
+          "params": [
+            {"name": "Angle", "type": "float", "min": -3.14159, "max": 3.14159, "default": 0.785, "unpack": "angle"},
+            {"name": "Scale", "type": "float", "min": 0.1, "max": 10, "default": 1, "unpack": "log"},
+            {"name": "Offset", "type": "float", "min": -1, "max": 1, "default": 0, "unpack": "signed"}
+          ]
+        },
+        {
+          "id": 17,
+          "name": "Worley Noise",
+          "category": "source",
+          "params": [
+            {"name": "Scale", "type": "float", "min": 1, "max": 100, "default": 10, "unpack": "log"},
+            {"name": "Jitter", "type": "float", "min": 0, "max": 1, "default": 1, "unpack": "linear"},
+            {"name": "Metric", "type": "enum", "default": 0, "options": ["Euclidean", "Manhattan", "Chebyshev"]},
+            {"name": "Mode", "type": "enum", "default": 0, "options": ["F1", "F2", "F2-F1"]}
+          ]
+        },
+        {
+          "id": 18,
+          "name": "Perlin Noise",
+          "category": "source",
+          "params": [
+            {"name": "Scale", "type": "float", "min": 1, "max": 100, "default": 10, "unpack": "log"},
+            {"name": "Octaves", "type": "float", "min": 1, "max": 16, "default": 4, "unpack": "int"},
+            {"name": "Persistence", "type": "float", "min": 0, "max": 1, "default": 0.5, "unpack": "linear"},
+            {"name": "Lacunarity", "type": "float", "min": 1, "max": 4, "default": 2, "unpack": "linear"}
+          ]
+        },
+        {
+          "id": 19,
+          "name": "Curl Noise",
+          "category": "source",
+          "params": [
+            {"name": "Scale", "type": "float", "min": 1, "max": 100, "default": 10, "unpack": "log"},
+            {"name": "Octaves", "type": "float", "min": 1, "max": 16, "default": 4, "unpack": "int"},
+            {"name": "Persistence", "type": "float", "min": 0, "max": 1, "default": 0.5, "unpack": "linear"},
+            {"name": "Lacunarity", "type": "float", "min": 1, "max": 4, "default": 2, "unpack": "linear"}
+          ]
+        },
+        {
+          "id": 20,
+          "name": "Noise",
+          "category": "source",
+          "params": [
+            {"name": "Type", "type": "enum", "default": 0, "options": ["White", "Blue", "Value"]},
+            {"name": "Scale", "type": "float", "min": 1, "max": 100, "default": 1, "unpack": "log"},
+            {"name": "Seed", "type": "float", "min": 0, "max": 255, "default": 3, "unpack": "seed"}
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "name": "Color Ramp",
+          "effects": [
+            {
+              "id": 49,
+              "name": "Blend",
+              "params": [
+                {"name": "Mode", "type": "enum", "default": 0, "options": ["Normal", "Multiply", "Screen", "Overlay", "Add", "Subtract"]},
+                {"name": "Opacity", "type": "float", "min": 0, "max": 1, "default": 1, "unpack": "linear"}
+              ]
+            },
+            {
+              "id": 48,
+              "name": "Gradient",
+              "params": [
+                {"name": "Stops", "type": "color_ramp", "default": [
+                  {"position": 0, "color": [0, 0, 0, 1]},
+                  {"position": 1, "color": [1, 1, 1, 1]}
+                ]}
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "erosion": {
+      "id": 1,
+      "name": "Erosion Texture",
+      "standalone": [
+        {
+          "id": 32,
+          "name": "Dijkstra Distance",
+          "category": "effect",
+          "params": [
+            {"name": "Minkowski", "type": "float", "min": -10, "max": 10, "default": 0, "unpack": "linear"},
+            {"name": "Chebyshev", "type": "float", "min": 0, "max": 1, "default": 0, "unpack": "linear"}
+          ]
+        },
+        {
+          "id": 33,
+          "name": "Fourier Filter",
+          "category": "effect",
+          "params": [
+            {"name": "High Pass", "type": "float", "min": 0, "max": 1, "default": 0, "unpack": "linear"},
+            {"name": "Low Pass", "type": "float", "min": 0, "max": 1, "default": 0.2, "unpack": "linear"}
+          ]
+        },
+        {
+          "id": 34,
+          "name": "Box Blur",
+          "category": "effect",
+          "params": [
+            {"name": "Iterations", "type": "float", "min": 1, "max": 500, "default": 200, "unpack": "log"},
+            {"name": "Threshold", "type": "float", "min": 0.001, "max": 1, "default": 0.01, "unpack": "log"}
+          ]
+        },
+        {
+          "id": 35,
+          "name": "Gradientify",
+          "category": "converter",
+          "params": [
+            {"name": "Scale", "type": "float", "min": 0.1, "max": 10, "default": 1, "unpack": "log"}
+          ]
+        },
+        {
+          "id": 36,
+          "name": "Poisson Solve",
+          "category": "converter",
+          "params": [
+            {"name": "Iterations", "type": "float", "min": 1, "max": 1000, "default": 100, "unpack": "log"}
+          ]
+        }
+      ],
+      "groups": []
+    }
+  }
+}

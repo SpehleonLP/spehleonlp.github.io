@@ -1,0 +1,46 @@
+{
+  "demos": [
+    {
+      "name": "erosion_test",
+      "file": "erosion_test.gif",
+      "label": "Erosion Test",
+      "stack": "erosion"
+    },
+    {
+      "name": "boom_mask",
+      "file": "boom_mask.gif",
+      "label": "Boom Mask",
+      "stack": "erosion"
+    },
+    {
+      "name": "boom_mask",
+      "file": "boom_mask.gif",
+      "label": "Boom Mask on 1s",
+      "stack": "erosion"
+    },
+    {
+      "name": "boom_mask",
+      "file": "boom_mask.gif",
+      "label": "Boom Mask on 4s",
+      "stack": "erosion"
+    },
+    {
+      "name": "boom_ramp",
+      "file": "boom_ramp2D_remapped.png",
+      "label": "Boom Ramp (Fire)",
+      "stack": "gradient"
+    },
+    {
+      "name": "fx_boost",
+      "file": "fxMapInOut-boost.png",
+      "label": "FX Boost (Orbs)",
+      "stack": "erosion"
+    },
+    {
+      "name": "default_gradient",
+      "file": "default_gradient.png",
+      "label": "Default Gradient",
+      "stack": "gradient"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+CMakeFiles/effect_stack.dir/effect_stack_api.c.o: \
+  /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/effect_stack_api.c \
+  /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/effect_stack_api.h \
+  /usr/lib/llvm-15/lib/clang/15.0.7/include/stdint.h \
+  /usr/share/emscripten/cache/sysroot/include/stdint.h \
+  /usr/share/emscripten/cache/sysroot/include/bits/alltypes.h \
+  /usr/share/emscripten/cache/sysroot/include/bits/stdint.h \
+  /usr/share/emscripten/cache/sysroot/include/compat/math.h \
+  /usr/share/emscripten/cache/sysroot/include/math.h \
+  /usr/share/emscripten/cache/sysroot/include/features.h \
+  /usr/share/emscripten/cache/sysroot/include/emscripten/emscripten.h \
+  /usr/share/emscripten/cache/sysroot/include/emscripten/em_asm.h \
+  /usr/share/emscripten/cache/sysroot/include/emscripten/em_macros.h \
+  /usr/share/emscripten/cache/sysroot/include/emscripten/em_types.h \
+  /usr/share/emscripten/cache/sysroot/include/emscripten/em_js.h \
+  /usr/share/emscripten/cache/sysroot/include/emscripten/wget.h \
+  /usr/share/emscripten/cache/sysroot/include/emscripten/version.h \
+  /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/erosion_pipeline.h \
+  /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/gradient_pipeline.h \
+  /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/image_memo/image_memo.h \
+  /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/image_memo/../effect_stack_api.h \
+  /usr/share/emscripten/cache/sysroot/include/compat/stdlib.h \
+  /usr/share/emscripten/cache/sysroot/include/stdlib.h \
+  /usr/share/emscripten/cache/sysroot/include/alloca.h \
+  /usr/share/emscripten/cache/sysroot/include/compat/string.h \
+  /usr/share/emscripten/cache/sysroot/include/string.h \
+  /usr/share/emscripten/cache/sysroot/include/strings.h \
+  /usr/share/emscripten/cache/sysroot/include/stdio.h \
+  /usr/share/emscripten/cache/sysroot/include/wasi/api.h \
+  /usr/lib/llvm-15/lib/clang/15.0.7/include/stddef.h \
+  /usr/lib/llvm-15/lib/clang/15.0.7/include/__stddef_max_align_t.h \
+  /usr/lib/llvm-15/lib/clang/15.0.7/include/stdbool.h

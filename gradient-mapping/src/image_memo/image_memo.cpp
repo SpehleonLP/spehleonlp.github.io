@@ -211,7 +211,7 @@ static i16vec4 used_color_flags_to_indices(ErosionImageMemo *ememo)
         }
     }
     
-    return (i16vec4){min_gap[0], min_gap[1], min_gap[2], min_gap[3]};
+    return (i16vec4){(int16_t)min_gap[0], (int16_t)min_gap[1], (int16_t)min_gap[2], (int16_t)min_gap[3]};
 }
 
 /*
@@ -453,7 +453,7 @@ int memo_load_image(int stack_type, const char *vfs_path, float target_quant) {
         if(g_erosion_memo.image.colors)
         {
 			uint32_t N = g_erosion_memo.image.width*g_erosion_memo.image.height;
-			uint8_t * deinterleaved = malloc(N*4*sizeof(uint8_t));
+			uint8_t * deinterleaved = (uint8_t *)malloc(N*4*sizeof(uint8_t));
 			
 			for(uint32_t i = 0; i < N; ++i)
 			{

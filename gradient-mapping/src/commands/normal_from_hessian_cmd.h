@@ -2,47 +2,55 @@
 #define NORMAL_FROM_HESSIAN_CMD_H
 
 #include <stdint.h>
+#include <memory>
 #include "hessian_cmd.h"
 #include "../effect_stack_api.h"  // for vec3
 
 /*
- * NormalFromHessianCmd - Convert Hessian field to normal map via coupled Poisson solve
+ * NormalFromHessianCmd - Convert decomposed Hessian fields to normal map
+ *                        via constraint solver
  *
- * Pipeline:
- *   1. Compute divergence of each Hessian row:
- *      div_x = ∂H.xx/∂x + ∂H.xy/∂y
- *      div_y = ∂H.xy/∂x + ∂H.yy/∂y
- *   2. FFT-based Poisson solve for gradient directly:
- *      ∇²gx = div_x → gx
- *      ∇²gy = div_y → gy
- *   3. Normalize: n = normalize(-gx, -gy, scale)
+ * Solves for major/minor height fields that satisfy:
+ *   1. ∇major + ∇minor = ∇height  (gradient constraint, weight 2)
+ *   2. Hessian(major) ≈ H1        (curvature constraint, weight 1)
+ *   3. Hessian(minor) ≈ H2        (curvature constraint, weight 1)
  *
- * This preserves eigenvector direction (unlike trace-based Poisson).
- * The scale parameter controls normal map "strength" (higher = flatter normals).
+ * Where H1 + H2 = original Hessian (eigendecomposition into rank-1 components).
+ *
+ * Uses Gauss-Seidel + SOR iteration to minimize weighted residuals.
  */
 typedef struct {
     /* Input */
-    const Hessian2D* hessian;
+    const Hessian2D* H1;      // Major curvature Hessian (rank-1: λ1 * e1⊗e1)
+    const Hessian2D* H2;      // Minor curvature Hessian (rank-1: λ2 * e2⊗e2)
+    const float* height;      // Original heightmap (for gradient constraint)
     uint32_t W, H;
-    float scale;              // Normal map Z scale (default 1.0)
-    const float* orig_height; // Original heightmap (optional, for zero-masking)
+
+    /* Solver parameters */
+    int max_iterations;       // Max iterations (default 100)
+    float tolerance;          // Convergence threshold (default 1e-5)
+    float sor_omega;          // SOR relaxation factor (default 1.7, range 1.0-1.95)
 
     /* Output (allocated by caller or internally) */
-    vec3* normals;        // W*H array of normalized normals
-    float* height;        // W*H array of recovered height (optional, can be NULL)
+    std::unique_ptr<vec3[]> major_normals;      // W*H normal map from major curvature field
+    std::unique_ptr<vec3[]> minor_normals;      // W*H normal map from minor curvature field
+    std::unique_ptr<float[]> major_height;      // W*H major height field (optional debug output)
+    std::unique_ptr<float[]> minor_height;      // W*H minor height field (optional debug output)
+
+    /* Diagnostics (filled by Execute) */
+    int iterations_used;      // Actual iterations until convergence
+    float final_residual;     // Final residual magnitude
 } NormalFromHessianCmd;
 
 /*
- * Compute normal map from Hessian field.
- * If cmd->normals is NULL, allocates it internally.
- * If cmd->height is NULL, height buffer is allocated temporarily and freed.
+ * Compute normal maps from decomposed Hessian fields.
+ * If cmd->major_normals/minor_normals are NULL, allocates them internally.
+ * If cmd->major_height/minor_height are NULL, they are allocated temporarily
+ * for the solve and freed (unless you want debug output, pre-allocate them).
  * Returns 0 on success, -1 on error.
  */
 int normal_from_hessian_Execute(NormalFromHessianCmd* cmd);
 
-/*
- * Free allocated memory.
- */
-void normal_from_hessian_Free(NormalFromHessianCmd* cmd);
+/* RAII: memory is freed automatically when cmd goes out of scope */
 
 #endif /* NORMAL_FROM_HESSIAN_CMD_H */

@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <memory>
 
 
 /* ========== Distance Metric ========== */
@@ -57,63 +58,57 @@ float sdf_ComputeDistance(const SDFDistanceParams *params, int16_t dx, int16_t d
 
 static void sdf_debug_export_source(SDFContext *ctx, const char *path) {
 	uint32_t W = ctx->W, H = ctx->H;
-	float *data = malloc(W * H * sizeof(float));
+	auto data = std::unique_ptr<float[]>(new (std::nothrow) float[W * H]);
 	if (!data)
 		return;
-	
+
 	for (uint32_t i = 0; i < W * H; i++) {
 		data[i] = (float)ctx->src[i];
 	}
-	
+
 	PngFloatCmd cmd = {.path = path,
-					   .data = data,
+					   .data = data.get(),
 					   .width = W,
 					   .height = H,
 					   .min_val = 0,
 					   .max_val = 255,
 					   .auto_range = 0};
 	png_ExportFloat(&cmd);
-	free(data);
 }
 
 static void sdf_debug_export_labels(SDFContext *ctx, const char *path) {
 	uint32_t W = ctx->W, H = ctx->H;
-	float *data = malloc(W * H * sizeof(float));
+	auto data = std::unique_ptr<float[]>(new (std::nothrow) float[W * H]);
 	if (!data)
 		return;
-	
+
 	for (uint32_t i = 0; i < W * H; i++) {
 		data[i] = (float)ctx->labels[i];
 	}
-	
+
 	PngFloatCmd cmd = {
-		.path = path, .data = data, .width = W, .height = H, .auto_range = 1};
+		.path = path, .data = data.get(), .width = W, .height = H, .auto_range = 1};
 	png_ExportFloat(&cmd);
-	free(data);
 }
 
 /* Export a grid showing all key data for one iteration */
 static void sdf_debug_export_iteration_grid(SDFContext *ctx, int iteration) {
 	uint32_t W = ctx->W, H = ctx->H;
 	uint32_t npixels = W * H;
-	
+
 	/* Allocate all data arrays */
-	float *src_data = malloc(npixels * sizeof(float));
-	float *dist_data = malloc(npixels * sizeof(float));
-	float *srcval_data = malloc(npixels * sizeof(float));
-	vec2 *disp_data = malloc(npixels * sizeof(vec2));
-	
+	auto src_data = std::unique_ptr<float[]>(new (std::nothrow) float[npixels]);
+	auto dist_data = std::unique_ptr<float[]>(new (std::nothrow) float[npixels]);
+	auto srcval_data = std::unique_ptr<float[]>(new (std::nothrow) float[npixels]);
+	auto disp_data = std::unique_ptr<vec2[]>(new (std::nothrow) vec2[npixels]);
+
 	if (!src_data || !dist_data || !srcval_data || !disp_data) {
-		free(src_data);
-		free(dist_data);
-		free(srcval_data);
-		free(disp_data);
 		return;
 	}
-	
+
 	for (uint32_t i = 0; i < npixels; i++) {
 		src_data[i] = (float)ctx->src[i];
-		
+
 		SDFCell *c = &ctx->cells[i];
 		if (c->source_value == 256) {
 			dist_data[i] = 0.0f;
@@ -127,18 +122,18 @@ static void sdf_debug_export_iteration_grid(SDFContext *ctx, int iteration) {
 			disp_data[i].y = (float)c->dy;
 		}
 	}
-	
+
 	PngGridTile tiles[4] = {
-		{.type = PNG_TILE_GRAYSCALE, .data = src_data},  // top-left: source
-		{.type = PNG_TILE_GRAYSCALE, .data = dist_data}, // top-right: distance
+		{.type = PNG_TILE_GRAYSCALE, .data = src_data.get()},  // top-left: source
+		{.type = PNG_TILE_GRAYSCALE, .data = dist_data.get()}, // top-right: distance
 		{.type = PNG_TILE_GRAYSCALE,
-		 .data = srcval_data},                     // bottom-left: found values
-		{.type = PNG_TILE_VEC2, .data = disp_data} // bottom-right: displacement
+		 .data = srcval_data.get()},                     // bottom-left: found values
+		{.type = PNG_TILE_VEC2, .data = disp_data.get()} // bottom-right: displacement
 	};
-	
+
 	char path[64];
 	snprintf(path, sizeof(path), "/sdf_iter_%02d.png", iteration);
-	
+
 	PngGridCmd cmd = {.path = path,
 					  .tile_width = W,
 					  .tile_height = H,
@@ -146,11 +141,6 @@ static void sdf_debug_export_iteration_grid(SDFContext *ctx, int iteration) {
 					  .rows = 2,
 					  .tiles = tiles};
 	png_ExportGrid(&cmd);
-	
-	free(src_data);
-	free(dist_data);
-	free(srcval_data);
-	free(disp_data);
 }
 
 #endif /* DEBUG_IMG_OUT */
@@ -179,7 +169,7 @@ int sdf_Initialize(SDFContext *ctx, const uint8_t *src, uint32_t W, uint32_t H,
 	/* Allocate labels array */
 	if(!ctx->labels)
 	{
-		ctx->labels = malloc(npixels * sizeof(uint32_t));
+		ctx->labels = (uint32_t *)malloc(npixels * sizeof(uint32_t));
 		if (!ctx->labels)
 			goto fail;
 		ctx->owns_labels = 1;  /* We allocated, we free */
@@ -202,7 +192,7 @@ int sdf_Initialize(SDFContext *ctx, const uint8_t *src, uint32_t W, uint32_t H,
 	}
 
 	/* Allocate per-region state */
-	ctx->regions = calloc(ctx->num_regions, sizeof(SDFRegion));
+	ctx->regions = (SDFRegion *)calloc(ctx->num_regions, sizeof(SDFRegion));
 	if (!ctx->regions)
 		goto fail;
 
@@ -221,7 +211,7 @@ int sdf_Initialize(SDFContext *ctx, const uint8_t *src, uint32_t W, uint32_t H,
 	}
 	
 	/* Allocate cells array */
-	ctx->cells = malloc(npixels * sizeof(SDFCell));
+	ctx->cells = (SDFCell *)malloc(npixels * sizeof(SDFCell));
 	if (!ctx->cells)
 		goto fail;
 	
@@ -369,7 +359,7 @@ static void dq_free(DijkstraQueue *q) {
 static int dq_push(DijkstraQueue *q, DijkstraEntry entry) {
 	if (q->size >= q->capacity) {
 		int32_t new_cap = q->capacity ? q->capacity * 2 : 256;
-		DijkstraEntry *new_data = realloc(q->data, new_cap * sizeof(DijkstraEntry));
+		DijkstraEntry *new_data = (DijkstraEntry *)realloc(q->data, new_cap * sizeof(DijkstraEntry));
 		if (!new_data) return -1;
 		q->data = new_data;
 		q->capacity = new_cap;

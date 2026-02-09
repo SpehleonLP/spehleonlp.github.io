@@ -192,11 +192,11 @@ int fft_ResizeImage(ResizingImage* dst, ResizingImage* src) {
 
     // Allocate destination if needed
     if (!dst->data) {
-        dst->data = malloc(dst_w * dst_h * stride * sizeof(float));
+        dst->data = (float *)malloc(dst_w * dst_h * stride * sizeof(float));
         if (!dst->data) return 0;
     }
     if (!dst->original) {
-        dst->original = malloc(dst_w * dst_h * stride);
+        dst->original = (uint8_t *)malloc(dst_w * dst_h * stride);
         if (!dst->original) {
             free(dst->data);
             dst->data = NULL;
@@ -237,9 +237,9 @@ int fft_Initialize(FFTBlurContext* ctx, int width, int height) {
     ctx->height = height;
 
     // Allocate buffers
-    ctx->real = malloc(size * sizeof(float));
-    ctx->imag = calloc(size, sizeof(float));  // Zero-initialized
-    ctx->original = malloc(size);
+    ctx->real = (float *)malloc(size * sizeof(float));
+    ctx->imag = (float *)calloc(size, sizeof(float));  // Zero-initialized
+    ctx->original = (uint8_t *)malloc(size);
 
     if (!ctx->real || !ctx->imag || !ctx->original) {
         fft_Free(ctx);

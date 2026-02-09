@@ -1,9 +1,11 @@
-// sources/noise.c
+// sources/noise.cpp
 // Simple noise data source implementation
 
 #include "noise.h"
 #include "../commands/fft_blur.h"
 #include <stdlib.h>
+#include <math.h>
+#include <memory>
 
 // PCG32 random number generator
 typedef struct {
@@ -46,7 +48,7 @@ static void noise_white(vec3* dst, const vec3* src, int W, int H, uint32_t seed)
 }
 
 // Blue noise - generated directly in frequency domain
-// Power spectrum P(f) ∝ f (energy increases with frequency, no low-freq content)
+// Power spectrum P(f) proportional to f (energy increases with frequency, no low-freq content)
 static void noise_blue(vec3* dst, const vec3* src, int W, int H, uint32_t seed) {
     (void)src; // Blue noise doesn't use source perturbation
 
@@ -59,17 +61,11 @@ static void noise_blue(vec3* dst, const vec3* src, int W, int H, uint32_t seed) 
     if (fft_w < W || fft_h < H) return;
     int fft_size = fft_w * fft_h;
 
-    float* real = (float*)calloc(fft_size, sizeof(float));
-    float* imag = (float*)calloc(fft_size, sizeof(float));
-    if (!real || !imag) {
-        free(real);
-        free(imag);
-        noise_white(dst, NULL, W, H, seed); // Fallback
-        return;
-    }
+    auto real = std::unique_ptr<float[]>(new float[fft_size]());
+    auto imag = std::unique_ptr<float[]>(new float[fft_size]());
 
     // Fill frequency domain directly with blue noise spectrum
-    // For each frequency, amplitude ∝ distance from DC (high-pass shape)
+    // For each frequency, amplitude proportional to distance from DC (high-pass shape)
     float half_w = fft_w * 0.5f;
     float half_h = fft_h * 0.5f;
     float max_dist = sqrtf(half_w * half_w + half_h * half_h);
@@ -104,7 +100,7 @@ static void noise_blue(vec3* dst, const vec3* src, int W, int H, uint32_t seed) 
     imag[0] = 0.0f;
 
     // Inverse FFT to get spatial domain
-    fft_2d(real, imag, fft_w, fft_h, 1, 1.0f);
+    fft_2d(real.get(), imag.get(), fft_w, fft_h, 1, 1.0f);
 
     // Find min/max for normalization
     float min_val = real[0];
@@ -145,9 +141,6 @@ static void noise_blue(vec3* dst, const vec3* src, int W, int H, uint32_t seed) 
             dst[y * W + x] = vec3_make(dx, dy, clampf(v, 0.0f, 1.0f));
         }
     }
-
-    free(real);
-    free(imag);
 }
 
 // Value noise - bilinearly interpolated grid noise
@@ -193,15 +186,15 @@ static void noise_value(vec3* dst, const vec3* src, int W, int H,
             float v11 = hash2d(x1, y1, seed);
 
             // Bilinear interpolation for value
-            float vx0 = lerp(v00, v10, u);
-            float vx1 = lerp(v01, v11, u);
-            float value = lerp(vx0, vx1, v);
+            float vx0 = lerpf(v00, v10, u);
+            float vx1 = lerpf(v01, v11, u);
+            float value = lerpf(vx0, vx1, v);
 
             // Analytical gradients
-            // dvalue/dx = du * (lerp(v10, v11, v) - lerp(v00, v01, v))
+            // dvalue/dx = du * (lerpf(v10, v11, v) - lerpf(v00, v01, v))
             // dvalue/dy = dv * (vx1 - vx0)
-            float vy0 = lerp(v00, v01, v);
-            float vy1 = lerp(v10, v11, v);
+            float vy0 = lerpf(v00, v01, v);
+            float vy1 = lerpf(v10, v11, v);
             float dvalue_dx = du * (vy1 - vy0);
             float dvalue_dy = dv * (vx1 - vx0);
 

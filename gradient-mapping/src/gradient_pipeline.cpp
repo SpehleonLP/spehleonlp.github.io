@@ -51,10 +51,10 @@ static vec4 sample_ramp(const GPColorRamp *ramp, float t) {
             float range = stops[i+1].position - stops[i].position;
             float local_t = (range > 0.0001f) ? (t - stops[i].position) / range : 0.0f;
             return (vec4){
-                lerp(stops[i].color.x, stops[i+1].color.x, local_t),
-                lerp(stops[i].color.y, stops[i+1].color.y, local_t),
-                lerp(stops[i].color.z, stops[i+1].color.z, local_t),
-                lerp(stops[i].color.w, stops[i+1].color.w, local_t)
+                lerpf(stops[i].color.x, stops[i+1].color.x, local_t),
+                lerpf(stops[i].color.y, stops[i+1].color.y, local_t),
+                lerpf(stops[i].color.z, stops[i+1].color.z, local_t),
+                lerpf(stops[i].color.w, stops[i+1].color.w, local_t)
             };
         }
     }

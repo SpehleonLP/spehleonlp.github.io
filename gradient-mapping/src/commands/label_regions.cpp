@@ -1,6 +1,7 @@
 #include "label_regions.h"
 #include <stdlib.h>
 #include <string.h>
+#include <memory>
 
 /*
  * Union-Find (Disjoint Set) for connected components.
@@ -16,11 +17,11 @@ typedef struct {
 
 static UnionFind *uf_create(int32_t capacity)
 {
-    UnionFind *uf = malloc(sizeof(UnionFind));
+    UnionFind *uf = (UnionFind *)malloc(sizeof(UnionFind));
     if (!uf) return NULL;
 
-    uf->parent = malloc(capacity * sizeof(int32_t));
-    uf->rank = calloc(capacity, sizeof(int32_t));
+    uf->parent = (int32_t *)malloc(capacity * sizeof(int32_t));
+    uf->rank = (int32_t *)calloc(capacity, sizeof(int32_t));
     uf->capacity = capacity;
     uf->next_label = 1;  /* Labels start at 1 */
 
@@ -150,7 +151,7 @@ int label_regions(LabelRegionsCmd *cmd)
     }
 
     /* Second pass: resolve labels to their roots and renumber consecutively */
-    uint32_t *remap = calloc(uf->next_label, sizeof(uint32_t));
+    auto remap = std::unique_ptr<uint32_t[]>(new (std::nothrow) uint32_t[uf->next_label]());
     if (!remap) {
         uf_destroy(uf);
         return -3;
@@ -169,7 +170,6 @@ int label_regions(LabelRegionsCmd *cmd)
 
     cmd->num_regions = final_label;
 
-    free(remap);
     uf_destroy(uf);
     return 0;
 }

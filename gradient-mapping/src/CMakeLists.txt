@@ -1,18 +1,19 @@
-cmake_minimum_required(VERSION 3.10)
-project(effect_stack C)
+cmake_minimum_required(VERSION 3.14)
+project(effect_stack CXX)
 
-set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 20)
 
 # Use GLOB to find source files (including subdirectories)
-file(GLOB SOURCES "*.c")
+file(GLOB SOURCES "*.cpp")
+list(FILTER SOURCES EXCLUDE REGEX "main\\.cpp$")
 file(GLOB HEADERS "*.h")
-file(GLOB SOURCES_SUBDIR "sources/*.c")
+file(GLOB SOURCES_SUBDIR "sources/*.cpp")
 file(GLOB HEADERS_SUBDIR "sources/*.h")
-file(GLOB COMMANDS_SOURCES "commands/*.c")
+file(GLOB COMMANDS_SOURCES "commands/*.cpp")
 file(GLOB COMMANDS_HEADERS "commands/*.h")
-file(GLOB IMAGE_MEMO_SOURCES "image_memo/*.c")
+file(GLOB IMAGE_MEMO_SOURCES "image_memo/*.cpp")
 file(GLOB IMAGE_MEMO_HEADERS "image_memo/*.h")
-file(GLOB EXPLORE_SOURCES "explore/*.c")
+file(GLOB EXPLORE_SOURCES "explore/*.cpp")
 file(GLOB EXPLORE_HEADERS "explore/*.h")
 list(APPEND SOURCES ${SOURCES_SUBDIR} ${COMMANDS_SOURCES} ${IMAGE_MEMO_SOURCES} ${EXPLORE_SOURCES})
 list(APPEND HEADERS ${HEADERS_SUBDIR} ${COMMANDS_HEADERS} ${IMAGE_MEMO_HEADERS} ${EXPLORE_HEADERS})
@@ -38,7 +39,7 @@ if(EMSCRIPTEN)
     list(JOIN EXPORTED_FUNCTIONS "," EXPORTED_FUNCTIONS_STR)
 
     # Emscripten compilation flags
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -fstrict-aliasing")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fstrict-aliasing")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} \
         -s WASM=1 \
         -s MODULARIZE=1 \
@@ -84,6 +85,30 @@ else()
         -Wextra
         -Wpedantic
         -fstrict-aliasing
+    )
+
+    # --- Native CLI executable ---
+    include(FetchContent)
+    FetchContent_Declare(
+        cxxopts
+        GIT_REPOSITORY https://github.com/jarro2783/cxxopts.git
+        GIT_TAG        v3.1.1
+    )
+    FetchContent_MakeAvailable(cxxopts)
+
+    add_executable(effect_stack_cli main.cpp)
+
+    target_include_directories(effect_stack_cli PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/sources
+        ${CMAKE_CURRENT_SOURCE_DIR}/commands
+        ${CMAKE_CURRENT_SOURCE_DIR}/image_memo
+    )
+
+    target_link_libraries(effect_stack_cli PRIVATE
+        effect_stack_lib
+        cxxopts::cxxopts
+        m
     )
 endif()
 

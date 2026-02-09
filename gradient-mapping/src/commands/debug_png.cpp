@@ -5,6 +5,7 @@ typedef int nothing; // make compiler shut up about empty file;
 #include <stdlib.h>
 #include <math.h>
 #include <float.h>
+#include <memory>
 #include "../utility.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "../image_memo/stb_image_write.h"
@@ -40,7 +41,7 @@ int png_ExportFloat(PngFloatCmd* cmd) {
 	float range = max_val - min_val;
 	if (range < 1e-6f) range = 1.0f;
 
-	uint8_t* pixels = malloc(N);
+	auto pixels = std::unique_ptr<uint8_t[]>(new (std::nothrow) uint8_t[N]);
 	if (!pixels) return -2;
 
 	for (uint32_t i = 0; i < N; i++) {
@@ -50,8 +51,7 @@ int png_ExportFloat(PngFloatCmd* cmd) {
 		pixels[i] = (uint8_t)(normalized * 255.0f);
 	}
 
-	int result = stbi_write_png(cmd->path, cmd->width, cmd->height, 1, pixels, cmd->width);
-	free(pixels);
+	int result = stbi_write_png(cmd->path, cmd->width, cmd->height, 1, pixels.get(), cmd->width);
 
 	return result ? 0 : -3;
 }
@@ -64,7 +64,7 @@ int png_ExportVec2(PngVec2Cmd* cmd) {
 	float scale = cmd->scale > 0 ? cmd->scale : 1.0f;
 	float z_bias = cmd->z_bias > 0 ? cmd->z_bias : 0.005f;
 
-	uint8_t* pixels = malloc(N * 3);
+	auto pixels = std::unique_ptr<uint8_t[]>(new (std::nothrow) uint8_t[N * 3]);
 	if (!pixels) return -2;
 
 	for (uint32_t i = 0; i < N; i++) {
@@ -91,8 +91,7 @@ int png_ExportVec2(PngVec2Cmd* cmd) {
 		pixels[i * 3 + 2] = float_to_byte(nz);
 	}
 
-	int result = stbi_write_png(cmd->path, cmd->width, cmd->height, 3, pixels, cmd->width * 3);
-	free(pixels);
+	int result = stbi_write_png(cmd->path, cmd->width, cmd->height, 3, pixels.get(), cmd->width * 3);
 
 	return result ? 0 : -3;
 }
@@ -103,7 +102,7 @@ int png_ExportVec3(PngVec3Cmd* cmd) {
 
 	uint32_t N = cmd->width * cmd->height;
 
-	uint8_t* pixels = malloc(N * 3);
+	auto pixels = std::unique_ptr<uint8_t[]>(new (std::nothrow) uint8_t[N * 3]);
 	if (!pixels) return -2;
 
 	for (uint32_t i = 0; i < N; i++) {
@@ -117,8 +116,7 @@ int png_ExportVec3(PngVec3Cmd* cmd) {
 		pixels[i * 3 + 2] = float_to_byte(nz);
 	}
 
-	int result = stbi_write_png(cmd->path, cmd->width, cmd->height, 3, pixels, cmd->width * 3);
-	free(pixels);
+	int result = stbi_write_png(cmd->path, cmd->width, cmd->height, 3, pixels.get(), cmd->width * 3);
 
 	return result ? 0 : -3;
 }
@@ -132,7 +130,7 @@ int png_ExportInterleaved(PngInterleavedCmd* cmd) {
 	int stride = cmd->stride > 0 ? cmd->stride : 1;
 
 	// Extract channel
-	float* extracted = malloc(N * sizeof(float));
+	auto extracted = std::unique_ptr<float[]>(new (std::nothrow) float[N]);
 	if (!extracted) return -2;
 
 	float min_val = cmd->min_val;
@@ -155,7 +153,7 @@ int png_ExportInterleaved(PngInterleavedCmd* cmd) {
 	// Export as grayscale
 	PngFloatCmd float_cmd = {
 		.path = cmd->path,
-		.data = extracted,
+		.data = extracted.get(),
 		.width = cmd->width,
 		.height = cmd->height,
 		.min_val = min_val,
@@ -164,7 +162,6 @@ int png_ExportInterleaved(PngInterleavedCmd* cmd) {
 	};
 
 	int result = png_ExportFloat(&float_cmd);
-	free(extracted);
 
 	return result;
 }
@@ -181,11 +178,21 @@ static void render_tile(
 			const float* data = (const float*)tile->data;
 			if (!data) break;
 
-			// Find min/max
-			float min_val = FLT_MAX, max_val = -FLT_MAX;
-			for (uint32_t i = 0; i < w * h; i++) {
-				if (data[i] < min_val) min_val = data[i];
-				if (data[i] > max_val) max_val = data[i];
+			float min_val, max_val;
+			if (tile->scale > 0.0f) {
+				// Check if data has negatives to decide signed vs unsigned range
+				int has_neg = 0;
+				for (uint32_t i = 0; i < w * h && !has_neg; i++)
+					has_neg = data[i] < 0.0f;
+				min_val = has_neg ? -tile->scale : 0.0f;
+				max_val = tile->scale;
+			} else {
+				// Auto-range
+				min_val = FLT_MAX; max_val = -FLT_MAX;
+				for (uint32_t i = 0; i < w * h; i++) {
+					if (data[i] < min_val) min_val = data[i];
+					if (data[i] > max_val) max_val = data[i];
+				}
 			}
 			float range = max_val - min_val;
 			if (range < 1e-6f) range = 1.0f;
@@ -209,13 +216,16 @@ static void render_tile(
 		{
 			const vec2* data = (const vec2*)tile->data;
 			if (!data) break;
+			float s = tile->scale > 0.0f ? tile->scale : 1.0f;
 
 			for (uint32_t y = 0; y < h; y++) {
 				for (uint32_t x = 0; x < w; x++) {
 					uint32_t i = y * w + x;
 					float nx = data[i].x;
 					float ny = data[i].y;
-					float nz = sqrtf(1.f - max_f32(0, nx * nx + ny * ny));
+					float nz = sqrtf(max_f32(0, 1.0f - nx * nx - ny * ny)) * s;
+					float len = sqrtf(nx * nx + ny * ny + nz * nz);
+					if (len > 1e-8f) { nx /= len; ny /= len; nz /= len; }
 
 					uint8_t* p = dest + y * dest_stride + x * 3;
 					p[0] = float_to_ubyte(nx);
@@ -230,14 +240,17 @@ static void render_tile(
 		{
 			const vec3* data = (const vec3*)tile->data;
 			if (!data) break;
+			float s = tile->scale > 0.0f ? tile->scale : 1.0f;
 
 			for (uint32_t y = 0; y < h; y++) {
 				for (uint32_t x = 0; x < w; x++) {
 					uint32_t i = y * w + x;
+					vec3 n = scale_normal(data[i], s);
+					
 					uint8_t* p = dest + y * dest_stride + x * 3;
-					p[0] = float_to_ubyte(data[i].x);
-					p[1] = float_to_ubyte(data[i].y);
-					p[2] = float_to_ubyte(data[i].z);
+					p[0] = float_to_ubyte(n.x);
+					p[1] = float_to_ubyte(n.y);
+					p[2] = float_to_ubyte(n.z);
 				}
 			}
 		}
@@ -251,12 +264,20 @@ static void render_tile(
 			int ch = tile->channel;
 			int stride = tile->stride > 0 ? tile->stride : 1;
 
-			// Find min/max for this channel
-			float min_val = FLT_MAX, max_val = -FLT_MAX;
-			for (uint32_t i = 0; i < w * h; i++) {
-				float v = data[i * stride + ch];
-				if (v < min_val) min_val = v;
-				if (v > max_val) max_val = v;
+			float min_val, max_val;
+			if (tile->scale > 0.0f) {
+				int has_neg = 0;
+				for (uint32_t i = 0; i < w * h && !has_neg; i++)
+					has_neg = data[i * stride + ch] < 0.0f;
+				min_val = has_neg ? -tile->scale : 0.0f;
+				max_val = tile->scale;
+			} else {
+				min_val = FLT_MAX; max_val = -FLT_MAX;
+				for (uint32_t i = 0; i < w * h; i++) {
+					float v = data[i * stride + ch];
+					if (v < min_val) min_val = v;
+					if (v > max_val) max_val = v;
+				}
 			}
 			float range = max_val - min_val;
 			if (range < 1e-6f) range = 1.0f;
@@ -293,19 +314,18 @@ int png_ExportGrid(PngGridCmd* cmd) {
 	uint32_t grid_h = th * cmd->rows;
 	int stride = grid_w * 3;
 
-	uint8_t* pixels = calloc(grid_w * grid_h * 3, 1);
+	auto pixels = std::unique_ptr<uint8_t[]>(new (std::nothrow) uint8_t[grid_w * grid_h * 3]());
 	if (!pixels) return -2;
 
 	for (uint32_t row = 0; row < cmd->rows; row++) {
 		for (uint32_t col = 0; col < cmd->cols; col++) {
 			const PngGridTile* tile = &cmd->tiles[row * cmd->cols + col];
-			uint8_t* dest = pixels + row * th * stride + col * tw * 3;
+			uint8_t* dest = pixels.get() + row * th * stride + col * tw * 3;
 			render_tile(dest, stride, tile, tw, th);
 		}
 	}
 
-	int result = stbi_write_png(cmd->path, grid_w, grid_h, 3, pixels, stride);
-	free(pixels);
+	int result = stbi_write_png(cmd->path, grid_w, grid_h, 3, pixels.get(), stride);
 
 	return result ? 0 : -3;
 }

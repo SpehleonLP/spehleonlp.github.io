@@ -1,6 +1,7 @@
 #include "hessian_from_eigen_cmd.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <memory>
 
 int hessian_from_eigen_Execute(HessianFromEigenCmd* cmd) {
     if (!cmd) {
@@ -19,7 +20,7 @@ int hessian_from_eigen_Execute(HessianFromEigenCmd* cmd) {
 
     // Allocate output if not provided
     if (!cmd->hessian) {
-        cmd->hessian = (Hessian2D*)malloc(size * sizeof(Hessian2D));
+        cmd->hessian = std::unique_ptr<Hessian2D[]>(new Hessian2D[size]);
         if (!cmd->hessian) {
             printf( "[hessian_from_eigen_Execute] Error: failed to allocate %u bytes\n",
                     (unsigned)(size * sizeof(Hessian2D)));
@@ -43,9 +44,3 @@ int hessian_from_eigen_Execute(HessianFromEigenCmd* cmd) {
     return 0;
 }
 
-void hessian_from_eigen_Free(HessianFromEigenCmd* cmd) {
-    if (cmd && cmd->hessian) {
-        free(cmd->hessian);
-        cmd->hessian = NULL;
-    }
-}

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
+#include <memory>
 
 /*
  * Compute eigendecomposition of a 2x2 symmetric matrix
@@ -93,7 +94,7 @@ int eigen_Execute(EigenDecomposeCmd* cmd) {
 
     // Allocate outputs if not provided
     if (!cmd->major) {
-        cmd->major = (EigenVec2*)malloc(size * sizeof(EigenVec2));
+        cmd->major = std::unique_ptr<EigenVec2[]>(new EigenVec2[size]);
         if (!cmd->major) {
             printf( "[eigen_Execute] Error: failed to allocate %u bytes for major\n",
                     (unsigned)(size * sizeof(EigenVec2)));
@@ -102,12 +103,11 @@ int eigen_Execute(EigenDecomposeCmd* cmd) {
     }
 
     if (!cmd->minor) {
-        cmd->minor = (EigenVec2*)malloc(size * sizeof(EigenVec2));
+        cmd->minor = std::unique_ptr<EigenVec2[]>(new EigenVec2[size]);
         if (!cmd->minor) {
             printf( "[eigen_Execute] Error: failed to allocate %u bytes for minor\n",
                     (unsigned)(size * sizeof(EigenVec2)));
-            free(cmd->major);
-            cmd->major = NULL;
+            cmd->major.reset();
             return -1;
         }
     }
@@ -132,15 +132,3 @@ int eigen_Execute(EigenDecomposeCmd* cmd) {
     return 0;
 }
 
-void eigen_Free(EigenDecomposeCmd* cmd) {
-    if (cmd) {
-        if (cmd->major) {
-            free(cmd->major);
-            cmd->major = NULL;
-        }
-        if (cmd->minor) {
-            free(cmd->minor);
-            cmd->minor = NULL;
-        }
-    }
-}

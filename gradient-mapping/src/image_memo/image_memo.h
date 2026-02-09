@@ -81,6 +81,10 @@ typedef struct
  * API functions
  * ========================================================================= */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * Load an image from VFS path into the memo cache for the given stack.
  *
@@ -121,5 +125,9 @@ void memo_free(int stack_type);
  * Free all memoized images (call at shutdown).
  */
 void memo_free_all(void);
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif /* IMAGE_MEMO_H */

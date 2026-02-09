@@ -2,6 +2,7 @@
 #define CONSTRAINED_POISSON_CMD_H
 
 #include <stdint.h>
+#include <memory>
 #include "../effect_stack_api.h"  // for vec3
 
 /*
@@ -25,7 +26,7 @@ typedef struct {
     float zero_threshold;          // Values <= this are considered zero (default 1e-6)
 
     /* Output */
-    float* result_height;          // W*H reconstructed height field
+    std::unique_ptr<float[]> result_height;  // W*H reconstructed height field
     int iterations_used;           // Actual iterations before convergence
     float final_residual;          // Final residual norm
 } ConstrainedPoissonCmd;
@@ -36,10 +37,5 @@ typedef struct {
  * Returns 0 on success, -1 on error.
  */
 int constrained_poisson_Execute(ConstrainedPoissonCmd* cmd);
-
-/*
- * Free allocated memory.
- */
-void constrained_poisson_Free(ConstrainedPoissonCmd* cmd);
 
 #endif /* CONSTRAINED_POISSON_CMD_H */

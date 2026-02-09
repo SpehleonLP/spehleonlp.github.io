@@ -120,10 +120,16 @@ typedef enum {
     EFFECT_BOX_BLUR             = 0x22,
     EFFECT_GRADIENTIFY          = 0x23,
     EFFECT_POISSON_SOLVE        = 0x24,
+    EFFECT_LAMINARIZE           = 0x25,
 
     /* Gradient stack specifics */
     EFFECT_COLOR_RAMP           = 0x30,
     EFFECT_BLEND_MODE           = 0x31,
+
+    /* Debug commands (CLI only, produce debug PNGs) */
+    EFFECT_DEBUG_HESSIAN_FLOW   = 0x40,
+    EFFECT_DEBUG_SPLIT_CHANNELS = 0x41,
+    EFFECT_DEBUG_LIC            = 0x42,
 } EffectId;
 
 // parameters for erosion source
@@ -210,6 +216,32 @@ typedef struct
 	int iterations;   // solver iterations
 } PoissonSolveParams;
 
+/* Helmholtz-style divergence redistribution on normal maps */
+typedef struct
+{
+	float scale;      // normal Z scaling for target divergence (0.01-10)
+	float strength;   // blend: 0=unchanged, 1=full correction
+	float blur_sigma; // Gaussian sigma for magnitude blur (0-5)
+} LaminarizeParams;
+
+
+/* =========================================================================
+ * Debug command parameter structs (CLI only)
+ * ========================================================================= */
+
+typedef enum { LIC_FIELD_NORMAL=0, LIC_FIELD_TANGENT=1, LIC_FIELD_BITANGENT=2 } LicVectorField;
+
+typedef struct {
+    int kernel_size;  // 3 or 5
+} DebugHessianFlowParams;
+
+/* No params needed for EFFECT_DEBUG_SPLIT_CHANNELS */
+
+typedef struct {
+    LicVectorField vector_field;
+    float kernel_length;  // half-length in pixels
+    float step_size;      // Euler step
+} DebugLicParams;
 
 /* =========================================================================
  * Gradient parameter structs (one per effect type)
@@ -253,6 +285,10 @@ typedef struct {
         BoxBlurParams       box_blur;
         GradientifyParams   gradientify;
         PoissonSolveParams  poisson_solve;
+        LaminarizeParams    laminarize;
+        /* Debug commands */
+        DebugHessianFlowParams debug_hessian_flow;
+        DebugLicParams         debug_lic;
         /* Gradient stack */
         ColorRamp           color_ramp;      /* note: stops is malloc'd */
         BlendModeParams     blend_mode;
@@ -270,6 +306,10 @@ typedef struct {
  * After this call, /effect_catalog.json exists on the emscripten VFS.
  * JS reads it with FS.readFile('/effect_catalog.json').
  * ========================================================================= */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 EXPORT void init_catalog(void);
 
@@ -350,6 +390,10 @@ extern void js_post_error(int error_code, int effect_id, int param_idx,
                           const char* message);
 extern void js_set_source_timing(int stack_type, float fade_in_time,
                                  float fade_out_time, float total_duration);
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 /* =========================================================================
  * Per-module catalog writers

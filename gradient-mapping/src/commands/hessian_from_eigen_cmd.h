@@ -2,6 +2,7 @@
 #define HESSIAN_FROM_EIGEN_CMD_H
 
 #include <stdint.h>
+#include <memory>
 #include "eigen_cmd.h"
 #include "hessian_cmd.h"
 
@@ -21,7 +22,7 @@ typedef struct {
     uint32_t W, H;
 
     /* Output (allocated by caller or internally) */
-    Hessian2D* hessian;      // W*H array of reconstructed Hessians
+    std::unique_ptr<Hessian2D[]> hessian;      // W*H array of reconstructed Hessians
 } HessianFromEigenCmd;
 
 /*
@@ -30,10 +31,5 @@ typedef struct {
  * Returns 0 on success, -1 on error.
  */
 int hessian_from_eigen_Execute(HessianFromEigenCmd* cmd);
-
-/*
- * Free allocated memory.
- */
-void hessian_from_eigen_Free(HessianFromEigenCmd* cmd);
 
 #endif /* HESSIAN_FROM_EIGEN_CMD_H */

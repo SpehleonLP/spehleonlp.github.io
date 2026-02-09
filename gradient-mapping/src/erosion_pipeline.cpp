@@ -1,16 +1,22 @@
 #include "erosion_pipeline.h"
 #include "commands/hessian_flow_dbg.h"
+#include "commands/constrained_poisson_cmd.h"
+#include "commands/laminarize_cmd.h"
 #include "commands/sdf_layered.h"
 #include "image_memo/image_memo.h"
 #include "commands/fft_blur.h"
 #include "commands/interp_quantized.h"
+#include "commands/lic_debug_cmd.h"
+#include "commands/debug_png.h"
 #include "commands/label_regions.h"
+#include "debug_output.h"
 #include "utility.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <memory>
 
 /* =============================================================================
  * Box Blur
@@ -18,8 +24,8 @@
 
 /* Single-channel box blur (3x3 kernel), iterated */
 static void box_blur_channel(float *data, uint32_t W, uint32_t H, int iterations) {
-	
-	float *temp = (float *)calloc(W * H, sizeof(float));
+
+	std::unique_ptr<float[]> temp(new float[W * H]());
 
 	for (int iter = 0; iter < iterations; iter++) {
 		for (uint32_t y = 0; y < H; y++) {
@@ -41,16 +47,14 @@ static void box_blur_channel(float *data, uint32_t W, uint32_t H, int iterations
 				temp[y * W + x] = sum / count;
 			}
 		}
-		memcpy(data, temp, W * H * sizeof(float));
+		memcpy(data, temp.get(), W * H * sizeof(float));
 	}
-
-	free(temp);
 }
 
-/* Box blur on planar height field (4 channels stored as separate planes) */
+/* Box blur on planar height field (3 channels stored as separate planes) */
 static void box_blur_heights_planar(float *heights, uint32_t W, uint32_t H, int iterations) {
 	size_t N = (size_t)W * H;
-	for (int c = 0; c < 4; c++) {
+	for (int c = 0; c < 3; c++) {
 		box_blur_channel(&heights[c * N], W, H, iterations);
 	}
 }
@@ -126,23 +130,27 @@ static void fft_filter_channel(float *data, uint32_t W, uint32_t H, float low_pa
 
 	fft_2d(ctx.real, ctx.imag, fftW, fftH, 1, 1.0f / (fftW * fftH));
 
-	/* Extract back from centered position, clamping to valid range */
+	/* Extract back from centered position, clamping to valid range.
+	 * Preserve zeros: if the input was 0, force the output to 0 so
+	 * the FFT ringing doesn't bleed into empty regions. */
 	for (uint32_t y = 0; y < H; y++) {
 		for (uint32_t x = 0; x < W; x++) {
+			uint32_t idx = y * W + x;
+			if (data[idx] == 0.0f) continue;
 			float val = ctx.real[(y + offY) * fftW + (x + offX)];
-			data[y * W + x] = fmaxf(0.0f, fminf(1.0f, val));
+			data[idx] = fmaxf(0.0f, fminf(1.0f, val));
 		}
 	}
 
 	fft_Free(&ctx);
 }
 
-/* FFT filter on planar height field (4 channels stored as separate planes) */
+/* FFT filter on planar height field (3 channels stored as separate planes) */
 static void fft_filter_heights_planar(float *heights, uint32_t W, uint32_t H, float low_pass, float Hgh_pass) {
 	if (W <= 0 || H <= 0) return;
 	size_t N = (size_t)W * H;
 
-	for (int c = 0; c < 4; c++) {
+	for (int c = 0; c < 3; c++) {
 		fft_filter_channel(&heights[c * N], W, H, low_pass, Hgh_pass);
 	}
 }
@@ -181,26 +189,22 @@ static void fft_filter_normals_planar(float *normals, uint32_t W, uint32_t H, fl
  *
  * Normal maps are stored as planar data with 3 components per height channel:
  *   Layout: [ch0_nx][ch0_ny][ch0_nz][ch1_nx][ch1_ny][ch1_nz][ch2_nx]...
- *   Total size: 4 channels * 3 components * W * H = 12 * W * H floats
+ *   Total size: 3 channels * 3 components * W * H = 9 * W * H floats
  * ============================================================================= */
 
-/* Convert one height channel to planar normal map (nx, ny, nz as separate planes) */
+/* Convert one height channel to planar normal map (nx, ny, nz as separate planes).
+ * Out-of-bounds samples are 0 (GL_CLAMP_TO_BORDER). */
 static void height_to_normals_planar(float *nx, float *ny, float *nz,
                                       const float *heights, uint32_t W, uint32_t H, float scale) {
 	for (uint32_t y = 0; y < H; y++) {
 		for (uint32_t x = 0; x < W; x++) {
 			size_t idx = y * W + x;
 
-			/* Sample neighbors with edge clamping */
-			size_t iL = (x > 0) ? idx - 1 : idx;
-			size_t iR = (x < W - 1) ? idx + 1 : idx;
-			size_t iD = (y > 0) ? idx - W : idx;
-			size_t iU = (y < H - 1) ? idx + W : idx;
-
-			float hL = heights[iL];
-			float hR = heights[iR];
-			float hD = heights[iD];
-			float hU = heights[iU];
+			/* Sample neighbors: 0 outside border */
+			float hL = (x > 0)     ? heights[idx - 1] : 0.0f;
+			float hR = (x < W - 1) ? heights[idx + 1] : 0.0f;
+			float hD = (y > 0)     ? heights[idx - W] : 0.0f;
+			float hU = (y < H - 1) ? heights[idx + W] : 0.0f;
 
 			/* Gradient via central differences */
 			float gx = (hR - hL) * 0.5f * scale;
@@ -215,74 +219,44 @@ static void height_to_normals_planar(float *nx, float *ny, float *nz,
 	}
 }
 
-/* Convert planar normal map back to height field via Poisson solve (Jacobi iteration) */
-static void normals_to_height_planar(float *heights, const float *nx, const float *ny, const float *nz,
+/* Convert planar normal map back to height field using constrained Poisson solve.
+ * original_heights provides the constraints (zeros stay zero, positives stay positive). */
+static void normals_to_height_planar(float *heights, const float *original_heights,
+                                      const float *nx, const float *ny, const float *nz,
                                       uint32_t W, uint32_t H, int iterations) {
 	if (W == 0 || H == 0) return;
 	size_t N = (size_t)W * H;
 
-	float *temp = (float *)calloc(N, sizeof(float));
-	if (!temp) return;
-
-	/* Initialize heights to zero */
-	memset(heights, 0, N * sizeof(float));
-
-	/* Jacobi iteration */
-	for (int iter = 0; iter < iterations; iter++) {
-		for (uint32_t y = 0; y < H; y++) {
-			for (uint32_t x = 0; x < W; x++) {
-				size_t idx = y * W + x;
-
-				/* Get gradient from normal: g = -n.xy / n.z */
-				float n_z = nz[idx];
-				if (n_z < 0.001f) n_z = 0.001f;  /* avoid div by zero */
-				float gx = -nx[idx] / n_z;
-				float gy = -ny[idx] / n_z;
-
-				/* Neighbor indices with edge clamping */
-				size_t iL = (x > 0) ? idx - 1 : idx;
-				size_t iR = (x < W - 1) ? idx + 1 : idx;
-				size_t iD = (y > 0) ? idx - W : idx;
-				size_t iU = (y < H - 1) ? idx + W : idx;
-
-				float hL = heights[iL];
-				float hR = heights[iR];
-				float hD = heights[iD];
-				float hU = heights[iU];
-
-				/* Poisson update */
-				float hNew = (hL + hR + hD + hU) * 0.25f;
-				hNew += (hR - hL) * 0.125f - gx * 0.5f;
-				hNew += (hU - hD) * 0.125f - gy * 0.5f;
-
-				temp[idx] = hNew;
-			}
-		}
-
-		/* Swap buffers */
-		float *swap = heights;
-		heights = temp;
-		temp = swap;
+	/* Pack planar normals into vec3 array for constrained_poisson */
+	std::unique_ptr<vec3[]> normals(new vec3[N]);
+	for (size_t i = 0; i < N; i++) {
+		normals[i] = (vec3){ nx[i], ny[i], nz[i] };
 	}
 
-	/* If odd iterations, result is in temp, need to copy back */
-	if (iterations % 2 == 1) {
-		memcpy(heights, temp, N * sizeof(float));
-	}
+	ConstrainedPoissonCmd cmd{};
+	cmd.original_height = original_heights;
+	cmd.target_normals = normals.get();
+	cmd.W = W;
+	cmd.H = H;
+	cmd.max_iterations = iterations > 0 ? iterations : 1000;
+	cmd.tolerance = 1e-5f;
+	cmd.zero_threshold = 1e-6f;
 
-	free(temp);
+	if (constrained_poisson_Execute(&cmd) == 0 && cmd.result_height) {
+		memcpy(heights, cmd.result_height.get(), N * sizeof(float));
+	}
 }
 
-/* Convert planar heights (4 channels) to planar normals (4 channels * 3 components) */
+/* Convert planar heights (3 channels) to planar normals (3 channels * 3 components) */
 static float* heights_to_normalmap_planar(const float *heights, uint32_t W, uint32_t H, float scale) {
 	if (W == 0 || H == 0) return NULL;
 	size_t N = (size_t)W * H;
 
-	/* Allocate 12 planes: 4 height channels * 3 normal components */
-	float *normals = (float *)calloc(12 * N, sizeof(float));
+	/* Allocate 9 planes: 3 height channels * 3 normal components */
+	float *normals = new (std::nothrow) float[9 * N]();
 	if (!normals) return NULL;
 
-	for (int c = 0; c < 4; c++) {
+	for (int c = 0; c < 3; c++) {
 		const float *h_channel = &heights[c * N];
 		float *nx = &normals[(c * 3 + 0) * N];
 		float *ny = &normals[(c * 3 + 1) * N];
@@ -293,21 +267,23 @@ static float* heights_to_normalmap_planar(const float *heights, uint32_t W, uint
 	return normals;
 }
 
-/* Convert planar normals back to planar heights */
-static void normalmap_to_heights_planar(float *heights, const float *normals, uint32_t W, uint32_t H, int iterations) {
+/* Convert planar normals back to planar heights (original_heights provides constraints) */
+static void normalmap_to_heights_planar(float *heights, const float *original_heights,
+                                         const float *normals, uint32_t W, uint32_t H, int iterations) {
 	if (W == 0 || H == 0) return;
 	size_t N = (size_t)W * H;
 
-	for (int c = 0; c < 4; c++) {
+	for (int c = 0; c < 3; c++) {
 		float *h_channel = &heights[c * N];
+		const float *orig_channel = &original_heights[c * N];
 		const float *nx = &normals[(c * 3 + 0) * N];
 		const float *ny = &normals[(c * 3 + 1) * N];
 		const float *nz = &normals[(c * 3 + 2) * N];
-		normals_to_height_planar(h_channel, nx, ny, nz, W, H, iterations);
+		normals_to_height_planar(h_channel, orig_channel, nx, ny, nz, W, H, iterations);
 	}
 }
 
-/* Process effects in gradient/normal space (planar normals: 12 planes for 4 channels * 3 components) */
+/* Process effects in gradient/normal space (planar normals: 9 planes for 3 channels * 3 components) */
 static int process_erosion_gradient_planar(float *normals, uint32_t W, uint32_t H,
                                             Effect const* effects, int effect_count, int i)
 {
@@ -330,9 +306,7 @@ static int process_erosion_gradient_planar(float *normals, uint32_t W, uint32_t 
 		case EFFECT_BOX_BLUR: {
 			int iters = (int)effects[i].params.box_blur.iterations;
 			if (iters < 1) iters = 1;
-			/* Apply to all 4 height channel normal sets */
-			for (int c = 0; c < 4; c++) {
-				/* Each height channel has 3 normal components stored contiguously */
+			for (int c = 0; c < 3; c++) {
 				float *nm_channel = &normals[c * 3 * N];
 				box_blur_normals_planar(nm_channel, W, H, iters);
 			}
@@ -342,10 +316,38 @@ static int process_erosion_gradient_planar(float *normals, uint32_t W, uint32_t 
 		case EFFECT_FOURIER_CLAMP: {
 			float low_pass = effects[i].params.fourier_clamp.Maximum;
 			float Hgh_pass = effects[i].params.fourier_clamp.Minimum;
-			/* Apply to all 4 height channel normal sets */
-			for (int c = 0; c < 4; c++) {
+			for (int c = 0; c < 3; c++) {
 				float *nm_channel = &normals[c * 3 * N];
 				fft_filter_normals_planar(nm_channel, W, H, low_pass, Hgh_pass);
+			}
+			break;
+		}
+
+		case EFFECT_LAMINARIZE: {
+			LaminarizeParams const* lp = &effects[i].params.laminarize;
+			for (int c = 0; c < 3; c++) {
+				float *nm = &normals[c * 3 * N];
+				/* Convert planar (nx[], ny[], nz[]) to vec3 array */
+				std::unique_ptr<vec3[]> input(new vec3[N]);
+				for (size_t j = 0; j < N; j++) {
+					input[j] = (vec3){ nm[j], nm[N + j], nm[2 * N + j] };
+				}
+				LaminarizeCmd lam{};
+				lam.normals = input.get();
+				lam.W = W;
+				lam.H = H;
+				lam.scale = lp->scale;
+				lam.strength = lp->strength;
+				lam.blur_sigma = lp->blur_sigma;
+				lam.max_iterations = 1000;
+				lam.tolerance = 1e-5f;
+				if (laminarize_Execute(&lam) == 0 && lam.result_normals) {
+					for (size_t j = 0; j < N; j++) {
+						nm[j]         = lam.result_normals[j].x;
+						nm[N + j]     = lam.result_normals[j].y;
+						nm[2 * N + j] = lam.result_normals[j].z;
+					}
+				}
 			}
 			break;
 		}
@@ -362,12 +364,75 @@ static int process_erosion_gradient_planar(float *normals, uint32_t W, uint32_t 
 		case EFFECT_BLEND_MODE:
 			/* Invalid in erosion pipeline */
 			break;
+
+		case EFFECT_DEBUG_HESSIAN_FLOW:
+		case EFFECT_DEBUG_LIC:
+			/* Not applicable in gradient space */
+			break;
+
+		case EFFECT_DEBUG_SPLIT_CHANNELS: {
+			/* Export 3 normal maps (one per height channel) */
+			for (int c = 0; c < 3; c++) {
+				float *nx = &normals[(c * 3 + 0) * N];
+				float *ny = &normals[(c * 3 + 1) * N];
+				float *nz = &normals[(c * 3 + 2) * N];
+				std::unique_ptr<vec3[]> packed(new vec3[N]);
+				for (size_t j = 0; j < N; j++) {
+					packed[j] = (vec3){ nx[j], ny[j], nz[j] };
+				}
+				char buf[512], filename[64];
+				snprintf(filename, sizeof(filename), "normal_ch%d.png", c);
+				PngVec3Cmd nc = {
+					.path = debug_path(filename, buf, sizeof(buf)),
+					.data = packed.get(),
+					.width = W,
+					.height = H,
+				};
+				png_ExportVec3(&nc);
+			}
+			break;
+		}
 		}
 	}
 
 	return i;
 }
 
+static int process_erosion_gradientify(float *height, uint32_t W, uint32_t H,
+                                            Effect const* effects, int effect_count, int i)
+{
+	/* Convert to planar normal map */
+	float scale = 1.0f;
+	int start = i;
+	if (i < effect_count && effects[i].effect_id == EFFECT_GRADIENTIFY) {
+		scale = effects[i].params.gradientify.scale;
+		if (scale <= 0.0f) scale = 1.0f;
+		start = (i += 1); /* skip past the gradientify itself */
+	}
+	/* Otherwise entered implicitly (e.g. from LAMINARIZE) — start at i */
+
+	/* Save original heights for constrained Poisson solve */
+	size_t N = (size_t)W * H;
+	std::unique_ptr<float[]> original_heights(new float[3 * N]);
+	memcpy(original_heights.get(), height, 3 * N * sizeof(float));
+
+	std::unique_ptr<float[]> normals(heights_to_normalmap_planar(height, W, H, scale));
+	if (!normals) return i;
+
+	/* Process effects in gradient space */
+	i = process_erosion_gradient_planar(normals.get(), W, H, effects, effect_count, start);
+
+	/* Poisson solve back to heights - get iterations from next effect if it's POISSON_SOLVE */
+	int iterations = 1000;
+	if (i < effect_count && effects[i].effect_id == EFFECT_POISSON_SOLVE) {
+		iterations = (int)effects[i].params.poisson_solve.iterations;
+		if (iterations < 1) iterations = 1000;
+	}
+	normalmap_to_heights_planar(height, original_heights.get(), normals.get(), W, H, iterations);
+
+	return i;
+}
+                                            
 /* Dijkstra distance transform on planar height data */
 static void run_dijkstra_planar(float *dst, uint32_t W, uint32_t H, SDFDistanceParams params)
 {
@@ -381,7 +446,7 @@ static void run_dijkstra_planar(float *dst, uint32_t W, uint32_t H, SDFDistanceP
 	if (memo->regions == NULL)
 	{
 		/* Allocate space for 3 channels worth of region labels */
-		uint32_t *regions = calloc(N * 3, sizeof(uint32_t));
+		uint32_t *regions = (uint32_t *)calloc(N * 3, sizeof(uint32_t));
 		if (!regions) return;
 
 		/* Run label_regions for each channel (RGB, not A) */
@@ -451,10 +516,6 @@ static void run_dijkstra_planar(float *dst, uint32_t W, uint32_t H, SDFDistanceP
 		free(iq.output);
 	}
 
-	/* Copy alpha channel unchanged */
-	for (uint32_t i = 0; i < N; ++i) {
-		dst[N * 3 + i] = memo->image.deinterleaved[N * 3 + i] / 255.0f;
-	}
 }
 
 #if 0
@@ -482,7 +543,7 @@ static void run_dijkstra_reference(vec4 *dst, uint32_t W, uint32_t H, SDFDistanc
 }
 #endif
 
-/* Process effects on planar height field (4 channels stored as separate planes) */
+/* Process effects on planar height field (3 channels stored as separate planes) */
 static void process_erosion_height_planar(float *dst, uint32_t W, uint32_t H, Effect const* effects, int effect_count)
 {
 	for (int i = 0; i < effect_count; ++i)
@@ -522,49 +583,64 @@ static void process_erosion_height_planar(float *dst, uint32_t W, uint32_t H, Ef
 		}
 
 		case EFFECT_GRADIENTIFY: {
-			HessianFlowDebugCmd flow = {0};
-			
-			flow.heightmap = &dst[W*H*1];
-			flow.W=W;
-			flow.H=H;
-			flow.output_path = "/debug.png";
-			flow.kernel_size = 5;
-			flow.border = HESSIAN_BORDER_CLAMP_EDGE;
-			flow.undefined_value = -1.f;
-			flow.normal_scale = 0.01f;
-			flow.major_weight = 0.5;
-			flow.minor_weight = 0.5;
-			
-			printf("executing heissan flow command.");
-			hessian_flow_debug_Execute(&flow);
-			hessian_flow_debug_Free(&flow);
-		
-#if 0
-			/* Convert to planar normal map */
-			float scale = effects[i].params.gradientify.scale;
-			if (scale <= 0.0f) scale = 1.0f;
-			float *normals = heights_to_normalmap_planar(dst, W, H, scale);
-			if (!normals) break;
+			i = process_erosion_gradientify(dst, W, H, effects, effect_count, i);
+			break;
+		}
 
-			/* Process effects in gradient space */
-			i = process_erosion_gradient_planar(normals, W, H, effects, effect_count, i + 1);
-
-			/* Poisson solve back to heights - get iterations from next effect if it's POISSON_SOLVE */
-			int iterations = 100;
-			if (i < effect_count && effects[i].effect_id == EFFECT_POISSON_SOLVE) {
-				iterations = (int)effects[i].params.poisson_solve.iterations;
-				if (iterations < 1) iterations = 100;
-			}
-			normalmap_to_heights_planar(dst, normals, W, H, iterations);
-
-			free(normals);
-#endif
+		case EFFECT_LAMINARIZE: {
+			/* Implicitly enter gradient space for laminarize */
+			i = process_erosion_gradientify(dst, W, H, effects, effect_count, i);
 			break;
 		}
 
 		case EFFECT_POISSON_SOLVE:
 			/* Orphaned poisson solve - ignore */
 			break;
+
+		case EFFECT_DEBUG_HESSIAN_FLOW: {
+			HessianFlowDebugCmd flow{};
+			flow.heightmap = &dst[W*H*1]; /* channel 1 (G) */
+			flow.W = W;
+			flow.H = H;
+			flow.kernel_size = effects[i].params.debug_hessian_flow.kernel_size;
+			flow.border = HESSIAN_BORDER_CLAMP_EDGE;
+			flow.undefined_value = -1.f;
+			flow.major_weight = 1.0;
+			flow.minor_weight = 1.0;
+			char dbg_path_buf[512];
+			flow.output_path = debug_path("hessian.png", dbg_path_buf, sizeof(dbg_path_buf));
+			hessian_flow_debug_Execute(&flow);
+			break;
+		}
+
+		case EFFECT_DEBUG_SPLIT_CHANNELS: {
+			size_t N = (size_t)W * H;
+			char buf[512];
+			PngFloatCmd fc = { .path = NULL, .data = NULL,
+				.width = W, .height = H, .min_val = 0, .max_val = 1, .auto_range = 0 };
+			fc.data = &dst[0*N];
+			fc.path = debug_path("fadeIn.png", buf, sizeof(buf));
+			png_ExportFloat(&fc);
+			fc.data = &dst[1*N];
+			fc.path = debug_path("fadeOut.png", buf, sizeof(buf));
+			png_ExportFloat(&fc);
+			fc.data = &dst[2*N];
+			fc.path = debug_path("softness.png", buf, sizeof(buf));
+			png_ExportFloat(&fc);
+			break;
+		}
+
+		case EFFECT_DEBUG_LIC: {
+			LicDebugCmd lic = {0};
+			lic.heights = dst;
+			lic.W = W;
+			lic.H = H;
+			lic.vector_field = effects[i].params.debug_lic.vector_field;
+			lic.kernel_length = effects[i].params.debug_lic.kernel_length;
+			lic.step_size = effects[i].params.debug_lic.step_size;
+			lic_debug_Execute(&lic);
+			break;
+		}
 
 		case EFFECT_COLOR_RAMP:
 		case EFFECT_BLEND_MODE:
@@ -590,29 +666,28 @@ uint8_t* process_erosion_stack(Effect const* effects, int effect_count, int* out
     uint32_t H = *out_h = (int)memo->image.height;
 	uint32_t N = W * H;
 
-	float * working_image = malloc(N * sizeof(float) * 4);
-	
-// deinterleave
-	for (uint32_t  i = 0; i < N*4; ++i)
+	std::unique_ptr<float[]> working_image(new float[N * 3]);
+
+// deinterleave (RGB only)
+	for (uint32_t c = 0; c < 3; ++c)
 	{
-		working_image[i] = memo->image.deinterleaved[i] / 255.f;
+		for (uint32_t i = 0; i < N; ++i)
+			working_image[c * N + i] = memo->image.deinterleaved[c * N + i] / 255.f;
 	}
 
-	process_erosion_height_planar(working_image, (uint32_t)W, (uint32_t)H, effects, effect_count);
+	process_erosion_height_planar(working_image.get(), (uint32_t)W, (uint32_t)H, effects, effect_count);
 
 	static u8vec4 * retn = 0L;
 	retn = (u8vec4*)realloc(retn, N * sizeof(u8vec4));
 
-// interleave
+// interleave (RGB + opaque alpha)
 	for (uint32_t  i = 0; i < N; ++i)
 	{
 		retn[i].x = clamp_i32(working_image[0*N + i] * 255 + 0.5, 0, 255);
 		retn[i].y = clamp_i32(working_image[1*N + i] * 255 + 0.5, 0, 255);
 		retn[i].z = clamp_i32(working_image[2*N + i] * 255 + 0.5, 0, 255);
-		retn[i].w = clamp_i32(working_image[3*N + i] * 255 + 0.5, 0, 255);
+		retn[i].w = 255;
 	}
-
-	free(working_image);
 	
 
     return (uint8_t*)retn;

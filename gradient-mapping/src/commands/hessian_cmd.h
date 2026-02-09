@@ -2,6 +2,7 @@
 #define HESSIAN_CMD_H
 
 #include <stdint.h>
+#include <memory>
 
 /*
  * Hessian matrix (2x2 symmetric) at a single pixel
@@ -41,7 +42,7 @@ typedef struct {
     float undefined_value;        // Value to treat as "no data" (exact match)
 
     /* Output (allocated by caller or by hessian_Execute) */
-    Hessian2D* hessian;  // W*H array of Hessian matrices
+    std::unique_ptr<Hessian2D[]> hessian;  // W*H array of Hessian matrices
 } HessianCmd;
 
 /*
@@ -50,10 +51,5 @@ typedef struct {
  * Returns 0 on success, -1 on error.
  */
 int hessian_Execute(HessianCmd* cmd);
-
-/*
- * Free allocated memory.
- */
-void hessian_Free(HessianCmd* cmd);
 
 #endif /* HESSIAN_CMD_H */

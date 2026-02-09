@@ -38,9 +38,9 @@ static float perlin_single_curl(float x, float y, uint32_t seed) {
     float n01 = vec2_dot(g01, d01);
     float n11 = vec2_dot(g11, d11);
 
-    float nx0 = lerp(n00, n10, u);
-    float nx1 = lerp(n01, n11, u);
-    return lerp(nx0, nx1, v);
+    float nx0 = lerpf(n00, n10, u);
+    float nx1 = lerpf(n01, n11, u);
+    return lerpf(nx0, nx1, v);
 }
 
 // fBm (fractal) Perlin noise

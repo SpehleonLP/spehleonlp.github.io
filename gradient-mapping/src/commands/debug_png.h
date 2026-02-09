@@ -103,6 +103,8 @@ typedef struct PngGridTile {
 	const void* data;
 	int channel;              // for INTERLEAVED type
 	int stride;               // for INTERLEAVED type
+	float scale;              // for GRAYSCALE/INTERLEAVED: 0=auto-range,
+	                          // >0: [0,scale] if unsigned, [-scale,scale] if signed
 } PngGridTile;
 
 typedef struct PngGridCmd {

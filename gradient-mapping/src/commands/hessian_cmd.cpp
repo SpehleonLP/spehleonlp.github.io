@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <memory>
 
 /*
  * Sample heightmap with border policy
@@ -218,7 +219,7 @@ int hessian_Execute(HessianCmd* cmd) {
 
     // Allocate output if not provided
     if (!cmd->hessian) {
-        cmd->hessian = (Hessian2D*)malloc(size * sizeof(Hessian2D));
+        cmd->hessian = std::unique_ptr<Hessian2D[]>(new Hessian2D[size]);
         if (!cmd->hessian) {
             printf( "[hessian_Execute] Error: failed to allocate %u bytes for hessian\n",
                     (unsigned)(size * sizeof(Hessian2D)));
@@ -246,9 +247,3 @@ int hessian_Execute(HessianCmd* cmd) {
     return 0;
 }
 
-void hessian_Free(HessianCmd* cmd) {
-    if (cmd && cmd->hessian) {
-        free(cmd->hessian);
-        cmd->hessian = NULL;
-    }
-}

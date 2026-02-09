@@ -2,6 +2,7 @@
 #define EIGEN_CMD_H
 
 #include <stdint.h>
+#include <memory>
 #include "hessian_cmd.h"
 #include "../effect_stack_api.h"  // for vec2
 
@@ -28,8 +29,8 @@ typedef struct {
     uint32_t W, H;
 
     /* Output (allocated by caller or by eigen_Execute) */
-    EigenVec2* major;  // W*H array, larger eigenvalue + vector
-    EigenVec2* minor;  // W*H array, smaller eigenvalue + vector
+    std::unique_ptr<EigenVec2[]> major;  // W*H array, larger eigenvalue + vector
+    std::unique_ptr<EigenVec2[]> minor;  // W*H array, smaller eigenvalue + vector
 } EigenDecomposeCmd;
 
 /*
@@ -38,10 +39,5 @@ typedef struct {
  * Returns 0 on success, -1 on error.
  */
 int eigen_Execute(EigenDecomposeCmd* cmd);
-
-/*
- * Free allocated memory.
- */
-void eigen_Free(EigenDecomposeCmd* cmd);
 
 #endif /* EIGEN_CMD_H */

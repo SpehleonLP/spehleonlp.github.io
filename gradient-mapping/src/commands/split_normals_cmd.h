@@ -2,6 +2,7 @@
 #define SPLIT_NORMALS_CMD_H
 
 #include <stdint.h>
+#include <memory>
 #include "hessian_cmd.h"
 #include "../effect_stack_api.h"  // for vec3
 
@@ -19,12 +20,11 @@ typedef struct {
     int kernel_size;              // 3 or 5 for Hessian computation
     HessianBorderPolicy border;   // How to handle edges (default UNDEFINED)
     float undefined_value;        // Value to treat as "no data" (exact match)
-    float normal_scale;           // Normal map Z scale (default 1.0, higher = flatter)
 
     /* Output (allocated internally) */
-    vec3* major_normals;          // W*H normal map from major curvature
-    vec3* minor_normals;          // W*H normal map from minor curvature
-    float* major_ratio;           // W*H ratio: |λ_major| / (|λ_major| + |λ_minor|)
+    std::unique_ptr<vec3[]> major_normals;          // W*H normal map from major curvature
+    std::unique_ptr<vec3[]> minor_normals;          // W*H normal map from minor curvature
+    std::unique_ptr<float[]> major_ratio;           // W*H ratio: |λ_major| / (|λ_major| + |λ_minor|)
 } SplitNormalsCmd;
 
 /*
@@ -33,9 +33,6 @@ typedef struct {
  */
 int split_normals_Execute(SplitNormalsCmd* cmd);
 
-/*
- * Free allocated memory.
- */
-void split_normals_Free(SplitNormalsCmd* cmd);
+/* RAII: memory is freed automatically when cmd goes out of scope */
 
 #endif /* SPLIT_NORMALS_CMD_H */

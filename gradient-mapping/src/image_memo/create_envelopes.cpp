@@ -22,14 +22,14 @@ const float g_NoiseFramePercent = 0.02;
 
 ImageData * MakeImage(int width, int height, int depth)
 {
-    ImageData* img = malloc(sizeof(ImageData));
+    ImageData* img = (ImageData*)malloc(sizeof(ImageData));
     if (!img) return NULL;
 
     img->width = width;
     img->height = height;
     img->depth = depth;
     img->pad00 = 0;
-    img->data = calloc(width * height * depth, 4);  // RGBA
+    img->data = (uint8_t*)calloc(width * height * depth, 4);  // RGBA
 
     if (!img->data) {
         free(img);
@@ -294,12 +294,12 @@ void PrintEnvelope(struct Envelope * e)
 
 EnvelopeBuilder * e_Initialize(int width, int height)
 {
-    EnvelopeBuilder* builder = malloc(sizeof(EnvelopeBuilder));
+    EnvelopeBuilder* builder = (EnvelopeBuilder*)malloc(sizeof(EnvelopeBuilder));
     if (!builder) return NULL;
 
     builder->width = width;
     builder->height = height;
-    builder->pixels = calloc(width * height, sizeof(struct PixelState));
+    builder->pixels = (struct PixelState*)calloc(width * height, sizeof(struct PixelState));
 	builder->key.c = 0;
  
     if (!builder->pixels) {
@@ -540,9 +540,9 @@ int e_Build(EnvelopeBuilder * builder, ImageData * dst, EnvelopeMetadata * out, 
 	if(r == -1) return -1;
 	
 	ResizingImage image = {
-		.width=builder->width,
-		.height=builder->height,
-		.data=malloc(sizeof(float)*4*builder->width*builder->height),
+		.width=(uint32_t)builder->width,
+		.height=(uint32_t)builder->height,
+		.data=(float*)malloc(sizeof(float)*4*builder->width*builder->height),
 		.original = 0L
 	};
 	

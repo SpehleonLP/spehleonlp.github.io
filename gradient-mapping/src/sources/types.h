@@ -120,7 +120,7 @@ static inline float quintic_deriv(float t) {
 }
 
 // Linear interpolation
-static inline float lerp(float a, float b, float t) {
+static inline float lerpf(float a, float b, float t) {
     return a + t * (b - a);
 }
 

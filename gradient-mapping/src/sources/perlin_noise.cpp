@@ -44,23 +44,23 @@ static vec3 perlin_single_with_deriv(float x, float y, uint32_t seed) {
     float n11 = g11.x * (fx - 1.0f) + g11.y * (fy - 1.0f);
 
     // Bilinear interpolation for value
-    float nx0 = lerp(n00, n10, u);
-    float nx1 = lerp(n01, n11, u);
-    float value = lerp(nx0, nx1, v);
+    float nx0 = lerpf(n00, n10, u);
+    float nx1 = lerpf(n01, n11, u);
+    float value = lerpf(nx0, nx1, v);
 
     // Analytical derivatives using chain rule
-    // d(nx0)/dx = lerp(g00.x, g10.x, u) + du * (n10 - n00)
-    // d(nx1)/dx = lerp(g01.x, g11.x, u) + du * (n11 - n01)
-    float dnx0_dx = lerp(g00.x, g10.x, u) + du * (n10 - n00);
-    float dnx1_dx = lerp(g01.x, g11.x, u) + du * (n11 - n01);
-    float dvalue_dx = lerp(dnx0_dx, dnx1_dx, v);
+    // d(nx0)/dx = lerpf(g00.x, g10.x, u) + du * (n10 - n00)
+    // d(nx1)/dx = lerpf(g01.x, g11.x, u) + du * (n11 - n01)
+    float dnx0_dx = lerpf(g00.x, g10.x, u) + du * (n10 - n00);
+    float dnx1_dx = lerpf(g01.x, g11.x, u) + du * (n11 - n01);
+    float dvalue_dx = lerpf(dnx0_dx, dnx1_dx, v);
 
-    // d(nx0)/dy = lerp(g00.y, g10.y, u)
-    // d(nx1)/dy = lerp(g01.y, g11.y, u)
-    // d(value)/dy = lerp(dnx0_dy, dnx1_dy, v) + dv * (nx1 - nx0)
-    float dnx0_dy = lerp(g00.y, g10.y, u);
-    float dnx1_dy = lerp(g01.y, g11.y, u);
-    float dvalue_dy = lerp(dnx0_dy, dnx1_dy, v) + dv * (nx1 - nx0);
+    // d(nx0)/dy = lerpf(g00.y, g10.y, u)
+    // d(nx1)/dy = lerpf(g01.y, g11.y, u)
+    // d(value)/dy = lerpf(dnx0_dy, dnx1_dy, v) + dv * (nx1 - nx0)
+    float dnx0_dy = lerpf(g00.y, g10.y, u);
+    float dnx1_dy = lerpf(g01.y, g11.y, u);
+    float dvalue_dy = lerpf(dnx0_dy, dnx1_dy, v) + dv * (nx1 - nx0);
 
     return vec3_make(dvalue_dx, dvalue_dy, value);
 }

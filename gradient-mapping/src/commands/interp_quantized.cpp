@@ -5,25 +5,23 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <memory>
 
 /* ========== Debug PNG Export Helpers ========== */
 #if DEBUG_IMG_OUT
 #include <stdio.h>
+#include "../debug_output.h"
 
 static void iq_debug_export_distances(InterpolateQuantizedCmd *cmd) {
     uint32_t W = cmd->W, H = cmd->H;
     uint32_t npixels = W * H;
 
-    float *dist_lower = malloc(npixels * sizeof(float));
-    float *dist_higher = malloc(npixels * sizeof(float));
-    float *src_data = malloc(npixels * sizeof(float));
-    float *output_data = malloc(npixels * sizeof(float));
+    auto dist_lower = std::unique_ptr<float[]>(new (std::nothrow) float[npixels]);
+    auto dist_higher = std::unique_ptr<float[]>(new (std::nothrow) float[npixels]);
+    auto src_data = std::unique_ptr<float[]>(new (std::nothrow) float[npixels]);
+    auto output_data = std::unique_ptr<float[]>(new (std::nothrow) float[npixels]);
 
     if (!dist_lower || !dist_higher || !src_data || !output_data) {
-        free(dist_lower);
-        free(dist_higher);
-        free(src_data);
-        free(output_data);
         return;
     }
 
@@ -43,27 +41,31 @@ static void iq_debug_export_distances(InterpolateQuantizedCmd *cmd) {
     }
 
     /* Export individual images */
+    char pathbuf[512];
+
     PngFloatCmd cmd_lower = {
-        .path = "/iq_dist_lower.png",
-        .data = dist_lower,
+        .path = debug_path("iq_dist_lower.png", pathbuf, sizeof(pathbuf)),
+        .data = dist_lower.get(),
         .width = W, .height = H,
         .min_val = 0, .max_val = max_dist > 0 ? max_dist : 1,
         .auto_range = 0
     };
     png_ExportFloat(&cmd_lower);
 
+    char pathbuf2[512];
     PngFloatCmd cmd_higher = {
-        .path = "/iq_dist_higher.png",
-        .data = dist_higher,
+        .path = debug_path("iq_dist_higher.png", pathbuf2, sizeof(pathbuf2)),
+        .data = dist_higher.get(),
         .width = W, .height = H,
         .min_val = 0, .max_val = max_dist > 0 ? max_dist : 1,
         .auto_range = 0
     };
     png_ExportFloat(&cmd_higher);
 
+    char pathbuf3[512];
     PngFloatCmd cmd_output = {
-        .path = "/iq_output.png",
-        .data = output_data,
+        .path = debug_path("iq_output.png", pathbuf3, sizeof(pathbuf3)),
+        .data = output_data.get(),
         .width = W, .height = H,
         .min_val = 0, .max_val = 1,
         .auto_range = 0
@@ -76,7 +78,7 @@ static void iq_debug_export_distances(InterpolateQuantizedCmd *cmd) {
      * 0.66 = only higher boundary found - light grey
      * 1.00 = both boundaries found - white
      */
-    float *coverage = malloc(npixels * sizeof(float));
+    auto coverage = std::unique_ptr<float[]>(new (std::nothrow) float[npixels]);
     if (coverage) {
         for (uint32_t i = 0; i < npixels; i++) {
             int has_lower = cmd->pixels[i].dist_lower >= 0;
@@ -92,27 +94,28 @@ static void iq_debug_export_distances(InterpolateQuantizedCmd *cmd) {
             }
         }
 
+        char pathbuf4[512];
         PngFloatCmd cmd_coverage = {
-            .path = "/iq_coverage.png",
-            .data = coverage,
+            .path = debug_path("iq_coverage.png", pathbuf4, sizeof(pathbuf4)),
+            .data = coverage.get(),
             .width = W, .height = H,
             .min_val = 0, .max_val = 1,
             .auto_range = 0
         };
         png_ExportFloat(&cmd_coverage);
-        free(coverage);
     }
 
     /* Export a 2x2 grid comparison */
     PngGridTile tiles[4] = {
-        { .type = PNG_TILE_GRAYSCALE, .data = src_data },       // top-left: source
-        { .type = PNG_TILE_GRAYSCALE, .data = output_data },    // top-right: output t
-        { .type = PNG_TILE_GRAYSCALE, .data = dist_lower },     // bottom-left: dist to V-1
-        { .type = PNG_TILE_GRAYSCALE, .data = dist_higher }     // bottom-right: dist to V+1
+        { .type = PNG_TILE_GRAYSCALE, .data = src_data.get() },       // top-left: source
+        { .type = PNG_TILE_GRAYSCALE, .data = output_data.get() },    // top-right: output t
+        { .type = PNG_TILE_GRAYSCALE, .data = dist_lower.get() },     // bottom-left: dist to V-1
+        { .type = PNG_TILE_GRAYSCALE, .data = dist_higher.get() }     // bottom-right: dist to V+1
     };
 
+    char pathbuf5[512];
     PngGridCmd grid_cmd = {
-        .path = "/iq_grid.png",
+        .path = debug_path("iq_grid.png", pathbuf5, sizeof(pathbuf5)),
         .tile_width = W,
         .tile_height = H,
         .cols = 2,
@@ -120,11 +123,6 @@ static void iq_debug_export_distances(InterpolateQuantizedCmd *cmd) {
         .tiles = tiles
     };
     png_ExportGrid(&grid_cmd);
-
-    free(dist_lower);
-    free(dist_higher);
-    free(src_data);
-    free(output_data);
 }
 
 #endif /* DEBUG_IMG_OUT */
@@ -150,7 +148,7 @@ int iq_Initialize(InterpolateQuantizedCmd *cmd, const uint8_t *src, const uint8_
 	if(cmd->labels == 0L)
 	{
 		/* Allocate labels */
-		cmd->labels = malloc(npixels * sizeof(uint32_t));
+		cmd->labels = (uint32_t *)malloc(npixels * sizeof(uint32_t));
 		if (!cmd->labels) goto fail;
 
 		/* Run label_regions */
@@ -166,7 +164,7 @@ int iq_Initialize(InterpolateQuantizedCmd *cmd, const uint8_t *src, const uint8_
     }
 
     /* Allocate per-pixel data */
-    if (!cmd->pixels) cmd->pixels = malloc(npixels * sizeof(InterpPixel));
+    if (!cmd->pixels) cmd->pixels = (InterpPixel *)malloc(npixels * sizeof(InterpPixel));
     if (!cmd->pixels) goto fail;
     for (uint32_t i = 0; i < npixels; i++) {
         cmd->pixels[i].dist_lower = -1.0f;
@@ -174,7 +172,7 @@ int iq_Initialize(InterpolateQuantizedCmd *cmd, const uint8_t *src, const uint8_
     }
 
     /* Allocate per-region data */
-    if (!cmd->regions) cmd->regions = malloc(cmd->num_regions * sizeof(InterpRegion));
+    if (!cmd->regions) cmd->regions = (InterpRegion *)malloc(cmd->num_regions * sizeof(InterpRegion));
     if (!cmd->regions) goto fail;
     for (uint32_t i = 0; i < cmd->num_regions; i++) {
         cmd->regions[i].max_dist_lower = -1.0f;
@@ -182,7 +180,7 @@ int iq_Initialize(InterpolateQuantizedCmd *cmd, const uint8_t *src, const uint8_
     }
 
     /* Allocate output */
-    if (!cmd->output) cmd->output = malloc(npixels * sizeof(float));
+    if (!cmd->output) cmd->output = (float *)malloc(npixels * sizeof(float));
     if (!cmd->output) goto fail;
 
 	memset(cmd->next_color, 0, sizeof(cmd->next_color));

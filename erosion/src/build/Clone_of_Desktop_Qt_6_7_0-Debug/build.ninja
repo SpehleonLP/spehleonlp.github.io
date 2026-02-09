@@ -55,8 +55,6 @@ build CMakeFiles/video_processor_lib.dir/video_processor.c.o: C_COMPILER__video_
   INCLUDES = -I/home/anyuser/websites/spehleonlp.github.io/erosion/src
   OBJECT_DIR = CMakeFiles/video_processor_lib.dir
   OBJECT_FILE_DIR = CMakeFiles/video_processor_lib.dir
-  TARGET_COMPILE_PDB = CMakeFiles/video_processor_lib.dir/video_processor_lib.pdb
-  TARGET_PDB = libvideo_processor_lib.pdb
 
 build CMakeFiles/video_processor_lib.dir/create_envelopes.c.o: C_COMPILER__video_processor_lib_unscanned_Debug /home/anyuser/websites/spehleonlp.github.io/erosion/src/create_envelopes.c || cmake_object_order_depends_target_video_processor_lib
   DEP_FILE = CMakeFiles/video_processor_lib.dir/create_envelopes.c.o.d
@@ -64,8 +62,6 @@ build CMakeFiles/video_processor_lib.dir/create_envelopes.c.o: C_COMPILER__video
   INCLUDES = -I/home/anyuser/websites/spehleonlp.github.io/erosion/src
   OBJECT_DIR = CMakeFiles/video_processor_lib.dir
   OBJECT_FILE_DIR = CMakeFiles/video_processor_lib.dir
-  TARGET_COMPILE_PDB = CMakeFiles/video_processor_lib.dir/video_processor_lib.pdb
-  TARGET_PDB = libvideo_processor_lib.pdb
 
 build CMakeFiles/video_processor_lib.dir/create_gradient.c.o: C_COMPILER__video_processor_lib_unscanned_Debug /home/anyuser/websites/spehleonlp.github.io/erosion/src/create_gradient.c || cmake_object_order_depends_target_video_processor_lib
   DEP_FILE = CMakeFiles/video_processor_lib.dir/create_gradient.c.o.d
@@ -73,8 +69,6 @@ build CMakeFiles/video_processor_lib.dir/create_gradient.c.o: C_COMPILER__video_
   INCLUDES = -I/home/anyuser/websites/spehleonlp.github.io/erosion/src
   OBJECT_DIR = CMakeFiles/video_processor_lib.dir
   OBJECT_FILE_DIR = CMakeFiles/video_processor_lib.dir
-  TARGET_COMPILE_PDB = CMakeFiles/video_processor_lib.dir/video_processor_lib.pdb
-  TARGET_PDB = libvideo_processor_lib.pdb
 
 build CMakeFiles/video_processor_lib.dir/smart_blur.c.o: C_COMPILER__video_processor_lib_unscanned_Debug /home/anyuser/websites/spehleonlp.github.io/erosion/src/smart_blur.c || cmake_object_order_depends_target_video_processor_lib
   DEP_FILE = CMakeFiles/video_processor_lib.dir/smart_blur.c.o.d
@@ -82,8 +76,111 @@ build CMakeFiles/video_processor_lib.dir/smart_blur.c.o: C_COMPILER__video_proce
   INCLUDES = -I/home/anyuser/websites/spehleonlp.github.io/erosion/src
   OBJECT_DIR = CMakeFiles/video_processor_lib.dir
   OBJECT_FILE_DIR = CMakeFiles/video_processor_lib.dir
-  TARGET_COMPILE_PDB = CMakeFiles/video_processor_lib.dir/video_processor_lib.pdb
-  TARGET_PDB = libvideo_processor_lib.pdb
+
+build CMakeFiles/video_processor_lib.dir/fluid_solver.c.o: C_COMPILER__video_processor_lib_unscanned_Debug /home/anyuser/websites/spehleonlp.github.io/erosion/src/fluid_solver.c || cmake_object_order_depends_target_video_processor_lib
+  DEP_FILE = CMakeFiles/video_processor_lib.dir/fluid_solver.c.o.d
+  FLAGS = -g -std=gnu11 -fdiagnostics-color=always -Wall -Wextra -Wpedantic
+  INCLUDES = -I/home/anyuser/websites/spehleonlp.github.io/erosion/src
+  OBJECT_DIR = CMakeFiles/video_processor_lib.dir
+  OBJECT_FILE_DIR = CMakeFiles/video_processor_lib.dir
+
+build CMakeFiles/video_processor_lib.dir/fft_blur.c.o: C_COMPILER__video_processor_lib_unscanned_Debug /home/anyuser/websites/spehleonlp.github.io/erosion/src/fft_blur.c || cmake_object_order_depends_target_video_processor_lib
+  DEP_FILE = CMakeFiles/video_processor_lib.dir/fft_blur.c.o.d
+  FLAGS = -g -std=gnu11 -fdiagnostics-color=always -Wall -Wextra -Wpedantic
+  INCLUDES = -I/home/anyuser/websites/spehleonlp.github.io/erosion/src
+  OBJECT_DIR = CMakeFiles/video_processor_lib.dir
+  OBJECT_FILE_DIR = CMakeFiles/video_processor_lib.dir
+
+build CMakeFiles/video_processor_lib.dir/normal_map.c.o: C_COMPILER__video_processor_lib_unscanned_Debug /home/anyuser/websites/spehleonlp.github.io/erosion/src/normal_map.c || cmake_object_order_depends_target_video_processor_lib
+  DEP_FILE = CMakeFiles/video_processor_lib.dir/normal_map.c.o.d
+  FLAGS = -g -std=gnu11 -fdiagnostics-color=always -Wall -Wextra -Wpedantic
+  INCLUDES = -I/home/anyuser/websites/spehleonlp.github.io/erosion/src
+  OBJECT_DIR = CMakeFiles/video_processor_lib.dir
+  OBJECT_FILE_DIR = CMakeFiles/video_processor_lib.dir
+
+build CMakeFiles/video_processor_lib.dir/helmholtz.c.o: C_COMPILER__video_processor_lib_unscanned_Debug /home/anyuser/websites/spehleonlp.github.io/erosion/src/helmholtz.c || cmake_object_order_depends_target_video_processor_lib
+  DEP_FILE = CMakeFiles/video_processor_lib.dir/helmholtz.c.o.d
+  FLAGS = -g -std=gnu11 -fdiagnostics-color=always -Wall -Wextra -Wpedantic
+  INCLUDES = -I/home/anyuser/websites/spehleonlp.github.io/erosion/src
+  OBJECT_DIR = CMakeFiles/video_processor_lib.dir
+  OBJECT_FILE_DIR = CMakeFiles/video_processor_lib.dir
+
+build CMakeFiles/video_processor_lib.dir/swirl.c.o: C_COMPILER__video_processor_lib_unscanned_Debug /home/anyuser/websites/spehleonlp.github.io/erosion/src/swirl.c || cmake_object_order_depends_target_video_processor_lib
+  DEP_FILE = CMakeFiles/video_processor_lib.dir/swirl.c.o.d
+  FLAGS = -g -std=gnu11 -fdiagnostics-color=always -Wall -Wextra -Wpedantic
+  INCLUDES = -I/home/anyuser/websites/spehleonlp.github.io/erosion/src
+  OBJECT_DIR = CMakeFiles/video_processor_lib.dir
+  OBJECT_FILE_DIR = CMakeFiles/video_processor_lib.dir
+
+build CMakeFiles/video_processor_lib.dir/debug_png.c.o: C_COMPILER__video_processor_lib_unscanned_Debug /home/anyuser/websites/spehleonlp.github.io/erosion/src/debug_png.c || cmake_object_order_depends_target_video_processor_lib
+  DEP_FILE = CMakeFiles/video_processor_lib.dir/debug_png.c.o.d
+  FLAGS = -g -std=gnu11 -fdiagnostics-color=always -Wall -Wextra -Wpedantic
+  INCLUDES = -I/home/anyuser/websites/spehleonlp.github.io/erosion/src
+  OBJECT_DIR = CMakeFiles/video_processor_lib.dir
+  OBJECT_FILE_DIR = CMakeFiles/video_processor_lib.dir
+
+build CMakeFiles/video_processor_lib.dir/flood_fill.c.o: C_COMPILER__video_processor_lib_unscanned_Debug /home/anyuser/websites/spehleonlp.github.io/erosion/src/flood_fill.c || cmake_object_order_depends_target_video_processor_lib
+  DEP_FILE = CMakeFiles/video_processor_lib.dir/flood_fill.c.o.d
+  FLAGS = -g -std=gnu11 -fdiagnostics-color=always -Wall -Wextra -Wpedantic
+  INCLUDES = -I/home/anyuser/websites/spehleonlp.github.io/erosion/src
+  OBJECT_DIR = CMakeFiles/video_processor_lib.dir
+  OBJECT_FILE_DIR = CMakeFiles/video_processor_lib.dir
+
+build CMakeFiles/video_processor_lib.dir/contour_flow.c.o: C_COMPILER__video_processor_lib_unscanned_Debug /home/anyuser/websites/spehleonlp.github.io/erosion/src/contour_flow.c || cmake_object_order_depends_target_video_processor_lib
+  DEP_FILE = CMakeFiles/video_processor_lib.dir/contour_flow.c.o.d
+  FLAGS = -g -std=gnu11 -fdiagnostics-color=always -Wall -Wextra -Wpedantic
+  INCLUDES = -I/home/anyuser/websites/spehleonlp.github.io/erosion/src
+  OBJECT_DIR = CMakeFiles/video_processor_lib.dir
+  OBJECT_FILE_DIR = CMakeFiles/video_processor_lib.dir
+
+build CMakeFiles/video_processor_lib.dir/chamfer.c.o: C_COMPILER__video_processor_lib_unscanned_Debug /home/anyuser/websites/spehleonlp.github.io/erosion/src/chamfer.c || cmake_object_order_depends_target_video_processor_lib
+  DEP_FILE = CMakeFiles/video_processor_lib.dir/chamfer.c.o.d
+  FLAGS = -g -std=gnu11 -fdiagnostics-color=always -Wall -Wextra -Wpedantic
+  INCLUDES = -I/home/anyuser/websites/spehleonlp.github.io/erosion/src
+  OBJECT_DIR = CMakeFiles/video_processor_lib.dir
+  OBJECT_FILE_DIR = CMakeFiles/video_processor_lib.dir
+
+build CMakeFiles/video_processor_lib.dir/label_regions.c.o: C_COMPILER__video_processor_lib_unscanned_Debug /home/anyuser/websites/spehleonlp.github.io/erosion/src/label_regions.c || cmake_object_order_depends_target_video_processor_lib
+  DEP_FILE = CMakeFiles/video_processor_lib.dir/label_regions.c.o.d
+  FLAGS = -g -std=gnu11 -fdiagnostics-color=always -Wall -Wextra -Wpedantic
+  INCLUDES = -I/home/anyuser/websites/spehleonlp.github.io/erosion/src
+  OBJECT_DIR = CMakeFiles/video_processor_lib.dir
+  OBJECT_FILE_DIR = CMakeFiles/video_processor_lib.dir
+
+build CMakeFiles/video_processor_lib.dir/contour_extract.c.o: C_COMPILER__video_processor_lib_unscanned_Debug /home/anyuser/websites/spehleonlp.github.io/erosion/src/contour_extract.c || cmake_object_order_depends_target_video_processor_lib
+  DEP_FILE = CMakeFiles/video_processor_lib.dir/contour_extract.c.o.d
+  FLAGS = -g -std=gnu11 -fdiagnostics-color=always -Wall -Wextra -Wpedantic
+  INCLUDES = -I/home/anyuser/websites/spehleonlp.github.io/erosion/src
+  OBJECT_DIR = CMakeFiles/video_processor_lib.dir
+  OBJECT_FILE_DIR = CMakeFiles/video_processor_lib.dir
+
+build CMakeFiles/video_processor_lib.dir/contour_smooth.c.o: C_COMPILER__video_processor_lib_unscanned_Debug /home/anyuser/websites/spehleonlp.github.io/erosion/src/contour_smooth.c || cmake_object_order_depends_target_video_processor_lib
+  DEP_FILE = CMakeFiles/video_processor_lib.dir/contour_smooth.c.o.d
+  FLAGS = -g -std=gnu11 -fdiagnostics-color=always -Wall -Wextra -Wpedantic
+  INCLUDES = -I/home/anyuser/websites/spehleonlp.github.io/erosion/src
+  OBJECT_DIR = CMakeFiles/video_processor_lib.dir
+  OBJECT_FILE_DIR = CMakeFiles/video_processor_lib.dir
+
+build CMakeFiles/video_processor_lib.dir/gif_decoder.c.o: C_COMPILER__video_processor_lib_unscanned_Debug /home/anyuser/websites/spehleonlp.github.io/erosion/src/gif_decoder.c || cmake_object_order_depends_target_video_processor_lib
+  DEP_FILE = CMakeFiles/video_processor_lib.dir/gif_decoder.c.o.d
+  FLAGS = -g -std=gnu11 -fdiagnostics-color=always -Wall -Wextra -Wpedantic
+  INCLUDES = -I/home/anyuser/websites/spehleonlp.github.io/erosion/src
+  OBJECT_DIR = CMakeFiles/video_processor_lib.dir
+  OBJECT_FILE_DIR = CMakeFiles/video_processor_lib.dir
+
+build CMakeFiles/video_processor_lib.dir/sdf_layered.c.o: C_COMPILER__video_processor_lib_unscanned_Debug /home/anyuser/websites/spehleonlp.github.io/erosion/src/sdf_layered.c || cmake_object_order_depends_target_video_processor_lib
+  DEP_FILE = CMakeFiles/video_processor_lib.dir/sdf_layered.c.o.d
+  FLAGS = -g -std=gnu11 -fdiagnostics-color=always -Wall -Wextra -Wpedantic
+  INCLUDES = -I/home/anyuser/websites/spehleonlp.github.io/erosion/src
+  OBJECT_DIR = CMakeFiles/video_processor_lib.dir
+  OBJECT_FILE_DIR = CMakeFiles/video_processor_lib.dir
+
+build CMakeFiles/video_processor_lib.dir/interp_quantized.c.o: C_COMPILER__video_processor_lib_unscanned_Debug /home/anyuser/websites/spehleonlp.github.io/erosion/src/interp_quantized.c || cmake_object_order_depends_target_video_processor_lib
+  DEP_FILE = CMakeFiles/video_processor_lib.dir/interp_quantized.c.o.d
+  FLAGS = -g -std=gnu11 -fdiagnostics-color=always -Wall -Wextra -Wpedantic
+  INCLUDES = -I/home/anyuser/websites/spehleonlp.github.io/erosion/src
+  OBJECT_DIR = CMakeFiles/video_processor_lib.dir
+  OBJECT_FILE_DIR = CMakeFiles/video_processor_lib.dir
 
 
 # =============================================================================
@@ -93,14 +190,13 @@ build CMakeFiles/video_processor_lib.dir/smart_blur.c.o: C_COMPILER__video_proce
 #############################################
 # Link the static library libvideo_processor_lib.a
 
-build libvideo_processor_lib.a: C_STATIC_LIBRARY_LINKER__video_processor_lib_Debug CMakeFiles/video_processor_lib.dir/video_processor.c.o CMakeFiles/video_processor_lib.dir/create_envelopes.c.o CMakeFiles/video_processor_lib.dir/create_gradient.c.o CMakeFiles/video_processor_lib.dir/smart_blur.c.o
+build libvideo_processor_lib.a: C_STATIC_LIBRARY_LINKER__video_processor_lib_Debug CMakeFiles/video_processor_lib.dir/video_processor.c.o CMakeFiles/video_processor_lib.dir/create_envelopes.c.o CMakeFiles/video_processor_lib.dir/create_gradient.c.o CMakeFiles/video_processor_lib.dir/smart_blur.c.o CMakeFiles/video_processor_lib.dir/fluid_solver.c.o CMakeFiles/video_processor_lib.dir/fft_blur.c.o CMakeFiles/video_processor_lib.dir/normal_map.c.o CMakeFiles/video_processor_lib.dir/helmholtz.c.o CMakeFiles/video_processor_lib.dir/swirl.c.o CMakeFiles/video_processor_lib.dir/debug_png.c.o CMakeFiles/video_processor_lib.dir/flood_fill.c.o CMakeFiles/video_processor_lib.dir/contour_flow.c.o CMakeFiles/video_processor_lib.dir/chamfer.c.o CMakeFiles/video_processor_lib.dir/label_regions.c.o CMakeFiles/video_processor_lib.dir/contour_extract.c.o CMakeFiles/video_processor_lib.dir/contour_smooth.c.o CMakeFiles/video_processor_lib.dir/gif_decoder.c.o CMakeFiles/video_processor_lib.dir/sdf_layered.c.o CMakeFiles/video_processor_lib.dir/interp_quantized.c.o
   LANGUAGE_COMPILE_FLAGS = -g
   OBJECT_DIR = CMakeFiles/video_processor_lib.dir
   POST_BUILD = :
   PRE_LINK = :
-  TARGET_COMPILE_PDB = CMakeFiles/video_processor_lib.dir/video_processor_lib.pdb
   TARGET_FILE = libvideo_processor_lib.a
-  TARGET_PDB = libvideo_processor_lib.pdb
+  TARGET_PDB = video_processor_lib.a.dbg
 
 
 #############################################
@@ -148,14 +244,14 @@ build all: phony libvideo_processor_lib.a
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja: RERUN_CMAKE | .qtc/package-manager/auto-setup.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeCCompiler.cmake.in /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeCCompilerABI.c /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeCInformation.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeCommonLanguageInclude.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeCompilerIdDetection.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeDetermineCCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeDetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeDetermineCompilerABI.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeDetermineCompilerId.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeDetermineCompilerSupport.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeDetermineSystem.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeFindBinUtils.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeGenericSystem.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeInitializeConfigs.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeLanguageInformation.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeNinjaFindMake.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeParseImplicitIncludeInfo.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeParseImplicitLinkInfo.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeParseLibraryArchitecture.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeSystem.cmake.in /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeSystemSpecificInformation.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeSystemSpecificInitialize.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeTestCCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeTestCompilerCommon.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/ADSP-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/ARMCC-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/ARMClang-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/AppleClang-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/Borland-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/Bruce-C-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/CMakeCommonCompilerMacros.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/Clang-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/Clang-DetermineCompilerInternal.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/Compaq-C-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/Cray-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/CrayClang-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/Embarcadero-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/Fujitsu-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/GHS-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/GNU-C-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/GNU-C.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/GNU-FindBinUtils.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/GNU.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/HP-C-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/IAR-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/IBMClang-C-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/Intel-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/LCC-C-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/MSVC-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/NVHPC-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/NVIDIA-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/OrangeC-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/PGI-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/PathScale-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/SCO-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/SDCC-C-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/SunPro-C-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/TI-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/TIClang-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/Tasking-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/TinyCC-C-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/VisualAge-C-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/Watcom-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/XL-C-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/XLClang-C-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/zOS-C-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Internal/CMakeDetermineLinkerId.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Internal/FeatureTesting.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Platform/Linux-GNU-C.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Platform/Linux-GNU.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Platform/Linux-Initialize.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Platform/Linux.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Platform/UnixPaths.cmake /home/anyuser/websites/spehleonlp.github.io/erosion/src/CMakeLists.txt CMakeCache.txt CMakeFiles/3.30.5/CMakeCCompiler.cmake CMakeFiles/3.30.5/CMakeSystem.cmake
+build build.ninja: RERUN_CMAKE | .qtc/package-manager/auto-setup.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeCInformation.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeCommonLanguageInclude.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeGenericSystem.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeInitializeConfigs.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeLanguageInformation.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeSystemSpecificInformation.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeSystemSpecificInitialize.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/CMakeCommonCompilerMacros.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/GNU-C.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/GNU.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Platform/Linux-GNU-C.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Platform/Linux-GNU.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Platform/Linux-Initialize.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Platform/Linux.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Platform/UnixPaths.cmake /home/anyuser/websites/spehleonlp.github.io/erosion/src/CMakeLists.txt CMakeCache.txt CMakeFiles/3.30.5/CMakeCCompiler.cmake CMakeFiles/3.30.5/CMakeSystem.cmake
   pool = console
 
 
 #############################################
 # A missing CMake input file is not an error.
 
-build .qtc/package-manager/auto-setup.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeCCompiler.cmake.in /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeCCompilerABI.c /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeCInformation.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeCommonLanguageInclude.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeCompilerIdDetection.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeDetermineCCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeDetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeDetermineCompilerABI.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeDetermineCompilerId.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeDetermineCompilerSupport.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeDetermineSystem.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeFindBinUtils.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeGenericSystem.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeInitializeConfigs.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeLanguageInformation.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeNinjaFindMake.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeParseImplicitIncludeInfo.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeParseImplicitLinkInfo.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeParseLibraryArchitecture.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeSystem.cmake.in /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeSystemSpecificInformation.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeSystemSpecificInitialize.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeTestCCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeTestCompilerCommon.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/ADSP-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/ARMCC-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/ARMClang-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/AppleClang-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/Borland-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/Bruce-C-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/CMakeCommonCompilerMacros.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/Clang-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/Clang-DetermineCompilerInternal.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/Compaq-C-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/Cray-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/CrayClang-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/Embarcadero-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/Fujitsu-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/GHS-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/GNU-C-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/GNU-C.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/GNU-FindBinUtils.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/GNU.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/HP-C-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/IAR-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/IBMClang-C-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/Intel-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/LCC-C-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/MSVC-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/NVHPC-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/NVIDIA-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/OrangeC-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/PGI-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/PathScale-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/SCO-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/SDCC-C-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/SunPro-C-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/TI-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/TIClang-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/Tasking-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/TinyCC-C-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/VisualAge-C-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/Watcom-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/XL-C-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/XLClang-C-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/zOS-C-DetermineCompiler.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Internal/CMakeDetermineLinkerId.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Internal/FeatureTesting.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Platform/Linux-GNU-C.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Platform/Linux-GNU.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Platform/Linux-Initialize.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Platform/Linux.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Platform/UnixPaths.cmake /home/anyuser/websites/spehleonlp.github.io/erosion/src/CMakeLists.txt CMakeCache.txt CMakeFiles/3.30.5/CMakeCCompiler.cmake CMakeFiles/3.30.5/CMakeSystem.cmake: phony
+build .qtc/package-manager/auto-setup.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeCInformation.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeCommonLanguageInclude.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeGenericSystem.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeInitializeConfigs.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeLanguageInformation.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeSystemSpecificInformation.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeSystemSpecificInitialize.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/CMakeCommonCompilerMacros.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/GNU-C.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Compiler/GNU.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Platform/Linux-GNU-C.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Platform/Linux-GNU.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Platform/Linux-Initialize.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Platform/Linux.cmake /home/anyuser/Qt/Tools/CMake/share/cmake-3.30/Modules/Platform/UnixPaths.cmake /home/anyuser/websites/spehleonlp.github.io/erosion/src/CMakeLists.txt CMakeCache.txt CMakeFiles/3.30.5/CMakeCCompiler.cmake CMakeFiles/3.30.5/CMakeSystem.cmake: phony
 
 
 #############################################

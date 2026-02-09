@@ -1,6 +1,6 @@
 
 // Initialize the Web Worker
-const worker = new Worker('scripts/worker.js');
+const worker = new Worker('scripts/worker.js?v=7');
 
 let w_messageCounter = 0;
 const workerOperation = (type, data) => {
@@ -149,7 +149,22 @@ async function CreateTextures(duration, width, height, pass_callback)
         console.log("beginning first pass");
 		await pass_callback();
 
-        let erosion = await workerOperation('finishPushingFrames', {});
+        let { erosion, debugZip } = await workerOperation('finishPushingFrames', {});
+
+        // Download debug.zip if present (from WASM virtual filesystem)
+        if (debugZip && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+            const blob = new Blob([debugZip], { type: 'application/zip' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'debug.zip';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            console.log('Downloaded debug.zip from WASM');
+        }
+
         const { fadeInDuration , fadeOutDuration } = await workerOperation('GetMetadata', {});
         UploadTexture(glContext, textures.u_erosionTexture, 'erosionTextureDrop', 0, erosion);
 
@@ -159,11 +174,12 @@ async function CreateTextures(duration, width, height, pass_callback)
         fadeInValue.textContent = parseFloat(duration * fadeInDuration);
         fadeOutValue.textContent = parseFloat(duration * fadeOutDuration);
 
-		let gradient = await workerOperation('computeGradient', {});
-        UploadTexture3D(glContext, textures.u_gradient, textures.u_gradient3D, 'gradientDrop', 1, 2, gradient.buffer, gradient.width, gradient.height, gradient.depth);
+		// Gradient computation removed - it didn't work due to bit crushing
+		// let gradient = await workerOperation('computeGradient', {});
+        // UploadTexture3D(glContext, textures.u_gradient, textures.u_gradient3D, 'gradientDrop', 1, 2, gradient.buffer, gradient.width, gradient.height, gradient.depth);
 
-		gradient = await workerOperation('computeGradient', {});
-        UploadTexture3D(glContext, textures.u_gradient, textures.u_gradient3D, 'gradientDrop', 1, 2, gradient.buffer, gradient.width, gradient.height, gradient.depth);
+		// gradient = await workerOperation('computeGradient', {});
+        // UploadTexture3D(glContext, textures.u_gradient, textures.u_gradient3D, 'gradientDrop', 1, 2, gradient.buffer, gradient.width, gradient.height, gradient.depth);
 
 		let a = await workerOperation('shutdownAndRelease');
 
@@ -200,103 +216,53 @@ async function ProcessVideo_new(event, mimeType) {
     }
 }
 
-// Function to process GIF files
+// Function to process GIF files - decoding is done in C via WASM
 async function ProcessGIF(event) {
     try {
         await runWithProgress(async () => {
             const arrayBuffer = event.target.result;
-            const byteArray = new Uint8Array(arrayBuffer);
 
-            // Parse GIF using omggif
-            const gifReader = new GifReader(byteArray);
-            const numFrames = gifReader.numFrames();
-            const width = gifReader.width;
-            const height = gifReader.height;
+            console.log(`Sending GIF to WASM for decoding (${arrayBuffer.byteLength} bytes)`);
 
-            console.log(`GIF: ${width}x${height}, ${numFrames} frames`);
+            // Send raw GIF data to worker for C-based decoding
+            const { width, height, duration } = await workerOperation('pushGif', {
+                gifData: arrayBuffer
+            });
 
-            if (numFrames === 0) {
-                throw new Error('GIF has no frames');
+            console.log(`GIF decoded: ${width}x${height}, duration=${duration}s`);
+
+            // Update UI with duration
+            lifetimeSlider.value = (lifetime = duration);
+            lifetimeValue.textContent = parseFloat(duration);
+            timeSlider.max = duration;
+
+            // Finish processing (frames were already pushed by push_gif)
+            let { erosion, debugZip } = await workerOperation('finishPushingFrames', {});
+
+            // Download debug.zip if present (from WASM virtual filesystem)
+            if (debugZip && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+                const blob = new Blob([debugZip], { type: 'application/zip' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'debug.zip';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                console.log('Downloaded debug.zip from WASM');
             }
 
-            // Calculate duration based on frame delays
-            let totalDelay = 0;
-            for (let i = 0; i < numFrames; i++) {
-                const frameInfo = gifReader.frameInfo(i);
-                totalDelay += frameInfo.delay || 10; // Default 10 centiseconds if no delay
-            }
-            const duration = totalDelay / 100; // Convert centiseconds to seconds
+            const { fadeInDuration, fadeOutDuration } = await workerOperation('GetMetadata', {});
+            UploadTexture(glContext, textures.u_erosionTexture, 'erosionTextureDrop', 0, erosion);
 
-            console.log(`Total duration: ${duration}s`);
+            fadeInSlider.value = (duration * fadeInDuration);
+            fadeOutSlider.value = (duration * fadeOutDuration);
 
-            // Create canvas for frame composition
-            const canvas = new OffscreenCanvas(width, height);
-            const ctx = canvas.getContext('2d');
+            fadeInValue.textContent = parseFloat(duration * fadeInDuration);
+            fadeOutValue.textContent = parseFloat(duration * fadeOutDuration);
 
-            // Buffer to store the current composed frame
-            let previousFrameData = new Uint8ClampedArray(width * height * 4);
-            previousFrameData.fill(0); // Start with transparent
-
-            const pass_callback = async () => {
-                for (let frameIndex = 0; frameIndex < numFrames; frameIndex++) {
-                    const frameInfo = gifReader.frameInfo(frameIndex);
-
-                    // Decode frame to RGBA pixels
-                    const frameRGBA = new Uint8ClampedArray(width * height * 4);
-                    gifReader.decodeAndBlitFrameRGBA(frameIndex, frameRGBA);
-
-                    // Handle frame disposal method
-                    if (frameIndex > 0) {
-                        const prevFrameInfo = gifReader.frameInfo(frameIndex - 1);
-
-                        // Disposal method 2: restore to background (transparent)
-                        if (prevFrameInfo.disposal === 2) {
-                            previousFrameData.fill(0);
-                        }
-                        // Disposal method 3: restore to previous (keep previousFrameData as is)
-                        // Disposal method 0 or 1: no disposal (overlay on previous)
-                    }
-
-                    // Composite this frame onto the previous frame
-                    const x = frameInfo.x || 0;
-                    const y = frameInfo.y || 0;
-                    const frameWidth = frameInfo.width || width;
-                    const frameHeight = frameInfo.height || height;
-
-                    // If this frame covers the entire canvas, just use it
-                    if (x === 0 && y === 0 && frameWidth === width && frameHeight === height) {
-                        for (let i = 0; i < frameRGBA.length; i++) {
-                            previousFrameData[i] = frameRGBA[i];
-                        }
-                    } else {
-                        // Composite partial frame
-                        for (let py = 0; py < frameHeight; py++) {
-                            for (let px = 0; px < frameWidth; px++) {
-                                const srcIdx = (py * width + px) * 4;
-                                const dstIdx = ((y + py) * width + (x + px)) * 4;
-
-                                if (dstIdx >= 0 && dstIdx < previousFrameData.length) {
-                                    const alpha = frameRGBA[srcIdx + 3];
-                                    if (alpha > 0) {
-                                        previousFrameData[dstIdx] = frameRGBA[srcIdx];
-                                        previousFrameData[dstIdx + 1] = frameRGBA[srcIdx + 1];
-                                        previousFrameData[dstIdx + 2] = frameRGBA[srcIdx + 2];
-                                        previousFrameData[dstIdx + 3] = frameRGBA[srcIdx + 3];
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    // Send the composed frame to the worker
-                    const frameDataCopy = new Uint8Array(previousFrameData);
-                    await workerOperation('pushFrame', {
-                        frameData: frameDataCopy.buffer
-                    }, [frameDataCopy.buffer]);
-                }
-            };
-
-            await CreateTextures(duration, width, height, pass_callback);
+            await workerOperation('shutdownAndRelease');
         });
 
         console.log('GIF processing completed successfully.');

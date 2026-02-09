@@ -1,0 +1,3 @@
+/home/anyuser/websites/spehleonlp.github.io/erosion/prototype/src/build/Clone_of_Desktop_Qt_6_7_0-Debug/CMakeFiles/effect_stack_lib.dir
+/home/anyuser/websites/spehleonlp.github.io/erosion/prototype/src/build/Clone_of_Desktop_Qt_6_7_0-Debug/CMakeFiles/edit_cache.dir
+/home/anyuser/websites/spehleonlp.github.io/erosion/prototype/src/build/Clone_of_Desktop_Qt_6_7_0-Debug/CMakeFiles/rebuild_cache.dir

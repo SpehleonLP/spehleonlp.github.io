@@ -19,15 +19,20 @@ CMakeFiles/effect_stack.dir/erosion_pipeline.c.o: \
   /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_flow_dbg.h \
   /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_cmd.h \
   /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/../effect_stack_api.h \
+  /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/constrained_poisson_cmd.h \
+  /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/laminarize_cmd.h \
   /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/sdf_layered.h \
   /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/image_memo/image_memo.h \
   /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/image_memo/../effect_stack_api.h \
   /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/fft_blur.h \
   /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/interp_quantized.h \
+  /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/lic_debug_cmd.h \
+  /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/debug_png.h \
   /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/label_regions.h \
-  /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/utility.h \
+  /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/debug_output.h \
   /usr/lib/llvm-15/lib/clang/15.0.7/include/stddef.h \
   /usr/lib/llvm-15/lib/clang/15.0.7/include/__stddef_max_align_t.h \
+  /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/utility.h \
   /usr/share/emscripten/cache/sysroot/include/stdio.h \
   /usr/share/emscripten/cache/sysroot/include/wasi/api.h \
   /usr/share/emscripten/cache/sysroot/include/compat/stdlib.h \

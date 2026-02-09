@@ -129,581 +129,677 @@ effect_stack/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/build
 .PHONY : effect_stack/fast
 
-commands/constrained_poisson_cmd.o: commands/constrained_poisson_cmd.c.o
+commands/constrained_poisson_cmd.o: commands/constrained_poisson_cmd.cpp.o
 .PHONY : commands/constrained_poisson_cmd.o
 
 # target to build an object file
-commands/constrained_poisson_cmd.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.c.o
-.PHONY : commands/constrained_poisson_cmd.c.o
+commands/constrained_poisson_cmd.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.cpp.o
+.PHONY : commands/constrained_poisson_cmd.cpp.o
 
-commands/constrained_poisson_cmd.i: commands/constrained_poisson_cmd.c.i
+commands/constrained_poisson_cmd.i: commands/constrained_poisson_cmd.cpp.i
 .PHONY : commands/constrained_poisson_cmd.i
 
 # target to preprocess a source file
-commands/constrained_poisson_cmd.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.c.i
-.PHONY : commands/constrained_poisson_cmd.c.i
+commands/constrained_poisson_cmd.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.cpp.i
+.PHONY : commands/constrained_poisson_cmd.cpp.i
 
-commands/constrained_poisson_cmd.s: commands/constrained_poisson_cmd.c.s
+commands/constrained_poisson_cmd.s: commands/constrained_poisson_cmd.cpp.s
 .PHONY : commands/constrained_poisson_cmd.s
 
 # target to generate assembly for a file
-commands/constrained_poisson_cmd.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.c.s
-.PHONY : commands/constrained_poisson_cmd.c.s
+commands/constrained_poisson_cmd.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.cpp.s
+.PHONY : commands/constrained_poisson_cmd.cpp.s
 
-commands/debug_png.o: commands/debug_png.c.o
+commands/debug_png.o: commands/debug_png.cpp.o
 .PHONY : commands/debug_png.o
 
 # target to build an object file
-commands/debug_png.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/debug_png.c.o
-.PHONY : commands/debug_png.c.o
+commands/debug_png.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/debug_png.cpp.o
+.PHONY : commands/debug_png.cpp.o
 
-commands/debug_png.i: commands/debug_png.c.i
+commands/debug_png.i: commands/debug_png.cpp.i
 .PHONY : commands/debug_png.i
 
 # target to preprocess a source file
-commands/debug_png.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/debug_png.c.i
-.PHONY : commands/debug_png.c.i
+commands/debug_png.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/debug_png.cpp.i
+.PHONY : commands/debug_png.cpp.i
 
-commands/debug_png.s: commands/debug_png.c.s
+commands/debug_png.s: commands/debug_png.cpp.s
 .PHONY : commands/debug_png.s
 
 # target to generate assembly for a file
-commands/debug_png.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/debug_png.c.s
-.PHONY : commands/debug_png.c.s
+commands/debug_png.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/debug_png.cpp.s
+.PHONY : commands/debug_png.cpp.s
 
-commands/eigen_cmd.o: commands/eigen_cmd.c.o
+commands/eigen_cmd.o: commands/eigen_cmd.cpp.o
 .PHONY : commands/eigen_cmd.o
 
 # target to build an object file
-commands/eigen_cmd.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/eigen_cmd.c.o
-.PHONY : commands/eigen_cmd.c.o
+commands/eigen_cmd.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/eigen_cmd.cpp.o
+.PHONY : commands/eigen_cmd.cpp.o
 
-commands/eigen_cmd.i: commands/eigen_cmd.c.i
+commands/eigen_cmd.i: commands/eigen_cmd.cpp.i
 .PHONY : commands/eigen_cmd.i
 
 # target to preprocess a source file
-commands/eigen_cmd.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/eigen_cmd.c.i
-.PHONY : commands/eigen_cmd.c.i
+commands/eigen_cmd.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/eigen_cmd.cpp.i
+.PHONY : commands/eigen_cmd.cpp.i
 
-commands/eigen_cmd.s: commands/eigen_cmd.c.s
+commands/eigen_cmd.s: commands/eigen_cmd.cpp.s
 .PHONY : commands/eigen_cmd.s
 
 # target to generate assembly for a file
-commands/eigen_cmd.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/eigen_cmd.c.s
-.PHONY : commands/eigen_cmd.c.s
+commands/eigen_cmd.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/eigen_cmd.cpp.s
+.PHONY : commands/eigen_cmd.cpp.s
 
-commands/erosion_dijkstra.o: commands/erosion_dijkstra.c.o
+commands/erosion_dijkstra.o: commands/erosion_dijkstra.cpp.o
 .PHONY : commands/erosion_dijkstra.o
 
 # target to build an object file
-commands/erosion_dijkstra.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.c.o
-.PHONY : commands/erosion_dijkstra.c.o
+commands/erosion_dijkstra.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.cpp.o
+.PHONY : commands/erosion_dijkstra.cpp.o
 
-commands/erosion_dijkstra.i: commands/erosion_dijkstra.c.i
+commands/erosion_dijkstra.i: commands/erosion_dijkstra.cpp.i
 .PHONY : commands/erosion_dijkstra.i
 
 # target to preprocess a source file
-commands/erosion_dijkstra.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.c.i
-.PHONY : commands/erosion_dijkstra.c.i
+commands/erosion_dijkstra.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.cpp.i
+.PHONY : commands/erosion_dijkstra.cpp.i
 
-commands/erosion_dijkstra.s: commands/erosion_dijkstra.c.s
+commands/erosion_dijkstra.s: commands/erosion_dijkstra.cpp.s
 .PHONY : commands/erosion_dijkstra.s
 
 # target to generate assembly for a file
-commands/erosion_dijkstra.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.c.s
-.PHONY : commands/erosion_dijkstra.c.s
+commands/erosion_dijkstra.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.cpp.s
+.PHONY : commands/erosion_dijkstra.cpp.s
 
-commands/fft_blur.o: commands/fft_blur.c.o
+commands/fft_blur.o: commands/fft_blur.cpp.o
 .PHONY : commands/fft_blur.o
 
 # target to build an object file
-commands/fft_blur.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/fft_blur.c.o
-.PHONY : commands/fft_blur.c.o
+commands/fft_blur.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/fft_blur.cpp.o
+.PHONY : commands/fft_blur.cpp.o
 
-commands/fft_blur.i: commands/fft_blur.c.i
+commands/fft_blur.i: commands/fft_blur.cpp.i
 .PHONY : commands/fft_blur.i
 
 # target to preprocess a source file
-commands/fft_blur.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/fft_blur.c.i
-.PHONY : commands/fft_blur.c.i
+commands/fft_blur.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/fft_blur.cpp.i
+.PHONY : commands/fft_blur.cpp.i
 
-commands/fft_blur.s: commands/fft_blur.c.s
+commands/fft_blur.s: commands/fft_blur.cpp.s
 .PHONY : commands/fft_blur.s
 
 # target to generate assembly for a file
-commands/fft_blur.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/fft_blur.c.s
-.PHONY : commands/fft_blur.c.s
+commands/fft_blur.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/fft_blur.cpp.s
+.PHONY : commands/fft_blur.cpp.s
 
-commands/hessian_cmd.o: commands/hessian_cmd.c.o
+commands/hessian_cmd.o: commands/hessian_cmd.cpp.o
 .PHONY : commands/hessian_cmd.o
 
 # target to build an object file
-commands/hessian_cmd.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/hessian_cmd.c.o
-.PHONY : commands/hessian_cmd.c.o
+commands/hessian_cmd.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/hessian_cmd.cpp.o
+.PHONY : commands/hessian_cmd.cpp.o
 
-commands/hessian_cmd.i: commands/hessian_cmd.c.i
+commands/hessian_cmd.i: commands/hessian_cmd.cpp.i
 .PHONY : commands/hessian_cmd.i
 
 # target to preprocess a source file
-commands/hessian_cmd.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/hessian_cmd.c.i
-.PHONY : commands/hessian_cmd.c.i
+commands/hessian_cmd.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/hessian_cmd.cpp.i
+.PHONY : commands/hessian_cmd.cpp.i
 
-commands/hessian_cmd.s: commands/hessian_cmd.c.s
+commands/hessian_cmd.s: commands/hessian_cmd.cpp.s
 .PHONY : commands/hessian_cmd.s
 
 # target to generate assembly for a file
-commands/hessian_cmd.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/hessian_cmd.c.s
-.PHONY : commands/hessian_cmd.c.s
+commands/hessian_cmd.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/hessian_cmd.cpp.s
+.PHONY : commands/hessian_cmd.cpp.s
 
-commands/hessian_flow_dbg.o: commands/hessian_flow_dbg.c.o
+commands/hessian_flow_dbg.o: commands/hessian_flow_dbg.cpp.o
 .PHONY : commands/hessian_flow_dbg.o
 
 # target to build an object file
-commands/hessian_flow_dbg.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.c.o
-.PHONY : commands/hessian_flow_dbg.c.o
+commands/hessian_flow_dbg.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.cpp.o
+.PHONY : commands/hessian_flow_dbg.cpp.o
 
-commands/hessian_flow_dbg.i: commands/hessian_flow_dbg.c.i
+commands/hessian_flow_dbg.i: commands/hessian_flow_dbg.cpp.i
 .PHONY : commands/hessian_flow_dbg.i
 
 # target to preprocess a source file
-commands/hessian_flow_dbg.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.c.i
-.PHONY : commands/hessian_flow_dbg.c.i
+commands/hessian_flow_dbg.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.cpp.i
+.PHONY : commands/hessian_flow_dbg.cpp.i
 
-commands/hessian_flow_dbg.s: commands/hessian_flow_dbg.c.s
+commands/hessian_flow_dbg.s: commands/hessian_flow_dbg.cpp.s
 .PHONY : commands/hessian_flow_dbg.s
 
 # target to generate assembly for a file
-commands/hessian_flow_dbg.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.c.s
-.PHONY : commands/hessian_flow_dbg.c.s
+commands/hessian_flow_dbg.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.cpp.s
+.PHONY : commands/hessian_flow_dbg.cpp.s
 
-commands/hessian_from_eigen_cmd.o: commands/hessian_from_eigen_cmd.c.o
+commands/hessian_from_eigen_cmd.o: commands/hessian_from_eigen_cmd.cpp.o
 .PHONY : commands/hessian_from_eigen_cmd.o
 
 # target to build an object file
-commands/hessian_from_eigen_cmd.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.c.o
-.PHONY : commands/hessian_from_eigen_cmd.c.o
+commands/hessian_from_eigen_cmd.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.cpp.o
+.PHONY : commands/hessian_from_eigen_cmd.cpp.o
 
-commands/hessian_from_eigen_cmd.i: commands/hessian_from_eigen_cmd.c.i
+commands/hessian_from_eigen_cmd.i: commands/hessian_from_eigen_cmd.cpp.i
 .PHONY : commands/hessian_from_eigen_cmd.i
 
 # target to preprocess a source file
-commands/hessian_from_eigen_cmd.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.c.i
-.PHONY : commands/hessian_from_eigen_cmd.c.i
+commands/hessian_from_eigen_cmd.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.cpp.i
+.PHONY : commands/hessian_from_eigen_cmd.cpp.i
 
-commands/hessian_from_eigen_cmd.s: commands/hessian_from_eigen_cmd.c.s
+commands/hessian_from_eigen_cmd.s: commands/hessian_from_eigen_cmd.cpp.s
 .PHONY : commands/hessian_from_eigen_cmd.s
 
 # target to generate assembly for a file
-commands/hessian_from_eigen_cmd.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.c.s
-.PHONY : commands/hessian_from_eigen_cmd.c.s
+commands/hessian_from_eigen_cmd.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.cpp.s
+.PHONY : commands/hessian_from_eigen_cmd.cpp.s
 
-commands/interp_quantized.o: commands/interp_quantized.c.o
+commands/interp_quantized.o: commands/interp_quantized.cpp.o
 .PHONY : commands/interp_quantized.o
 
 # target to build an object file
-commands/interp_quantized.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/interp_quantized.c.o
-.PHONY : commands/interp_quantized.c.o
+commands/interp_quantized.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/interp_quantized.cpp.o
+.PHONY : commands/interp_quantized.cpp.o
 
-commands/interp_quantized.i: commands/interp_quantized.c.i
+commands/interp_quantized.i: commands/interp_quantized.cpp.i
 .PHONY : commands/interp_quantized.i
 
 # target to preprocess a source file
-commands/interp_quantized.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/interp_quantized.c.i
-.PHONY : commands/interp_quantized.c.i
+commands/interp_quantized.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/interp_quantized.cpp.i
+.PHONY : commands/interp_quantized.cpp.i
 
-commands/interp_quantized.s: commands/interp_quantized.c.s
+commands/interp_quantized.s: commands/interp_quantized.cpp.s
 .PHONY : commands/interp_quantized.s
 
 # target to generate assembly for a file
-commands/interp_quantized.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/interp_quantized.c.s
-.PHONY : commands/interp_quantized.c.s
+commands/interp_quantized.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/interp_quantized.cpp.s
+.PHONY : commands/interp_quantized.cpp.s
 
-commands/label_regions.o: commands/label_regions.c.o
+commands/label_regions.o: commands/label_regions.cpp.o
 .PHONY : commands/label_regions.o
 
 # target to build an object file
-commands/label_regions.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/label_regions.c.o
-.PHONY : commands/label_regions.c.o
+commands/label_regions.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/label_regions.cpp.o
+.PHONY : commands/label_regions.cpp.o
 
-commands/label_regions.i: commands/label_regions.c.i
+commands/label_regions.i: commands/label_regions.cpp.i
 .PHONY : commands/label_regions.i
 
 # target to preprocess a source file
-commands/label_regions.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/label_regions.c.i
-.PHONY : commands/label_regions.c.i
+commands/label_regions.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/label_regions.cpp.i
+.PHONY : commands/label_regions.cpp.i
 
-commands/label_regions.s: commands/label_regions.c.s
+commands/label_regions.s: commands/label_regions.cpp.s
 .PHONY : commands/label_regions.s
 
 # target to generate assembly for a file
-commands/label_regions.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/label_regions.c.s
-.PHONY : commands/label_regions.c.s
+commands/label_regions.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/label_regions.cpp.s
+.PHONY : commands/label_regions.cpp.s
 
-commands/normal_from_hessian_cmd.o: commands/normal_from_hessian_cmd.c.o
+commands/laminarize_cmd.o: commands/laminarize_cmd.cpp.o
+.PHONY : commands/laminarize_cmd.o
+
+# target to build an object file
+commands/laminarize_cmd.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/laminarize_cmd.cpp.o
+.PHONY : commands/laminarize_cmd.cpp.o
+
+commands/laminarize_cmd.i: commands/laminarize_cmd.cpp.i
+.PHONY : commands/laminarize_cmd.i
+
+# target to preprocess a source file
+commands/laminarize_cmd.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/laminarize_cmd.cpp.i
+.PHONY : commands/laminarize_cmd.cpp.i
+
+commands/laminarize_cmd.s: commands/laminarize_cmd.cpp.s
+.PHONY : commands/laminarize_cmd.s
+
+# target to generate assembly for a file
+commands/laminarize_cmd.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/laminarize_cmd.cpp.s
+.PHONY : commands/laminarize_cmd.cpp.s
+
+commands/lic_debug_cmd.o: commands/lic_debug_cmd.cpp.o
+.PHONY : commands/lic_debug_cmd.o
+
+# target to build an object file
+commands/lic_debug_cmd.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/lic_debug_cmd.cpp.o
+.PHONY : commands/lic_debug_cmd.cpp.o
+
+commands/lic_debug_cmd.i: commands/lic_debug_cmd.cpp.i
+.PHONY : commands/lic_debug_cmd.i
+
+# target to preprocess a source file
+commands/lic_debug_cmd.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/lic_debug_cmd.cpp.i
+.PHONY : commands/lic_debug_cmd.cpp.i
+
+commands/lic_debug_cmd.s: commands/lic_debug_cmd.cpp.s
+.PHONY : commands/lic_debug_cmd.s
+
+# target to generate assembly for a file
+commands/lic_debug_cmd.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/lic_debug_cmd.cpp.s
+.PHONY : commands/lic_debug_cmd.cpp.s
+
+commands/lic_stylize_cmd.o: commands/lic_stylize_cmd.cpp.o
+.PHONY : commands/lic_stylize_cmd.o
+
+# target to build an object file
+commands/lic_stylize_cmd.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/lic_stylize_cmd.cpp.o
+.PHONY : commands/lic_stylize_cmd.cpp.o
+
+commands/lic_stylize_cmd.i: commands/lic_stylize_cmd.cpp.i
+.PHONY : commands/lic_stylize_cmd.i
+
+# target to preprocess a source file
+commands/lic_stylize_cmd.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/lic_stylize_cmd.cpp.i
+.PHONY : commands/lic_stylize_cmd.cpp.i
+
+commands/lic_stylize_cmd.s: commands/lic_stylize_cmd.cpp.s
+.PHONY : commands/lic_stylize_cmd.s
+
+# target to generate assembly for a file
+commands/lic_stylize_cmd.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/lic_stylize_cmd.cpp.s
+.PHONY : commands/lic_stylize_cmd.cpp.s
+
+commands/normal_from_hessian_cmd.o: commands/normal_from_hessian_cmd.cpp.o
 .PHONY : commands/normal_from_hessian_cmd.o
 
 # target to build an object file
-commands/normal_from_hessian_cmd.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.c.o
-.PHONY : commands/normal_from_hessian_cmd.c.o
+commands/normal_from_hessian_cmd.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.cpp.o
+.PHONY : commands/normal_from_hessian_cmd.cpp.o
 
-commands/normal_from_hessian_cmd.i: commands/normal_from_hessian_cmd.c.i
+commands/normal_from_hessian_cmd.i: commands/normal_from_hessian_cmd.cpp.i
 .PHONY : commands/normal_from_hessian_cmd.i
 
 # target to preprocess a source file
-commands/normal_from_hessian_cmd.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.c.i
-.PHONY : commands/normal_from_hessian_cmd.c.i
+commands/normal_from_hessian_cmd.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.cpp.i
+.PHONY : commands/normal_from_hessian_cmd.cpp.i
 
-commands/normal_from_hessian_cmd.s: commands/normal_from_hessian_cmd.c.s
+commands/normal_from_hessian_cmd.s: commands/normal_from_hessian_cmd.cpp.s
 .PHONY : commands/normal_from_hessian_cmd.s
 
 # target to generate assembly for a file
-commands/normal_from_hessian_cmd.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.c.s
-.PHONY : commands/normal_from_hessian_cmd.c.s
+commands/normal_from_hessian_cmd.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.cpp.s
+.PHONY : commands/normal_from_hessian_cmd.cpp.s
 
-commands/sdf_layered.o: commands/sdf_layered.c.o
+commands/sdf_layered.o: commands/sdf_layered.cpp.o
 .PHONY : commands/sdf_layered.o
 
 # target to build an object file
-commands/sdf_layered.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/sdf_layered.c.o
-.PHONY : commands/sdf_layered.c.o
+commands/sdf_layered.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/sdf_layered.cpp.o
+.PHONY : commands/sdf_layered.cpp.o
 
-commands/sdf_layered.i: commands/sdf_layered.c.i
+commands/sdf_layered.i: commands/sdf_layered.cpp.i
 .PHONY : commands/sdf_layered.i
 
 # target to preprocess a source file
-commands/sdf_layered.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/sdf_layered.c.i
-.PHONY : commands/sdf_layered.c.i
+commands/sdf_layered.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/sdf_layered.cpp.i
+.PHONY : commands/sdf_layered.cpp.i
 
-commands/sdf_layered.s: commands/sdf_layered.c.s
+commands/sdf_layered.s: commands/sdf_layered.cpp.s
 .PHONY : commands/sdf_layered.s
 
 # target to generate assembly for a file
-commands/sdf_layered.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/sdf_layered.c.s
-.PHONY : commands/sdf_layered.c.s
+commands/sdf_layered.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/sdf_layered.cpp.s
+.PHONY : commands/sdf_layered.cpp.s
 
-commands/split_normals_cmd.o: commands/split_normals_cmd.c.o
+commands/split_normals_cmd.o: commands/split_normals_cmd.cpp.o
 .PHONY : commands/split_normals_cmd.o
 
 # target to build an object file
-commands/split_normals_cmd.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/split_normals_cmd.c.o
-.PHONY : commands/split_normals_cmd.c.o
+commands/split_normals_cmd.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/split_normals_cmd.cpp.o
+.PHONY : commands/split_normals_cmd.cpp.o
 
-commands/split_normals_cmd.i: commands/split_normals_cmd.c.i
+commands/split_normals_cmd.i: commands/split_normals_cmd.cpp.i
 .PHONY : commands/split_normals_cmd.i
 
 # target to preprocess a source file
-commands/split_normals_cmd.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/split_normals_cmd.c.i
-.PHONY : commands/split_normals_cmd.c.i
+commands/split_normals_cmd.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/split_normals_cmd.cpp.i
+.PHONY : commands/split_normals_cmd.cpp.i
 
-commands/split_normals_cmd.s: commands/split_normals_cmd.c.s
+commands/split_normals_cmd.s: commands/split_normals_cmd.cpp.s
 .PHONY : commands/split_normals_cmd.s
 
 # target to generate assembly for a file
-commands/split_normals_cmd.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/split_normals_cmd.c.s
-.PHONY : commands/split_normals_cmd.c.s
+commands/split_normals_cmd.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/commands/split_normals_cmd.cpp.s
+.PHONY : commands/split_normals_cmd.cpp.s
 
-effect_stack_api.o: effect_stack_api.c.o
+debug_output.o: debug_output.cpp.o
+.PHONY : debug_output.o
+
+# target to build an object file
+debug_output.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/debug_output.cpp.o
+.PHONY : debug_output.cpp.o
+
+debug_output.i: debug_output.cpp.i
+.PHONY : debug_output.i
+
+# target to preprocess a source file
+debug_output.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/debug_output.cpp.i
+.PHONY : debug_output.cpp.i
+
+debug_output.s: debug_output.cpp.s
+.PHONY : debug_output.s
+
+# target to generate assembly for a file
+debug_output.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/debug_output.cpp.s
+.PHONY : debug_output.cpp.s
+
+effect_stack_api.o: effect_stack_api.cpp.o
 .PHONY : effect_stack_api.o
 
 # target to build an object file
-effect_stack_api.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/effect_stack_api.c.o
-.PHONY : effect_stack_api.c.o
+effect_stack_api.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/effect_stack_api.cpp.o
+.PHONY : effect_stack_api.cpp.o
 
-effect_stack_api.i: effect_stack_api.c.i
+effect_stack_api.i: effect_stack_api.cpp.i
 .PHONY : effect_stack_api.i
 
 # target to preprocess a source file
-effect_stack_api.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/effect_stack_api.c.i
-.PHONY : effect_stack_api.c.i
+effect_stack_api.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/effect_stack_api.cpp.i
+.PHONY : effect_stack_api.cpp.i
 
-effect_stack_api.s: effect_stack_api.c.s
+effect_stack_api.s: effect_stack_api.cpp.s
 .PHONY : effect_stack_api.s
 
 # target to generate assembly for a file
-effect_stack_api.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/effect_stack_api.c.s
-.PHONY : effect_stack_api.c.s
+effect_stack_api.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/effect_stack_api.cpp.s
+.PHONY : effect_stack_api.cpp.s
 
-erosion_pipeline.o: erosion_pipeline.c.o
+erosion_pipeline.o: erosion_pipeline.cpp.o
 .PHONY : erosion_pipeline.o
 
 # target to build an object file
-erosion_pipeline.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/erosion_pipeline.c.o
-.PHONY : erosion_pipeline.c.o
+erosion_pipeline.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/erosion_pipeline.cpp.o
+.PHONY : erosion_pipeline.cpp.o
 
-erosion_pipeline.i: erosion_pipeline.c.i
+erosion_pipeline.i: erosion_pipeline.cpp.i
 .PHONY : erosion_pipeline.i
 
 # target to preprocess a source file
-erosion_pipeline.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/erosion_pipeline.c.i
-.PHONY : erosion_pipeline.c.i
+erosion_pipeline.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/erosion_pipeline.cpp.i
+.PHONY : erosion_pipeline.cpp.i
 
-erosion_pipeline.s: erosion_pipeline.c.s
+erosion_pipeline.s: erosion_pipeline.cpp.s
 .PHONY : erosion_pipeline.s
 
 # target to generate assembly for a file
-erosion_pipeline.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/erosion_pipeline.c.s
-.PHONY : erosion_pipeline.c.s
+erosion_pipeline.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/erosion_pipeline.cpp.s
+.PHONY : erosion_pipeline.cpp.s
 
-gradient_pipeline.o: gradient_pipeline.c.o
+gradient_pipeline.o: gradient_pipeline.cpp.o
 .PHONY : gradient_pipeline.o
 
 # target to build an object file
-gradient_pipeline.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/gradient_pipeline.c.o
-.PHONY : gradient_pipeline.c.o
+gradient_pipeline.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/gradient_pipeline.cpp.o
+.PHONY : gradient_pipeline.cpp.o
 
-gradient_pipeline.i: gradient_pipeline.c.i
+gradient_pipeline.i: gradient_pipeline.cpp.i
 .PHONY : gradient_pipeline.i
 
 # target to preprocess a source file
-gradient_pipeline.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/gradient_pipeline.c.i
-.PHONY : gradient_pipeline.c.i
+gradient_pipeline.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/gradient_pipeline.cpp.i
+.PHONY : gradient_pipeline.cpp.i
 
-gradient_pipeline.s: gradient_pipeline.c.s
+gradient_pipeline.s: gradient_pipeline.cpp.s
 .PHONY : gradient_pipeline.s
 
 # target to generate assembly for a file
-gradient_pipeline.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/gradient_pipeline.c.s
-.PHONY : gradient_pipeline.c.s
+gradient_pipeline.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/gradient_pipeline.cpp.s
+.PHONY : gradient_pipeline.cpp.s
 
-image_memo/create_envelopes.o: image_memo/create_envelopes.c.o
+image_memo/create_envelopes.o: image_memo/create_envelopes.cpp.o
 .PHONY : image_memo/create_envelopes.o
 
 # target to build an object file
-image_memo/create_envelopes.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/image_memo/create_envelopes.c.o
-.PHONY : image_memo/create_envelopes.c.o
+image_memo/create_envelopes.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/image_memo/create_envelopes.cpp.o
+.PHONY : image_memo/create_envelopes.cpp.o
 
-image_memo/create_envelopes.i: image_memo/create_envelopes.c.i
+image_memo/create_envelopes.i: image_memo/create_envelopes.cpp.i
 .PHONY : image_memo/create_envelopes.i
 
 # target to preprocess a source file
-image_memo/create_envelopes.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/image_memo/create_envelopes.c.i
-.PHONY : image_memo/create_envelopes.c.i
+image_memo/create_envelopes.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/image_memo/create_envelopes.cpp.i
+.PHONY : image_memo/create_envelopes.cpp.i
 
-image_memo/create_envelopes.s: image_memo/create_envelopes.c.s
+image_memo/create_envelopes.s: image_memo/create_envelopes.cpp.s
 .PHONY : image_memo/create_envelopes.s
 
 # target to generate assembly for a file
-image_memo/create_envelopes.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/image_memo/create_envelopes.c.s
-.PHONY : image_memo/create_envelopes.c.s
+image_memo/create_envelopes.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/image_memo/create_envelopes.cpp.s
+.PHONY : image_memo/create_envelopes.cpp.s
 
-image_memo/image_memo.o: image_memo/image_memo.c.o
+image_memo/image_memo.o: image_memo/image_memo.cpp.o
 .PHONY : image_memo/image_memo.o
 
 # target to build an object file
-image_memo/image_memo.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/image_memo/image_memo.c.o
-.PHONY : image_memo/image_memo.c.o
+image_memo/image_memo.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/image_memo/image_memo.cpp.o
+.PHONY : image_memo/image_memo.cpp.o
 
-image_memo/image_memo.i: image_memo/image_memo.c.i
+image_memo/image_memo.i: image_memo/image_memo.cpp.i
 .PHONY : image_memo/image_memo.i
 
 # target to preprocess a source file
-image_memo/image_memo.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/image_memo/image_memo.c.i
-.PHONY : image_memo/image_memo.c.i
+image_memo/image_memo.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/image_memo/image_memo.cpp.i
+.PHONY : image_memo/image_memo.cpp.i
 
-image_memo/image_memo.s: image_memo/image_memo.c.s
+image_memo/image_memo.s: image_memo/image_memo.cpp.s
 .PHONY : image_memo/image_memo.s
 
 # target to generate assembly for a file
-image_memo/image_memo.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/image_memo/image_memo.c.s
-.PHONY : image_memo/image_memo.c.s
+image_memo/image_memo.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/image_memo/image_memo.cpp.s
+.PHONY : image_memo/image_memo.cpp.s
 
-sources/curl_noise.o: sources/curl_noise.c.o
+sources/curl_noise.o: sources/curl_noise.cpp.o
 .PHONY : sources/curl_noise.o
 
 # target to build an object file
-sources/curl_noise.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/curl_noise.c.o
-.PHONY : sources/curl_noise.c.o
+sources/curl_noise.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/curl_noise.cpp.o
+.PHONY : sources/curl_noise.cpp.o
 
-sources/curl_noise.i: sources/curl_noise.c.i
+sources/curl_noise.i: sources/curl_noise.cpp.i
 .PHONY : sources/curl_noise.i
 
 # target to preprocess a source file
-sources/curl_noise.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/curl_noise.c.i
-.PHONY : sources/curl_noise.c.i
+sources/curl_noise.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/curl_noise.cpp.i
+.PHONY : sources/curl_noise.cpp.i
 
-sources/curl_noise.s: sources/curl_noise.c.s
+sources/curl_noise.s: sources/curl_noise.cpp.s
 .PHONY : sources/curl_noise.s
 
 # target to generate assembly for a file
-sources/curl_noise.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/curl_noise.c.s
-.PHONY : sources/curl_noise.c.s
+sources/curl_noise.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/curl_noise.cpp.s
+.PHONY : sources/curl_noise.cpp.s
 
-sources/linear_gradient.o: sources/linear_gradient.c.o
+sources/linear_gradient.o: sources/linear_gradient.cpp.o
 .PHONY : sources/linear_gradient.o
 
 # target to build an object file
-sources/linear_gradient.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/linear_gradient.c.o
-.PHONY : sources/linear_gradient.c.o
+sources/linear_gradient.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/linear_gradient.cpp.o
+.PHONY : sources/linear_gradient.cpp.o
 
-sources/linear_gradient.i: sources/linear_gradient.c.i
+sources/linear_gradient.i: sources/linear_gradient.cpp.i
 .PHONY : sources/linear_gradient.i
 
 # target to preprocess a source file
-sources/linear_gradient.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/linear_gradient.c.i
-.PHONY : sources/linear_gradient.c.i
+sources/linear_gradient.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/linear_gradient.cpp.i
+.PHONY : sources/linear_gradient.cpp.i
 
-sources/linear_gradient.s: sources/linear_gradient.c.s
+sources/linear_gradient.s: sources/linear_gradient.cpp.s
 .PHONY : sources/linear_gradient.s
 
 # target to generate assembly for a file
-sources/linear_gradient.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/linear_gradient.c.s
-.PHONY : sources/linear_gradient.c.s
+sources/linear_gradient.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/linear_gradient.cpp.s
+.PHONY : sources/linear_gradient.cpp.s
 
-sources/noise.o: sources/noise.c.o
+sources/noise.o: sources/noise.cpp.o
 .PHONY : sources/noise.o
 
 # target to build an object file
-sources/noise.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/noise.c.o
-.PHONY : sources/noise.c.o
+sources/noise.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/noise.cpp.o
+.PHONY : sources/noise.cpp.o
 
-sources/noise.i: sources/noise.c.i
+sources/noise.i: sources/noise.cpp.i
 .PHONY : sources/noise.i
 
 # target to preprocess a source file
-sources/noise.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/noise.c.i
-.PHONY : sources/noise.c.i
+sources/noise.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/noise.cpp.i
+.PHONY : sources/noise.cpp.i
 
-sources/noise.s: sources/noise.c.s
+sources/noise.s: sources/noise.cpp.s
 .PHONY : sources/noise.s
 
 # target to generate assembly for a file
-sources/noise.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/noise.c.s
-.PHONY : sources/noise.c.s
+sources/noise.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/noise.cpp.s
+.PHONY : sources/noise.cpp.s
 
-sources/perlin_noise.o: sources/perlin_noise.c.o
+sources/perlin_noise.o: sources/perlin_noise.cpp.o
 .PHONY : sources/perlin_noise.o
 
 # target to build an object file
-sources/perlin_noise.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/perlin_noise.c.o
-.PHONY : sources/perlin_noise.c.o
+sources/perlin_noise.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/perlin_noise.cpp.o
+.PHONY : sources/perlin_noise.cpp.o
 
-sources/perlin_noise.i: sources/perlin_noise.c.i
+sources/perlin_noise.i: sources/perlin_noise.cpp.i
 .PHONY : sources/perlin_noise.i
 
 # target to preprocess a source file
-sources/perlin_noise.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/perlin_noise.c.i
-.PHONY : sources/perlin_noise.c.i
+sources/perlin_noise.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/perlin_noise.cpp.i
+.PHONY : sources/perlin_noise.cpp.i
 
-sources/perlin_noise.s: sources/perlin_noise.c.s
+sources/perlin_noise.s: sources/perlin_noise.cpp.s
 .PHONY : sources/perlin_noise.s
 
 # target to generate assembly for a file
-sources/perlin_noise.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/perlin_noise.c.s
-.PHONY : sources/perlin_noise.c.s
+sources/perlin_noise.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/perlin_noise.cpp.s
+.PHONY : sources/perlin_noise.cpp.s
 
-sources/worley_noise.o: sources/worley_noise.c.o
+sources/worley_noise.o: sources/worley_noise.cpp.o
 .PHONY : sources/worley_noise.o
 
 # target to build an object file
-sources/worley_noise.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/worley_noise.c.o
-.PHONY : sources/worley_noise.c.o
+sources/worley_noise.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/worley_noise.cpp.o
+.PHONY : sources/worley_noise.cpp.o
 
-sources/worley_noise.i: sources/worley_noise.c.i
+sources/worley_noise.i: sources/worley_noise.cpp.i
 .PHONY : sources/worley_noise.i
 
 # target to preprocess a source file
-sources/worley_noise.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/worley_noise.c.i
-.PHONY : sources/worley_noise.c.i
+sources/worley_noise.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/worley_noise.cpp.i
+.PHONY : sources/worley_noise.cpp.i
 
-sources/worley_noise.s: sources/worley_noise.c.s
+sources/worley_noise.s: sources/worley_noise.cpp.s
 .PHONY : sources/worley_noise.s
 
 # target to generate assembly for a file
-sources/worley_noise.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/worley_noise.c.s
-.PHONY : sources/worley_noise.c.s
+sources/worley_noise.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/sources/worley_noise.cpp.s
+.PHONY : sources/worley_noise.cpp.s
 
-utility.o: utility.c.o
+utility.o: utility.cpp.o
 .PHONY : utility.o
 
 # target to build an object file
-utility.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/utility.c.o
-.PHONY : utility.c.o
+utility.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/utility.cpp.o
+.PHONY : utility.cpp.o
 
-utility.i: utility.c.i
+utility.i: utility.cpp.i
 .PHONY : utility.i
 
 # target to preprocess a source file
-utility.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/utility.c.i
-.PHONY : utility.c.i
+utility.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/utility.cpp.i
+.PHONY : utility.cpp.i
 
-utility.s: utility.c.s
+utility.s: utility.cpp.s
 .PHONY : utility.s
 
 # target to generate assembly for a file
-utility.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/utility.c.s
-.PHONY : utility.c.s
+utility.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/effect_stack.dir/build.make CMakeFiles/effect_stack.dir/utility.cpp.s
+.PHONY : utility.cpp.s
 
 # Help Target
 help:
@@ -744,6 +840,15 @@ help:
 	@echo "... commands/label_regions.o"
 	@echo "... commands/label_regions.i"
 	@echo "... commands/label_regions.s"
+	@echo "... commands/laminarize_cmd.o"
+	@echo "... commands/laminarize_cmd.i"
+	@echo "... commands/laminarize_cmd.s"
+	@echo "... commands/lic_debug_cmd.o"
+	@echo "... commands/lic_debug_cmd.i"
+	@echo "... commands/lic_debug_cmd.s"
+	@echo "... commands/lic_stylize_cmd.o"
+	@echo "... commands/lic_stylize_cmd.i"
+	@echo "... commands/lic_stylize_cmd.s"
 	@echo "... commands/normal_from_hessian_cmd.o"
 	@echo "... commands/normal_from_hessian_cmd.i"
 	@echo "... commands/normal_from_hessian_cmd.s"
@@ -753,6 +858,9 @@ help:
 	@echo "... commands/split_normals_cmd.o"
 	@echo "... commands/split_normals_cmd.i"
 	@echo "... commands/split_normals_cmd.s"
+	@echo "... debug_output.o"
+	@echo "... debug_output.i"
+	@echo "... debug_output.s"
 	@echo "... effect_stack_api.o"
 	@echo "... effect_stack_api.i"
 	@echo "... effect_stack_api.s"

@@ -1,5 +1,11 @@
 #include "create_envelopes.h"
+#include "contour_extract.h"
+#include "contour_smooth.h"
+#include "fft_blur.h"
+#include "fluid_solver.h"
+#include "interp_quantized.h"
 #include "smart_blur.h"
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -20,11 +26,18 @@ enum
 	IN_SUSTAIN,
 	IN_RELEASE,
 	ALPHA_THRESHOLD = 16,
-	NOISE_FRAMES = 4,
 	NOISE_ALPHA = 32,
 };
 
+const float g_NoiseFramePercent = 0.02;
 
+#define TEST_X1 ((uint32_t)(107))
+#define TEST_Y1 ((uint32_t)(118))
+#define TEST_X2 ((uint32_t)(90))
+#define TEST_Y2 ((uint32_t)(40))
+#define TEST_IDX1 (builder->width*TEST_Y1 + TEST_X1)
+#define TEST_IDX2 (builder->width*TEST_Y2 + TEST_X2)
+#define PRINT_IF(...) { if((TEST_X1) == x && (TEST_Y1) == y) printf(__VA_ARGS__); }
 
 uint8_t GetAlpha(const union Color* key, const union Color* sample)
 {
@@ -140,7 +153,8 @@ EnvelopeBuilder * e_Initialize(int width, int height)
     builder->width = width;
     builder->height = height;
     builder->pixels = calloc(width * height, sizeof(struct PixelState));
-
+	builder->key.c = 0;
+ 
     if (!builder->pixels) {
         free(builder);
         return NULL;
@@ -148,9 +162,6 @@ EnvelopeBuilder * e_Initialize(int width, int height)
 
     return builder;
 }
-
-#define TEST_X (317)
-#define TEST_Y (153)
 
 int e_ProcessFrame(EnvelopeBuilder * builder, ImageData const* src, int frame_id)
 {
@@ -165,14 +176,10 @@ int e_ProcessFrame(EnvelopeBuilder * builder, ImageData const* src, int frame_id
 		builder->key = *(union Color const*)(src->data);
 	}
 
-	int x = TEST_X;
-	int y = TEST_Y;
-
 #define LOOP 1
 #if LOOP
-#define PRINT_F(...)
-    for (y = 0; y < builder->height; y++) {
-        for (x = 0; x < builder->width; x++) {
+    for (uint32_t y = 0; y < (uint32_t)builder->height; y++) {
+        for (uint32_t x = 0; x < (uint32_t)builder->width; x++) {
 #else
 #define PRINT_F(...) printf(__VA_ARGS__)
 #define PRINT_X(...) printf(__VA_ARGS__)
@@ -189,7 +196,7 @@ int e_ProcessFrame(EnvelopeBuilder * builder, ImageData const* src, int frame_id
             	current_alpha = GetAlpha(&builder->key, (union Color const*)(&src->data[src_idx])) * current_alpha / 255;
             }
 
-            PRINT_F("current alpha: %i\n", (int)current_alpha);
+            PRINT_IF("current alpha: %i, frame %d\n", (int)current_alpha, frame_id);
 
 			int check_it_again = 0;
 			do {
@@ -199,7 +206,7 @@ int e_ProcessFrame(EnvelopeBuilder * builder, ImageData const* src, int frame_id
 				{
 				case NOT_IN_ENVELOPE:
 		            if (current_alpha > 4) {
-		                PRINT_F("Process frame: entering attack state, %d\n", frame_id);
+		                PRINT_IF("Process frame: entering attack state, %d\n", frame_id);
 		                pixel->in_envelope = IN_ATTACK;
 		                pixel->current.attack_start = frame_id;
 		                pixel->current.min_attack_alpha = current_alpha;
@@ -214,7 +221,7 @@ int e_ProcessFrame(EnvelopeBuilder * builder, ImageData const* src, int frame_id
 		            }
 		            else
 		            {
-		                PRINT_F("Process frame: entering sustain state, %d\n", frame_id);
+		                PRINT_IF("Process frame: entering sustain state, %d\n", frame_id);
 		            	pixel->in_envelope = IN_SUSTAIN;
 		            }
 		        case IN_SUSTAIN:
@@ -222,7 +229,7 @@ int e_ProcessFrame(EnvelopeBuilder * builder, ImageData const* src, int frame_id
 		                pixel->current.max_alpha = current_alpha;
 		                pixel->current.attack_end = frame_id;
 		            	pixel->in_envelope = IN_ATTACK;
-		            	PRINT_F("Process frame: backtracking to attack state %d\n", frame_id);
+		            	PRINT_IF("Process frame: backtracking to attack state %d\n", frame_id);
 		            	break;
 		            }
 
@@ -232,7 +239,7 @@ int e_ProcessFrame(EnvelopeBuilder * builder, ImageData const* src, int frame_id
 		                pixel->current.min_release_alpha = current_alpha;
 		            	pixel->in_envelope = IN_RELEASE;
 
-		                PRINT_F("Process frame: entering release state, %d\n", frame_id);
+		                PRINT_IF("Process frame: entering release state, %d\n", frame_id);
 		                if(current_alpha == 0)
 		                {
 		                    pixel->in_envelope = NOT_IN_ENVELOPE;
@@ -243,35 +250,37 @@ int e_ProcessFrame(EnvelopeBuilder * builder, ImageData const* src, int frame_id
 		            }
 		            break;
 		      case IN_RELEASE:
-		            if (current_alpha < pixel->current.min_release_alpha)
+		            if (current_alpha <= pixel->current.min_release_alpha)
 		            {
-		                if(current_alpha)
+		                if(current_alpha > NOISE_ALPHA)
 		                {
 		                	pixel->current.min_release_alpha = current_alpha;
 		               		pixel->current.release_end = frame_id;
 		               	}
-		                else
+		               	
+		                if(current_alpha < NOISE_ALPHA)
 		                {
 		            		pixel->in_envelope = NOT_IN_ENVELOPE;
-		                   PRINT_F("Process frame: exiting envelope, %d\n", frame_id);
+		               		pixel->current.release_end = frame_id;
+		                	pixel->current.min_release_alpha = 0;
+		                   PRINT_IF("Process frame: exiting envelope, %d\n", frame_id);
 		                }
 		            }
 
 		            if (current_alpha > pixel->current.min_release_alpha)
 		            {
 						check_it_again = 1;
-
-						if((frame_id - pixel->current.attack_end) < NOISE_FRAMES)
-		            		pixel->in_envelope = NOT_IN_ENVELOPE;
-		            	else
-		            		pixel->in_envelope = IN_SUSTAIN;
+		            	pixel->in_envelope = IN_SUSTAIN;
 		            }
 
 	left_envelope:
 		            if(pixel->in_envelope == NOT_IN_ENVELOPE
-		            && (pixel->current.release_end - pixel->current.attack_start) > NOISE_FRAMES
 		            && (pixel->current.max_alpha > NOISE_ALPHA) )
 		            {
+						pixel->current.attack_end = max_i32(pixel->current.attack_start, pixel->current.attack_end);
+						//pixel->current.release_start = max_i32(pixel->current.attack_start+1, pixel->current.release_start);
+						//pixel->current.release_end = max_i32(pixel->current.release_start, pixel->current.release_end);
+		            
 		            	if(!pixel->has_best || compare_env(&pixel->current, &pixel->best) > 0)
 		            	{
 		            	/*
@@ -293,7 +302,7 @@ int e_ProcessFrame(EnvelopeBuilder * builder, ImageData const* src, int frame_id
 		            }
 		            else
 		            {
-						PRINT_F("pixel->in_envelope = %d\npixel->current.release_end = %d\npixel->current.attack_start = %d\npixel->current.max_alpha=%d\n",
+						PRINT_IF("pixel->in_envelope = %d\npixel->current.release_end = %d\npixel->current.attack_start = %d\npixel->current.max_alpha=%d\n",
 								pixel->in_envelope,
 								pixel->current.release_end,
 								pixel->current.attack_start,
@@ -348,6 +357,14 @@ static void update_minmax(MinMax * m, int v)
 	m->max = max_i32(m->max, v);
 }
 
+static MinMax minmax_i32(MinMax a, MinMax b)
+{
+	MinMax m;
+	m.min = min_i32(a.min, b.min);
+	m.max = max_i32(a.max, b.max);
+	return m;
+}
+
 int e_GetBuilderMetadata(EnvelopeMetadata * out, EnvelopeBuilder * builder, int total_frames)
 {
 	if(builder == 0L || out == 0L)
@@ -358,13 +375,11 @@ int e_GetBuilderMetadata(EnvelopeMetadata * out, EnvelopeBuilder * builder, int 
 
 // add black frame at the end to finish any unifinished business.
     {
+		printf("total frames: %d\n", total_frames);
         ImageData * last_frame = MakeImage(builder->width, builder->height, 1);
        
-        uint32_t N = builder->width * builder->height;
-		for(uint32_t i = 0u; i < N; ++i)
-		{
-			((union Color*)(last_frame->data))[i] = builder->key;
-		} 
+        // reset key so that black frame is consistent
+        builder->key.c = 0;
         
         e_ProcessFrame(builder, last_frame, total_frames);
         free(last_frame->data);
@@ -387,6 +402,17 @@ int e_GetBuilderMetadata(EnvelopeMetadata * out, EnvelopeBuilder * builder, int 
     m.end_release_frame.max=0;
     
     for (int i = 0; i < builder->width * builder->height; i++) {
+    
+        if (builder->pixels[i].has_best) 
+        {
+			int duration = builder->pixels[i].best.release_end - builder->pixels[i].best.attack_start;
+			
+			if((duration / (float)(total_frames)) < g_NoiseFramePercent)
+			{
+				builder->pixels[i].has_best = 0;
+			}
+		}   
+		    
         if (builder->pixels[i].has_best) {
            update_minmax(&m.start_attack_frame,    builder->pixels[i].best.attack_start);
            update_minmax(&m.end_attack_frame,    builder->pixels[i].best.attack_end);
@@ -397,7 +423,26 @@ int e_GetBuilderMetadata(EnvelopeMetadata * out, EnvelopeBuilder * builder, int 
     }
 
 	if(out) *out = m;
+
+	// Count how many pixels have envelopes
+	int envelope_count = 0;
+	int in_envelope_count = 0;
+	for (int i = 0; i < builder->width * builder->height; i++) {
+	    if (builder->pixels[i].has_best) {
+	        envelope_count++;
+	    }
+	    else if(builder->pixels[i].in_envelope)
+	    {
+			in_envelope_count++;
+	    }
+	}
+	printf("DEBUG: Found %d pixels with valid envelopes (out of %d total)\n",
+	       envelope_count, builder->width * builder->height);
 	
+	if(in_envelope_count)
+		printf("DEBUG: Found %d pixels with unfinished envelopes (out of %d total)\n",
+			   in_envelope_count, builder->width * builder->height);
+
     if(m.start_attack_frame.min > m.start_attack_frame.max
     && m.start_release_frame.min > m.start_release_frame.max)
     {
@@ -405,33 +450,11 @@ int e_GetBuilderMetadata(EnvelopeMetadata * out, EnvelopeBuilder * builder, int 
   		return -1;
     }
 
+	printf("DEBUG: Bounds - attack:[%d,%d] release:[%d,%d]\n",
+	       m.start_attack_frame.min, m.end_attack_frame.max,
+	       m.start_release_frame.min, m.end_release_frame.max);
+
 	return 0;
-}
-
-// error bars is ratio of target quantization to current quantization. 
-// we want to use a memoization to get the area of contigous bands
-// banding is in terms of non-color data. 
-// Large Widths + Minimum Riser: This is definitive banding.
-// Short Widths + Random Risers: This is noise or legitimate high-frequency data.
-//
-float e_MeasureBanding(EnvelopeBuilder * builder, int channel, float error_bars)
-{
-	uint32_t W = builder->width;
-	uint32_t H = builder->height;
-	
-	for(uint32_t y = 0; y < H; ++y)
-	{
-		for(uint32_t x = 0; x < W; ++x)
-		{
-			uint32_t i = y*W+x;
-			uint32_t sample = (&(builder->pixels[i].best.attack_start))[channel];
-			
-			
-		}
-	}
-	
-
-
 }
 
 int e_NormalizeBuilder(float * dst, EnvelopeBuilder * builder, EnvelopeMetadata * m)
@@ -441,76 +464,173 @@ int e_NormalizeBuilder(float * dst, EnvelopeBuilder * builder, EnvelopeMetadata 
 		"attack start", "attack end", "release start", "release end"
 	};
 
-	MinMax * ranges = &m->start_attack_frame;
+	MinMax ranges[2];
+	ranges[0] = minmax_i32(m->start_attack_frame, m->end_attack_frame);
+	ranges[1] = minmax_i32(m->start_release_frame, m->end_release_frame);
 	int durations[4];
 	float error_bars[4];
-	
+
 	uint32_t N = builder->width*builder->height;
 	SmartBlurContext* blur = 0L;
+	InterpolateQuantizedCmd interpolate_quantized;
+
+	// Test pixel coordinates
+	int test_x = TEST_X1;
+	int test_y = TEST_Y1;
+	int test_idx = TEST_IDX1;
+	int did_crackle = 0;
+
+	printf("\n=== e_NormalizeBuilder: Test pixel (%d, %d) idx=%d ===\n", test_x, test_y, test_idx);
+	if(builder->pixels[test_idx].has_best) {
+		struct Envelope* env = &builder->pixels[test_idx].best;
+		printf("Test pixel HAS envelope: attack[%d-%d] release[%d-%d] max_alpha=%d\n",
+		       env->attack_start, env->attack_end, env->release_start, env->release_end, env->max_alpha);
+	} else {
+		printf("Test pixel has NO envelope (has_best=0)\n");
+	}
+
+	int min_duration = INT_MAX;
 	
 	for(int i = 0; i < 4; ++i)
 	{
-		durations[i]  = max_i32(1, ranges[i].max - ranges[i].min);
-		error_bars[i] =  256.0 / durations[i];
+		MinMax * range = &ranges[i/2];
+		durations[i]  = max_i32(1, (range->max) - range->min);
+		error_bars[i] =  (1.0 / durations[i]);
 		
-		float inv = 1.0 / durations[i];
+		if(durations[i] >= 1)
+		{
+			min_duration = min_i32(min_duration, durations[i]);
+		}
+	}	
+	
+	if(min_duration == INT_MAX)
+		min_duration = 0;
 		
-		if(durations[i] > 255) // high res enough that we don't need to blur
+	int banding_estimate = max_i32(builder->width, builder->height) / min_duration;
+		
+	for(int i = 0; i < 4; ++i)
+	{
+		MinMax * range = &ranges[i/2];
+// amp a tiny bit so that things that appear late don't get slammed to 0. 
+		float inv = (1.0 - 2.0 / 256.0) / max_f32(1, durations[i]);
+
+		printf("Layer %d (%s): range=[%d,%d], duration=%d, inv=%f, error=%f\n", i, layer_names[i], range->min, range->max, durations[i], inv, error_bars[i]);
+				
+		if(banding_estimate <= 1) // DISABLED SMART BLUR FOR DEBUGGING
 		{
 			for(uint32_t j = 0u; j < N; ++j)
 			{
 				if(builder->pixels[j].has_best)
 				{
-					dst[j*4 + i] = (&(builder->pixels[j].best.attack_start))[i] * inv;
+					// Normalize by subtracting min and dividing by duration
+					int frame_value = (&(builder->pixels[j].best.attack_start))[i] - range->min;
+					dst[j*4 + i] = (frame_value) * inv + 0.004;
 				}
 				else
 				{
 					dst[j*4+i] = 0.f;
 				}
 			}
-		} 
-		else
+		}
+		else 
 		{
 		    if(blur == 0L)
+		    {
 				blur = sb_Initialize(builder->width, builder->height);
-		
-			int W = builder->width;
+			}
+
+			sb_Setup(blur);
 			
+			int W = builder->width;
+
 			for(uint32_t j = 0u; j < N; ++j)
 			{
+				int px = j % W;
+				int py = j / W;
+				int is_debug = (i == 3 && py == 73 && px >= 39 && px <= 41);
+
 				if(builder->pixels[j].has_best)
 				{
-					float value =  (&(builder->pixels[j].best.attack_start))[i] * inv;
-                   sb_SetConstraints(blur, j % W, j / W, value - error_bars[i], value + error_bars[i], value);
+					// Normalize by subtracting min and dividing by duration
+					int frame_value = (&(builder->pixels[j].best.attack_start))[i] - (range->min);
+
+					if(i < 2)
+						frame_value = (range->max) - frame_value;
+
+					if(is_debug) {
+						struct Envelope *env = &builder->pixels[j].best;
+						printf("DEBUG layer3 (%d,%d): has_best=1, release_end=%d, range.min=%d, frame_value=%d\n",
+							px, py, env->release_end, range->min, frame_value);
+					}
+
+                   sb_SetValue(blur, j % W, j / W, frame_value);
                 }
                 else
                 {
+					if(is_debug) {
+						printf("DEBUG layer3 (%d,%d): has_best=0, setting -1\n", px, py);
+					}
                     // No envelope - interpret as always fully transparent.
-                    sb_SetConstraints(blur, j % W, j / W, 0.0f, 0.0f, 0.0f);
+                    sb_SetValue(blur, j % W, j / W, -1);
                 }
 			}
 			
-            int iters = sb_RunUntilConverged(blur, 0.01f, 1000);
-			printf("Smart blur converged: %s in %d iterations\n", layer_names[i], iters);
+			if(banding_estimate < 4)
+			{
+				int iters = sb_RunUntilConverged(blur, 0.01f, 32);
+				printf("Smart blur converged: %s in %d iterations\n", layer_names[i], iters);
+			}
+			else
+			{
+				did_crackle = 1;
+
+				iq_Initialize(
+					&interpolate_quantized,
+					blur->input,
+					builder->width,
+					builder->height,
+					0);
+					
+				iq_Execute(&interpolate_quantized);
+				memcpy(blur->output, interpolate_quantized.output, sizeof(float)*N);
+				iq_Free(&interpolate_quantized);
+			}
 			
 			for(uint32_t j = 0u; j < N; ++j)
 			{
-				dst[j*4 + i] = blur->values[j];
+				int px = j % W;
+				int py = j / W;
+				int is_debug = (i == 3 && py == 73 && px >= 39 && px <= 41);
+
+				float frame_value = blur->output[j];
+
+				if(is_debug) {
+					printf("DEBUG layer3 output (%d,%d): blur->input=%d, blur->output=%f, inv=%f\n",
+						px, py, blur->input[j], frame_value, inv);
+				}
+
+				if(frame_value < 0)
+					dst[j*4+i] = 0;
+				else
+					dst[j*4 + i] = blur->output[j] * inv + 0.004;
+
+				if(is_debug) {
+					printf("DEBUG layer3 final (%d,%d): dst=%f\n", px, py, dst[j*4+i]);
+				}
 			}
 		}
 	}
 	
 	if(blur)
 		sb_Free(blur);
-	
-	return 0;	
+
+	return did_crackle;	
 }
 
+int next_pow2(int n);
 
 int e_Build(EnvelopeBuilder * builder, ImageData * dst, EnvelopeMetadata * out, int total_frames)
 {
-	float delta_alpha;
-
 	if (!builder || !dst || !dst->data)
     {
         printf("Build failed (invalid argument)\n");
@@ -524,60 +644,164 @@ int e_Build(EnvelopeBuilder * builder, ImageData * dst, EnvelopeMetadata * out, 
 
 	if(out) *out = m;
 	if(r == -1) return -1;
+	
+	ResizingImage image = {
+		.width=builder->width,
+		.height=builder->height,
+		.data=malloc(sizeof(float)*4*builder->width*builder->height),
+		.original = 0L
+	};
+	
+	int did_crackle = e_NormalizeBuilder(image.data, builder, &m);
 
-	float * tmp = malloc(sizeof(float)*4*builder->width*builder->height);
-	e_NormalizeBuilder(tmp, builder, &m);
+	if(did_crackle)
+	{
+		ResizingImage upsampled = {
+			.width=next_pow2(image.width),
+			.height=next_pow2(image.height),
+			.data=0L,
+			.original = 0L
+		};
+		
+#if 1
+		if(fft_ResizeImage(&upsampled, &image))
+		{
+			free(image.data);
+			free(image.original);
+
+			image = upsampled;
+#if 1
+			FFTBlurContext context;
+			memset(&context, 0, sizeof(context));
+			if(fft_Initialize(&context, image.width, image.height) == 0)
+			{
+				for(int channel = 0; channel < 4; ++channel)
+				{
+					fft_LoadChannel(&context, &image, 4, channel);
+					fft_LowPassFilter(&context, 0.15, 0);
+					fft_CopyBackToImage(&image, &context, 4, channel);
+				}
+
+				fft_Free(&context);
+			}
+#endif
+		}
+#endif
+		
+		FluidSolver solver;
+		memset(&solver, 0, sizeof(solver));
+		solver.width = image.width;
+		solver.height = image.height;
+		solver.height_interlaced0to4 = image.data;
+		fs_Setup(&solver);
+		fs_debug_export_all("/debug.png", &solver);
+		fs_Free(&solver);
+		
+		
+	}
+
+	uint32_t W = image.width;
+	uint32_t H = image.height;
 
   // float attack_duration = max_i32(1, m.end_attack_frame.max - m.start_attack_frame.min);
   //  float release_duration = max_i32(1, m.end_release_frame.max - m.start_release_frame.min);
 
-    int H = min_i32(builder->height, dst->height);
-    int W = min_i32(builder->width, dst->width);
+    // resize destination buffer.
+	if(dst->width != W
+	|| dst->height != H)
+	{
+		if(dst->width*dst->height != W*H)
+		{
+			free(dst->data);
+			dst->data = (uint8_t*)calloc(W*H*dst->depth, 4);
+		}
+		
+		dst->width = W;
+		dst->height = H;
+	}
+	
+    // Test pixel coordinates
+	int test_idx = TEST_IDX1;
+
+    printf("\n=== e_Build: Writing output texture ===\n");
 
     // Write texture using normalized values from e_NormalizeBuilder
-    for (int y = 0; y < H; y++) {
-        for (int x = 0; x < W; x++) {
-            int idx = (y * builder->width + x);
-            struct PixelState* pixel = &builder->pixels[idx];
+    for (uint32_t y = 0; y < H; y++) {
+        for (uint32_t x = 0; x < W; x++) {
+            int idx = (y * W + x);
 
             int dst_idx = (y * dst->width + x) * 4;
 
-            if (pixel->has_best == 0) {
-                *(uint32_t*)(&dst->data[dst_idx]) = 0xFF000000;
-            } else {
+            {
                 // Get normalized values from tmp array
                 // tmp[idx*4 + 0] = attack_start (normalized)
                 // tmp[idx*4 + 1] = attack_end (normalized)
                 // tmp[idx*4 + 2] = release_start (normalized)
                 // tmp[idx*4 + 3] = release_end (normalized)
-                float attack_norm = tmp[idx*4 + 0];
-                float release_norm = tmp[idx*4 + 3];
+                
+                float attack_start = 1.0 - image.data[idx*4+0];
+                float attack_end = 1.0 - image.data[idx*4+1];
+                float release_start = image.data[idx*4+2];
+                float release_end = image.data[idx*4+3];
+                
+                if(release_end <= 0.0)
+                {
+					*(uint32_t*)(&dst->data[dst_idx]) = 0xFF000000;
+					if(idx == test_idx) {
+						printf("Test pixel (%d,%d): NO ENVELOPE - writing black (0xFF000000)\n", x, y);
+					}
+					
+					continue;
+                }
+                
+                float texEffect_r = 1.0 - attack_start; // works
+                float texEffect_g = release_end; // works
 
                 // B: Edge hardness based on attack/release speed
-                delta_alpha = (pixel->best.max_alpha - pixel->best.min_attack_alpha);
-                float attack_speed = delta_alpha / max_f32(1.0f, pixel->best.attack_end - pixel->best.attack_start);
 
-                delta_alpha = (pixel->best.max_alpha - pixel->best.min_release_alpha);
-                float release_speed = delta_alpha / max_f32(1.0f, pixel->best.release_end - pixel->best.release_start);
+				// Attack
+				float attack_speed = 1.0 / max_f32(1.0f, attack_end - attack_start);
+				
+				// Release
+				float release_speed = 1.0 / max_f32(1.0f, release_end - release_start);
+				
+				float attack_softness = 1.0f - (attack_speed * (m.end_attack_frame.max - m.start_attack_frame.min) / (15.0f * m.total_frames));
+				float release_softness = 1.0f - (release_speed * (m.end_release_frame.max - m.start_release_frame.min) / (15.0f * m.total_frames));
+				
+				float texEffect_b = 0; //min_f32(attack_softness, release_softness);
 
-                float attack_softness = 1.0f - (attack_speed * (m.end_attack_frame.max - m.start_attack_frame.min) / (15.0f * m.total_frames));
-                float release_softness = 1.0f - (release_speed * (m.end_release_frame.max - m.start_release_frame.min) / (15.0f * m.total_frames));
-
-                float softness = min_f32(attack_softness, release_softness);
+                if(idx == test_idx) {
+                    printf("Test pixel (%d,%d): HAS ENVELOPE\n", x, y);
+                    printf("  attack_norm=%f, release_norm=%f\n", 1.0 - texEffect_r, texEffect_g);
+                    printf("  attack_speed=%f, release_speed=%f\n", attack_speed, release_speed);
+                    printf("  attack_softness=%f, release_softness=%f, final softness=%f\n",
+                           attack_softness, release_softness, texEffect_b);
+                }
 
                 // R: Inverted normalized attack timing (for shader)
-                dst->data[dst_idx + 0] = (uint8_t)clamp_i32((1.0f - attack_norm) * 255, 0, 255);
+                uint8_t r = (uint8_t)clamp_i32(texEffect_r * 255, 0, 255);
                 // G: Normalized release timing
-                dst->data[dst_idx + 1] = (uint8_t)clamp_i32(release_norm * 255, 0, 255);
+                uint8_t g = (uint8_t)clamp_i32(texEffect_g * 255, 1, 255);
                 // B: Edge softness
-                dst->data[dst_idx + 2] = (uint8_t)clamp_i32(softness * 255, 0, 255);
+                uint8_t b = (uint8_t)clamp_i32(texEffect_b * 255, 0, 255);
                 // A: Full opacity for valid pixels
-                dst->data[dst_idx + 3] = 255;
+                uint8_t a = 255;
+
+                dst->data[dst_idx + 0] = r;
+                dst->data[dst_idx + 1] = g;
+                dst->data[dst_idx + 2] = b;
+                dst->data[dst_idx + 3] = a;
+
+                if(idx == test_idx) {
+                    printf("  Final RGBA written: R=%d G=%d B=%d A=%d\n", r, g, b, a);
+                }
             }
         }
     }
 
-    free(tmp);
+    free(image.data);
+    free(image.original);
+    
     return 0;
 }
 

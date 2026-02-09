@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gradient Mapping Texture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================
+   CSS VARIABLES
+   ============================================ */
+:root {
+  --bg-0: #08080a;
+  --bg-1: #101014;
+  --bg-2: #18181c;
+  --bg-3: #202026;
+  --bg-4: #28282e;
+  --border-0: #2a2a30;
+  --border-1: #38383f;
+  --border-2: #48484f;
+  --text-0: #eeeef2;
+  --text-1: #a0a0a8;
+  --text-2: #68686f;
+  --accent: #d49a3a;
+  --accent-hover: #e4aa4a;
+  --accent-dim: #7a5a20;
+  --accent-glow: rgba(212, 154, 58, 0.15);
+  --flag-in: #5a9fd4;
+  --flag-in-dim: rgba(90, 159, 212, 0.25);
+  --flag-out: #d4885a;
+  --flag-out-dim: rgba(212, 136, 90, 0.25);
+  --danger: #c45050;
+  --toolbar-h: 46px;
+  --playback-h: 54px;
+  --panel-w: 272px;
+  --radius-s: 4px;
+  --radius-m: 6px;
+  --radius-l: 10px;
+  --transition: 0.15s ease;
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-0);
+  color: var(--text-0);
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-2); }
+
+/* ============================================
+   TOOLBAR
+   ============================================ */
+.toolbar {
+  height: var(--toolbar-h);
+  background: var(--bg-1);
+  border-bottom: 1px solid var(--border-0);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  gap: 12px;
+  user-select: none;
+  z-index: 20;
+  position: relative;
+}
+
+.toolbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-shrink: 0;
+}
+.toolbar-brand svg { width: 20px; height: 20px; color: var(--accent); }
+.toolbar-brand span { font-weight: 600; font-size: 14px; letter-spacing: 0.02em; color: var(--text-0); }
+
+.toolbar-actions { display: flex; align-items: center; gap: 6px; }
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: var(--radius-s);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition), box-shadow var(--transition);
+  white-space: nowrap;
+}
+.btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+.btn-secondary {
+  background: var(--bg-3);
+  color: var(--text-1);
+  border: 1px solid var(--border-0);
+}
+.btn-secondary:hover { background: var(--bg-4); color: var(--text-0); border-color: var(--border-1); }
+
+.btn-accent { background: var(--accent); color: #0a0a0a; }
+.btn-accent:hover { background: var(--accent-hover); box-shadow: 0 0 12px var(--accent-glow); }
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: var(--radius-s);
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+  flex-shrink: 0;
+}
+.btn-icon:hover { background: var(--bg-4); color: var(--text-0); }
+.btn-icon.active { background: var(--bg-4); color: var(--accent); }
+.btn-icon svg { width: 16px; height: 16px; }
+
+/* ============================================
+   WORKSPACE LAYOUT
+   ============================================ */
+.workspace { display: flex; height: calc(100% - var(--toolbar-h)); }
+
+/* ============================================
+   SIDE PANELS
+   ============================================ */
+.panel {
+  width: var(--panel-w);
+  flex-shrink: 0;
+  background: var(--bg-1);
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border-0);
+  user-select: none;
+}
+.panel-right { border-right: none; border-left: 1px solid var(--border-0); }
+
+.panel-header {
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--border-0);
+  flex-shrink: 0;
+}
+.panel-header h2 { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-1); }
+.panel-header-actions { display: flex; align-items: center; gap: 2px; }
+.panel-header .btn-icon { width: 26px; height: 26px; }
+.panel-header .btn-icon svg { width: 14px; height: 14px; }
+
+/* ============================================
+   EFFECT STACK
+   ============================================ */
+.effect-stack { flex: 1; overflow-y: auto; padding: 6px; }
+
+.effect-item {
+  background: var(--bg-2);
+  border: 1px solid var(--border-0);
+  border-radius: var(--radius-m);
+  margin-bottom: 4px;
+  overflow: hidden;
+  transition: border-color var(--transition);
+}
+.effect-item:hover { border-color: var(--border-1); }
+
+.effect-header { display: flex; align-items: center; gap: 8px; padding: 7px 8px; cursor: pointer; }
+.effect-name { flex: 1; font-size: 12px; font-weight: 500; color: var(--text-0); }
+.effect-chevron { color: var(--text-2); transition: transform 0.2s ease; }
+.effect-chevron svg { width: 12px; height: 12px; display: block; }
+.effect-item[data-expanded="true"] .effect-chevron { transform: rotate(180deg); }
+
+.effect-remove { width: 22px; height: 22px; opacity: 0; transition: opacity var(--transition); }
+.effect-remove svg { width: 12px; height: 12px; }
+.effect-item:hover .effect-remove { opacity: 1; }
+.effect-remove:hover { color: var(--danger) !important; background: rgba(196, 80, 80, 0.12) !important; }
+
+.effect-body { padding: 4px 10px 10px; display: none; }
+.effect-item[data-expanded="true"] .effect-body { display: block; }
+
+/* ============================================
+   TOGGLE SWITCH
+   ============================================ */
+.toggle { position: relative; display: inline-flex; width: 28px; height: 16px; flex-shrink: 0; }
+.toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-track { position: absolute; inset: 0; background: var(--border-0); border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+.toggle-track::after { content: ''; position: absolute; width: 12px; height: 12px; left: 2px; top: 2px; background: var(--text-2); border-radius: 50%; transition: transform 0.2s, background 0.2s; }
+.toggle input:checked + .toggle-track { background: var(--accent-dim); }
+.toggle input:checked + .toggle-track::after { transform: translateX(12px); background: var(--accent); }
+
+/* ============================================
+   PARAMETER CONTROLS
+   ============================================ */
+.param { margin-bottom: 8px; }
+.param:last-child { margin-bottom: 0; }
+.param-label { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+.param-label label { font-size: 11px; color: var(--text-1); font-weight: 400; }
+.param-label .param-value { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-2); min-width: 36px; text-align: right; }
+
+/* ============================================
+   RANGE INPUTS
+   ============================================ */
+input[type="range"] {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 4px;
+  background: var(--border-0); border-radius: 2px; outline: none; cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%;
+  background: var(--accent); border: 2px solid var(--bg-1); cursor: pointer;
+  transition: box-shadow var(--transition);
+}
+input[type="range"]::-webkit-slider-thumb:hover { box-shadow: 0 0 0 3px var(--accent-glow); }
+input[type="range"]::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg-1); cursor: pointer; }
+
+/* ============================================
+   ADD EFFECT BUTTON
+   ============================================ */
+.add-effect-wrap { position: relative; padding: 2px 0; }
+
+.add-effect-btn {
+  width: 100%; padding: 8px; background: transparent;
+  border: 1px dashed var(--border-1); border-radius: var(--radius-m);
+  color: var(--text-2); font-family: inherit; font-size: 12px; font-weight: 500;
+  cursor: pointer; transition: color var(--transition), border-color var(--transition), background var(--transition);
+}
+.add-effect-btn:hover { color: var(--accent); border-color: var(--accent-dim); background: var(--accent-glow); }
+
+.add-effect-menu {
+  display: none; position: absolute; bottom: calc(100% + 4px); left: 0; right: 0;
+  background: var(--bg-3); border: 1px solid var(--border-1); border-radius: var(--radius-m);
+  padding: 4px; z-index: 30; box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+.add-effect-menu.open { display: block; }
+.add-effect-menu button {
+  display: block; width: 100%; padding: 6px 10px; background: none; border: none;
+  border-radius: var(--radius-s); color: var(--text-1); font-family: inherit; font-size: 12px;
+  text-align: left; cursor: pointer; transition: background var(--transition), color var(--transition);
+}
+.add-effect-menu button:hover { background: var(--bg-4); color: var(--text-0); }
+
+/* ============================================
+   PANEL PREVIEW
+   ============================================ */
+.panel-preview { flex-shrink: 0; padding: 8px; border-top: 1px solid var(--border-0); position: relative; }
+
+.preview-image {
+  width: 100%; aspect-ratio: 1 / 1; border-radius: var(--radius-m); overflow: hidden;
+  position: relative; cursor: pointer;
+  background-color: #141416;
+  background-image:
+    linear-gradient(45deg, #1c1c1f 25%, transparent 25%),
+    linear-gradient(-45deg, #1c1c1f 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #1c1c1f 75%),
+    linear-gradient(-45deg, transparent 75%, #1c1c1f 75%);
+  background-size: 12px 12px; background-position: 0 0, 0 6px, 6px -6px, -6px 0;
+  border: 1px solid var(--border-0); display: flex; align-items: center; justify-content: center;
+  transition: border-color var(--transition);
+}
+.preview-image:hover { border-color: var(--border-1); }
+.preview-image.drag-over { border-color: var(--accent); box-shadow: inset 0 0 20px var(--accent-glow); }
+
+.preview-placeholder { text-align: center; color: var(--text-2); font-size: 11px; line-height: 1.5; pointer-events: none; }
+.preview-placeholder svg { width: 24px; height: 24px; margin-bottom: 4px; opacity: 0.4; }
+
+.preview-actions { position: absolute; bottom: 6px; right: 6px; display: flex; gap: 4px; opacity: 0; transition: opacity var(--transition); }
+.preview-image:hover .preview-actions { opacity: 1; }
+.preview-actions .btn-icon { width: 28px; height: 28px; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); border-radius: var(--radius-s); color: var(--text-1); }
+.preview-actions .btn-icon:hover { background: rgba(0,0,0,0.85); color: var(--text-0); }
+
+/* ============================================
+   VIEWPORT
+   ============================================ */
+.viewport-wrap { flex: 1; display: flex; flex-direction: column; min-width: 0; background: var(--bg-0); }
+
+.viewport {
+  flex: 1; position: relative; overflow: hidden;
+  background-color: #0c0c0e;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.viewport canvas { display: block; width: 100%; height: 100%; }
+
+.viewport-badge {
+  position: absolute; top: 10px; left: 10px;
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-2);
+  background: rgba(0,0,0,0.55); backdrop-filter: blur(4px);
+  padding: 3px 7px; border-radius: 3px; border: 1px solid var(--border-0);
+  pointer-events: none; z-index: 5;
+}
+
+/* ============================================
+   PLAYBACK BAR
+   ============================================ */
+.playback-bar {
+  height: var(--playback-h);
+  background: var(--bg-1);
+  border-top: 1px solid var(--border-0);
+  display: flex;
+  align-items: flex-end;
+  padding: 0 10px 10px;
+  gap: 10px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.playback-bar .btn-icon { width: 32px; height: 32px; flex-shrink: 0; }
+
+/* ============================================
+   CUSTOM TIMELINE
+   ============================================ */
+.timeline-container {
+  flex: 1;
+  position: relative;
+  height: 100%;
+}
+
+/* --- Track --- */
+.timeline-track {
+  position: absolute;
+  left: 0; right: 0; bottom: 5px;
+  height: 4px;
+  background: var(--border-0);
+  border-radius: 2px;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.track-zone {
+  position: absolute;
+  top: 0; bottom: 0;
+  border-radius: 2px;
+  pointer-events: none;
+  transition: opacity 0.1s;
+}
+.track-zone-in {
+  left: 0;
+  background: linear-gradient(to right, var(--flag-in-dim), var(--flag-in-dim));
+}
+.track-zone-out {
+  right: 0;
+  background: linear-gradient(to right, var(--flag-out-dim), var(--flag-out-dim));
+}
+.track-zone-active {
+  background: rgba(255,255,255,0.06);
+}
+
+/* --- Playhead --- */
+.track-playhead {
+  position: absolute;
+  top: -6px; bottom: -2px;
+  width: 2px;
+  background: var(--text-0);
+  border-radius: 1px;
+  z-index: 4;
+  pointer-events: none;
+  transform: translateX(-1px);
+}
+.track-playhead::after {
+  content: '';
+  position: absolute;
+  top: -2px; left: 50%;
+  transform: translateX(-50%);
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--text-0);
+  pointer-events: all;
+  cursor: ew-resize;
+  box-shadow: 0 0 4px rgba(0,0,0,0.5);
+  transition: transform 0.1s;
+}
+.track-playhead:hover::after,
+.track-playhead.dragging::after {
+  transform: translateX(-50%) scale(1.3);
+}
+
+/* --- Flags --- */
+.timeline-flag {
+  position: absolute;
+  bottom: 11px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: ew-resize;
+  z-index: 5;
+  user-select: none;
+  transform: translateX(-50%);
+}
+.timeline-flag:hover .flag-tag,
+.timeline-flag.dragging .flag-tag {
+  filter: brightness(1.3);
+}
+
+.flag-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  border-radius: 2px;
+  white-space: nowrap;
+  transition: filter var(--transition);
+}
+.flag-in .flag-tag { background: var(--flag-in-dim); color: var(--flag-in); }
+.flag-out .flag-tag { background: var(--flag-out-dim); color: var(--flag-out); }
+
+.flag-stem {
+  width: 1px;
+  height: 7px;
+}
+.flag-in .flag-stem { background: var(--flag-in); opacity: 0.45; }
+.flag-out .flag-stem { background: var(--flag-out); opacity: 0.45; }
+
+.flag-tooltip {
+  position: absolute;
+  top: -20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-0);
+  background: var(--bg-4);
+  border: 1px solid var(--border-1);
+  padding: 1px 5px;
+  border-radius: 3px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s;
+  z-index: 10;
+}
+.timeline-flag:hover .flag-tooltip,
+.timeline-flag.dragging .flag-tooltip {
+  opacity: 1;
+}
+
+/* ============================================
+   TIME INFO & DURATION POPOVER
+   ============================================ */
+.time-info {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  height: 32px;
+}
+
+.time-current { color: var(--text-1); min-width: 38px; text-align: right; }
+.time-sep { color: var(--text-2); margin: 0 1px; }
+
+.duration-wrap { position: relative; }
+
+.time-duration {
+  background: none; border: 1px solid transparent;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: var(--text-2); cursor: pointer;
+  padding: 2px 5px; border-radius: 3px;
+  transition: all var(--transition);
+}
+.time-duration:hover {
+  color: var(--text-0);
+  background: var(--bg-3);
+  border-color: var(--border-0);
+}
+.time-duration.active {
+  color: var(--accent);
+  background: var(--bg-3);
+  border-color: var(--accent-dim);
+}
+
+.duration-popover {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  width: 200px;
+  background: var(--bg-2);
+  border: 1px solid var(--border-1);
+  border-radius: var(--radius-m);
+  padding: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  z-index: 50;
+}
+.duration-popover.open { display: block; }
+
+/* ============================================
+   TOAST NOTIFICATION
+   ============================================ */
+.toast {
+  position: fixed; bottom: -50px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-3); border: 1px solid var(--border-1); color: var(--text-0);
+  padding: 8px 18px; border-radius: var(--radius-m); font-size: 12px; font-weight: 500;
+  z-index: 100; transition: bottom 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5); pointer-events: none;
+}
+.toast.show { bottom: 20px; }
+
+/* ============================================
+   PROGRESS MODAL
+   ============================================ */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.65); backdrop-filter: blur(4px);
+  z-index: 200; align-items: center; justify-content: center;
+}
+.modal-overlay.active { display: flex; }
+
+.modal-spinner {
+  width: 36px; height: 36px;
+  border: 3px solid var(--border-1); border-top-color: var(--accent);
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- ============================================
+     TOOLBAR
+     ============================================ -->
+<header class="toolbar">
+  <div class="toolbar-brand">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+      <rect x="2" y="2" width="16" height="16" rx="3"/>
+      <path d="M2 14l5-5 3 3 4-6 4 4"/>
+    </svg>
+    <span>Gradient Mapping</span>
+  </div>
+  <div class="toolbar-actions">
+    <button class="btn btn-secondary" id="loadGif">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+        <path d="M8 10V2M8 2l3 3M8 2L5 5"/>
+        <path d="M2 10v3a1 1 0 001 1h10a1 1 0 001-1v-3"/>
+      </svg>
+      Load GIF
+    </button>
+    <button class="btn btn-accent" id="copyShader">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="5" width="9" height="9" rx="1.5"/>
+        <path d="M11 5V3.5A1.5 1.5 0 009.5 2h-6A1.5 1.5 0 002 3.5v6A1.5 1.5 0 003.5 11H5"/>
+      </svg>
+      Copy Shader
+    </button>
+  </div>
+</header>
+
+<!-- ============================================
+     WORKSPACE
+     ============================================ -->
+<main class="workspace">
+
+  <!-- LEFT PANEL: Gradient Ramp -->
+  <aside class="panel panel-left">
+    <div class="panel-header">
+      <h2>Gradient Ramp</h2>
+      <div class="panel-header-actions">
+        <button class="btn-icon" title="Import texture" data-import="gradient">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M8 10V2M8 2l3 3M8 2L5 5"/>
+            <path d="M2 10v3a1 1 0 001 1h10a1 1 0 001-1v-3"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="effect-stack" id="gradientStack">
+      <div class="effect-item" data-expanded="true">
+        <div class="effect-header">
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span></label>
+          <span class="effect-name">Color Balance</span>
+          <span class="effect-chevron"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 4.5l3 3 3-3"/></svg></span>
+          <button class="btn-icon effect-remove" title="Remove"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 3l6 6M9 3l-6 6"/></svg></button>
+        </div>
+        <div class="effect-body">
+          <div class="param"><div class="param-label"><label>Shadows</label><span class="param-value">0.00</span></div><input type="range" min="-1" max="1" step="0.01" value="0"></div>
+          <div class="param"><div class="param-label"><label>Midtones</label><span class="param-value">0.12</span></div><input type="range" min="-1" max="1" step="0.01" value="0.12"></div>
+          <div class="param"><div class="param-label"><label>Highlights</label><span class="param-value">-0.05</span></div><input type="range" min="-1" max="1" step="0.01" value="-0.05"></div>
+        </div>
+      </div>
+
+      <div class="effect-item" data-expanded="false">
+        <div class="effect-header">
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span></label>
+          <span class="effect-name">Brightness / Contrast</span>
+          <span class="effect-chevron"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 4.5l3 3 3-3"/></svg></span>
+          <button class="btn-icon effect-remove" title="Remove"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 3l6 6M9 3l-6 6"/></svg></button>
+        </div>
+        <div class="effect-body">
+          <div class="param"><div class="param-label"><label>Brightness</label><span class="param-value">0.00</span></div><input type="range" min="-1" max="1" step="0.01" value="0"></div>
+          <div class="param"><div class="param-label"><label>Contrast</label><span class="param-value">0.00</span></div><input type="range" min="-1" max="1" step="0.01" value="0"></div>
+        </div>
+      </div>
+
+      <div class="add-effect-wrap">
+        <div class="add-effect-menu" id="gradientEffectMenu">
+          <button data-effect="colorBalance">Color Balance</button>
+          <button data-effect="brightnessContrast">Brightness / Contrast</button>
+          <button data-effect="hueShift">Hue Shift</button>
+          <button data-effect="posterize">Posterize</button>
+        </div>
+        <button class="add-effect-btn" data-menu="gradientEffectMenu">+ Add Effect</button>
+      </div>
+    </div>
+
+    <div class="panel-preview">
+      <div class="preview-image" id="gradientPreview" data-drop="gradient">
+        <div class="preview-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="2"/><path d="M3 16l5-4 3 3 4-5 6 5v3a3 3 0 01-3 3H6a3 3 0 01-3-3z"/></svg>
+          <div>2D gradient ramp</div>
+        </div>
+        <div class="preview-actions">
+          <button class="btn-icon" title="Download texture"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 2v8M8 10l3-3M8 10L5 7"/><path d="M2 12v1a1 1 0 001 1h10a1 1 0 001-1v-1"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CENTER: Viewport -->
+  <section class="viewport-wrap">
+    <div class="viewport" id="viewport">
+      <div class="viewport-badge">WebGL</div>
+      <canvas id="glCanvas"></canvas>
+    </div>
+
+    <div class="playback-bar">
+      <button class="btn-icon" id="playPause" title="Play">
+        <svg viewBox="0 0 16 16" fill="currentColor" id="playIcon"><path d="M4 2.5v11l9-5.5z"/></svg>
+        <svg viewBox="0 0 16 16" fill="currentColor" id="pauseIcon" style="display:none"><rect x="3" y="2" width="3.5" height="12" rx="1"/><rect x="9.5" y="2" width="3.5" height="12" rx="1"/></svg>
+      </button>
+
+      <div class="timeline-container" id="timelineContainer">
+        <!-- Flags -->
+        <div class="timeline-flag flag-in" id="flagIn" style="left:25%">
+          <div class="flag-tooltip" id="flagInTip">0.50s</div>
+          <div class="flag-tag">In</div>
+          <div class="flag-stem"></div>
+        </div>
+        <div class="timeline-flag flag-out" id="flagOut" style="left:75%">
+          <div class="flag-tooltip" id="flagOutTip">0.50s</div>
+          <div class="flag-tag">Out</div>
+          <div class="flag-stem"></div>
+        </div>
+
+        <!-- Track -->
+        <div class="timeline-track" id="timelineTrack">
+          <div class="track-zone track-zone-in" id="zoneIn"></div>
+          <div class="track-zone track-zone-active" id="zoneActive"></div>
+          <div class="track-zone track-zone-out" id="zoneOut"></div>
+          <div class="track-playhead" id="playhead" style="left:0%"></div>
+        </div>
+      </div>
+
+      <div class="time-info">
+        <span class="time-current" id="timeCurrent">0.00</span>
+        <span class="time-sep">/</span>
+        <div class="duration-wrap">
+          <button class="time-duration" id="durationBtn">2.00s</button>
+          <div class="duration-popover" id="durationPopover">
+            <div class="param">
+              <div class="param-label">
+                <label>Duration (s)</label>
+                <span class="param-value" id="durationVal">2.00</span>
+              </div>
+              <input type="range" id="durationSlider" min="0.5" max="30" step="0.1" value="2.0">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RIGHT PANEL: Erosion Texture -->
+  <aside class="panel panel-right">
+    <div class="panel-header">
+      <h2>Erosion Texture</h2>
+      <div class="panel-header-actions">
+        <button class="btn-icon" title="Import texture" data-import="erosion">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M8 10V2M8 2l3 3M8 2L5 5"/>
+            <path d="M2 10v3a1 1 0 001 1h10a1 1 0 001-1v-3"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="effect-stack" id="erosionStack">
+      <div class="effect-item" data-expanded="true">
+        <div class="effect-header">
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span></label>
+          <span class="effect-name">Smart Blur</span>
+          <span class="effect-chevron"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 4.5l3 3 3-3"/></svg></span>
+          <button class="btn-icon effect-remove" title="Remove"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 3l6 6M9 3l-6 6"/></svg></button>
+        </div>
+        <div class="effect-body">
+          <div class="param"><div class="param-label"><label>Iterations</label><span class="param-value">200</span></div><input type="range" min="1" max="500" step="1" value="200"></div>
+          <div class="param"><div class="param-label"><label>Threshold</label><span class="param-value">0.010</span></div><input type="range" min="0.001" max="1" step="0.001" value="0.01"></div>
+        </div>
+      </div>
+
+      <div class="effect-item" data-expanded="false">
+        <div class="effect-header">
+          <label class="toggle"><input type="checkbox"><span class="toggle-track"></span></label>
+          <span class="effect-name">Edge Detect</span>
+          <span class="effect-chevron"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 4.5l3 3 3-3"/></svg></span>
+          <button class="btn-icon effect-remove" title="Remove"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 3l6 6M9 3l-6 6"/></svg></button>
+        </div>
+        <div class="effect-body">
+          <div class="param"><div class="param-label"><label>Strength</label><span class="param-value">0.50</span></div><input type="range" min="0" max="1" step="0.01" value="0.5"></div>
+        </div>
+      </div>
+
+      <div class="add-effect-wrap">
+        <div class="add-effect-menu" id="erosionEffectMenu">
+          <button data-effect="smartBlur">Smart Blur</button>
+          <button data-effect="fluidInterp">Fluid Interpolation</button>
+          <button data-effect="edgeDetect">Edge Detect</button>
+          <button data-effect="threshold">Threshold</button>
+          <button data-effect="levels">Levels</button>
+        </div>
+        <button class="add-effect-btn" data-menu="erosionEffectMenu">+ Add Effect</button>
+      </div>
+    </div>
+
+    <div class="panel-preview">
+      <div class="preview-image" id="erosionPreview" data-drop="erosion">
+        <div class="preview-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 12h18M12 3v18"/><path d="M3 3l18 18" opacity="0.4"/></svg>
+          <div>Erosion texture</div>
+        </div>
+        <div class="preview-actions">
+          <button class="btn-icon" title="Download texture"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 2v8M8 10l3-3M8 10L5 7"/><path d="M2 12v1a1 1 0 001 1h10a1 1 0 001-1v-1"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="progressModal">
+  <div class="modal-spinner"></div>
+</div>
+
+<!-- ============================================
+     JAVASCRIPT
+     ============================================ -->
+<script>
+(function() {
+  'use strict';
+
+  // --- DOM refs ---
+  const playPause = document.getElementById('playPause');
+  const playIcon = document.getElementById('playIcon');
+  const pauseIcon = document.getElementById('pauseIcon');
+  const copyShader = document.getElementById('copyShader');
+  const toast = document.getElementById('toast');
+
+  // Timeline elements
+  const timelineContainer = document.getElementById('timelineContainer');
+  const timelineTrack = document.getElementById('timelineTrack');
+  const playhead = document.getElementById('playhead');
+  const flagIn = document.getElementById('flagIn');
+  const flagOut = document.getElementById('flagOut');
+  const flagInTip = document.getElementById('flagInTip');
+  const flagOutTip = document.getElementById('flagOutTip');
+  const zoneIn = document.getElementById('zoneIn');
+  const zoneActive = document.getElementById('zoneActive');
+  const zoneOut = document.getElementById('zoneOut');
+
+  // Time display
+  const timeCurrent = document.getElementById('timeCurrent');
+  const durationBtn = document.getElementById('durationBtn');
+  const durationPopover = document.getElementById('durationPopover');
+  const durationSlider = document.getElementById('durationSlider');
+  const durationVal = document.getElementById('durationVal');
+
+  // --- State ---
+  let duration = 2.0;      // total animation duration (seconds)
+  let fadeInPct = 0.25;     // fade-in ends at this fraction of timeline
+  let fadeOutPct = 0.25;    // fade-out occupies this fraction from the right
+  let time = 0;             // current playback time (seconds)
+  let isPlaying = false;
+  let lastTimestamp = null;
+  let animFrameId = null;
+
+  // Derived values
+  function fadeInSeconds() { return fadeInPct * duration; }
+  function fadeOutSeconds() { return fadeOutPct * duration; }
+  function fadeOutFlagPct() { return 1 - fadeOutPct; }  // position from left
+  function timePct() { return duration > 0 ? time / duration : 0; }
+
+  // --- Render timeline visuals ---
+  function renderTimeline() {
+    const inP = fadeInPct * 100;
+    const outP = fadeOutFlagPct() * 100;
+
+    // Position flags
+    flagIn.style.left = inP + '%';
+    flagOut.style.left = outP + '%';
+
+    // Update tooltips
+    flagInTip.textContent = fadeInSeconds().toFixed(2) + 's';
+    flagOutTip.textContent = fadeOutSeconds().toFixed(2) + 's';
+
+    // Update zones
+    const lo = Math.min(inP, outP);
+    const hi = Math.max(inP, outP);
+
+    zoneIn.style.left = '0';
+    zoneIn.style.width = inP + '%';
+
+    zoneOut.style.right = '0';
+    zoneOut.style.width = (100 - outP) + '%';
+
+    // Active zone fills between the two flags (or collapses if crossed)
+    if (outP > inP) {
+      zoneActive.style.left = inP + '%';
+      zoneActive.style.width = (outP - inP) + '%';
+      zoneActive.style.display = '';
+    } else {
+      zoneActive.style.display = 'none';
+    }
+
+    // Playhead position
+    playhead.style.left = (timePct() * 100) + '%';
+
+    // Time display
+    timeCurrent.textContent = time.toFixed(2);
+    durationBtn.textContent = duration.toFixed(2) + 's';
+  }
+
+  // --- Flag dragging ---
+  let dragging = null; // 'flagIn', 'flagOut', or 'playhead'
+
+  function getTrackPct(clientX) {
+    const rect = timelineTrack.getBoundingClientRect();
+    return Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+  }
+
+  flagIn.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    dragging = 'flagIn';
+    flagIn.classList.add('dragging');
+  });
+
+  flagOut.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    dragging = 'flagOut';
+    flagOut.classList.add('dragging');
+  });
+
+  playhead.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragging = 'playhead';
+    playhead.classList.add('dragging');
+  });
+
+  // Click on track = seek
+  timelineTrack.addEventListener('mousedown', (e) => {
+    if (e.target.closest('.timeline-flag') || e.target.closest('.track-playhead')) return;
+    const pct = getTrackPct(e.clientX);
+    time = pct * duration;
+    dragging = 'playhead';
+    playhead.classList.add('dragging');
+    renderTimeline();
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    const pct = getTrackPct(e.clientX);
+
+    if (dragging === 'flagIn') {
+      fadeInPct = pct;
+    } else if (dragging === 'flagOut') {
+      fadeOutPct = 1 - pct;
+    } else if (dragging === 'playhead') {
+      time = pct * duration;
+    }
+
+    renderTimeline();
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (dragging) {
+      flagIn.classList.remove('dragging');
+      flagOut.classList.remove('dragging');
+      playhead.classList.remove('dragging');
+      dragging = null;
+    }
+  });
+
+  // --- Play / Pause ---
+  playPause.addEventListener('click', () => {
+    isPlaying = !isPlaying;
+    playIcon.style.display = isPlaying ? 'none' : '';
+    pauseIcon.style.display = isPlaying ? '' : 'none';
+    playPause.title = isPlaying ? 'Pause' : 'Play';
+    if (isPlaying) {
+      lastTimestamp = null;
+      animFrameId = requestAnimationFrame(tick);
+    } else if (animFrameId) {
+      cancelAnimationFrame(animFrameId);
+      animFrameId = null;
+    }
+  });
+
+  function tick(ts) {
+    if (!lastTimestamp) lastTimestamp = ts;
+    const dt = (ts - lastTimestamp) / 1000;
+    lastTimestamp = ts;
+    time += dt;
+    if (duration > 0) time = time % duration;
+    renderTimeline();
+    if (isPlaying) animFrameId = requestAnimationFrame(tick);
+  }
+
+  // --- Duration popover ---
+  durationBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = durationPopover.classList.contains('open');
+    durationPopover.classList.toggle('open');
+    durationBtn.classList.toggle('active');
+    if (!isOpen) durationSlider.focus();
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!durationPopover.contains(e.target) && e.target !== durationBtn) {
+      durationPopover.classList.remove('open');
+      durationBtn.classList.remove('active');
+    }
+  });
+  durationPopover.addEventListener('click', (e) => e.stopPropagation());
+
+  durationSlider.addEventListener('input', () => {
+    duration = parseFloat(durationSlider.value);
+    durationVal.textContent = duration.toFixed(2);
+    if (time > duration) time = 0;
+    renderTimeline();
+  });
+
+  // --- Effect collapse/expand ---
+  document.querySelectorAll('.effect-header').forEach(header => {
+    header.addEventListener('click', (e) => {
+      if (e.target.closest('.toggle') || e.target.closest('.effect-remove')) return;
+      const item = header.closest('.effect-item');
+      const expanded = item.getAttribute('data-expanded') === 'true';
+      item.setAttribute('data-expanded', !expanded);
+    });
+  });
+
+  // --- Remove effect ---
+  document.querySelectorAll('.effect-remove').forEach(btn => {
+    btn.addEventListener('click', () => btn.closest('.effect-item').remove());
+  });
+
+  // --- Add effect menus ---
+  document.querySelectorAll('.add-effect-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const menuId = btn.getAttribute('data-menu');
+      const menu = document.getElementById(menuId);
+      const wasOpen = menu.classList.contains('open');
+      document.querySelectorAll('.add-effect-menu').forEach(m => m.classList.remove('open'));
+      if (!wasOpen) menu.classList.add('open');
+    });
+  });
+
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.add-effect-menu').forEach(m => m.classList.remove('open'));
+  });
+
+  document.querySelectorAll('.add-effect-menu button').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const effectName = btn.textContent.trim();
+      const menu = btn.closest('.add-effect-menu');
+      const stack = menu.closest('.effect-stack');
+      const wrap = menu.closest('.add-effect-wrap');
+      menu.classList.remove('open');
+
+      const item = document.createElement('div');
+      item.className = 'effect-item';
+      item.setAttribute('data-expanded', 'true');
+      item.innerHTML = `
+        <div class="effect-header">
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span></label>
+          <span class="effect-name">${effectName}</span>
+          <span class="effect-chevron"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 4.5l3 3 3-3"/></svg></span>
+          <button class="btn-icon effect-remove" title="Remove"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 3l6 6M9 3l-6 6"/></svg></button>
+        </div>
+        <div class="effect-body">
+          <div class="param"><div class="param-label"><label>Amount</label><span class="param-value">0.50</span></div><input type="range" min="0" max="1" step="0.01" value="0.5"></div>
+        </div>`;
+      stack.insertBefore(item, wrap);
+
+      const hdr = item.querySelector('.effect-header');
+      hdr.addEventListener('click', (ev) => {
+        if (ev.target.closest('.toggle') || ev.target.closest('.effect-remove')) return;
+        item.setAttribute('data-expanded', item.getAttribute('data-expanded') !== 'true');
+      });
+      item.querySelector('.effect-remove').addEventListener('click', () => item.remove());
+      const sl = item.querySelector('input[type="range"]');
+      const vl = item.querySelector('.param-value');
+      sl.addEventListener('input', () => { vl.textContent = parseFloat(sl.value).toFixed(2); });
+    });
+  });
+
+  // --- Param slider displays ---
+  document.querySelectorAll('.effect-body .param').forEach(param => {
+    const slider = param.querySelector('input[type="range"]');
+    const display = param.querySelector('.param-value');
+    if (slider && display) {
+      slider.addEventListener('input', () => {
+        const v = parseFloat(slider.value);
+        display.textContent = Math.abs(v) < 0.1 ? v.toFixed(3) : Math.abs(v) < 10 ? v.toFixed(2) : v.toFixed(0);
+      });
+    }
+  });
+
+  // --- Copy Shader ---
+  copyShader.addEventListener('click', () => {
+    const shaderCode = `#version 300 es
+precision mediump float;
+uniform sampler2D u_erosionTexture;
+uniform sampler2D u_gradient;
+uniform float u_fadeInDuration;
+uniform float u_fadeOutDuration;
+uniform float u_animationDuration;
+uniform float u_time;
+
+#define u_fadeOutStart (u_animationDuration - u_fadeOutDuration)
+
+in vec2 v_texCoord;
+in vec3 f_life;
+out vec4 fragColor;
+
+float unlerp(float a, float b, float v) {
+  return (v - a) / (b - a);
+}
+
+vec4 GetColorADS(vec2 tc) {
+  vec4 e = texture(u_erosionTexture, tc);
+  float kp = u_fadeInDuration * (1.0 - e.r);
+  float kr = u_fadeOutStart + e.g * u_fadeOutDuration;
+  float nt = 1.0 - clamp(unlerp(kp, kr, u_time), 0.0, 1.0);
+  vec4 c = texture(u_gradient, vec2(1.0 - e.r, nt));
+  float fi = clamp((f_life.r - (1.0 - e.r)) * 15.0 * (1.01 - e.b), 0.0, 1.0);
+  float fo = clamp((e.g - f_life.g) * 15.0 * (1.01 - e.b), 0.0, 1.0);
+  return vec4(c.rgb, c.a * fi * fo);
+}
+
+void main() {
+  fragColor = GetColorADS(v_texCoord);
+}`;
+    navigator.clipboard.writeText(shaderCode).then(() => {
+      showToast('Shader code copied');
+    }).catch(() => {
+      showToast('Failed to copy');
+    });
+  });
+
+  // --- Toast ---
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  }
+
+  // --- Preview drag-and-drop ---
+  document.querySelectorAll('.preview-image[data-drop]').forEach(area => {
+    area.addEventListener('dragover', (e) => { e.preventDefault(); area.classList.add('drag-over'); });
+    area.addEventListener('dragleave', () => { area.classList.remove('drag-over'); });
+    area.addEventListener('drop', (e) => {
+      e.preventDefault();
+      area.classList.remove('drag-over');
+      if (e.dataTransfer.files.length > 0 && e.dataTransfer.files[0].type.startsWith('image/'))
+        loadPreviewImage(area, e.dataTransfer.files[0]);
+    });
+    area.addEventListener('click', (e) => {
+      if (e.target.closest('.preview-actions')) return;
+      const input = document.createElement('input');
+      input.type = 'file'; input.accept = 'image/*';
+      input.onchange = ev => { if (ev.target.files[0]) loadPreviewImage(area, ev.target.files[0]); };
+      input.click();
+    });
+  });
+
+  function loadPreviewImage(area, file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      area.style.backgroundImage = `url(${e.target.result})`;
+      area.style.backgroundSize = 'contain';
+      area.style.backgroundRepeat = 'no-repeat';
+      area.style.backgroundPosition = 'center';
+      const ph = area.querySelector('.preview-placeholder');
+      if (ph) ph.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  document.querySelectorAll('[data-import]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const type = btn.getAttribute('data-import');
+      const area = document.getElementById(type === 'gradient' ? 'gradientPreview' : 'erosionPreview');
+      const input = document.createElement('input');
+      input.type = 'file'; input.accept = 'image/*';
+      input.onchange = ev => { if (ev.target.files[0]) loadPreviewImage(area, ev.target.files[0]); };
+      input.click();
+    });
+  });
+
+  // --- Init ---
+  renderTimeline();
+
+})();
+</script>
+</body>
+</html>

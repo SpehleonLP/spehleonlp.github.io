@@ -1,7 +1,6 @@
 # Image formats
 *.jpg
 *.jpeg
-*.png
 *.gif
 *.bmp
 *.tiff
@@ -35,4 +34,10 @@
 # dataset/
 # images/
 # videos/
-reference/
+erosion/reference/
+erosion-old/
+gradient-mapping/reference/
+gradient-mapping/debug_output/
+gradient-mapping/src/build/
+gradient-mapping/src/build_cli/
+gradient-mapping/src/.qtcreator/

@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include "create_envelopes.h"
 #include "create_gradient.h"
+#include "gif_decoder.h"
 
 struct Video
 {
@@ -31,6 +32,7 @@ static struct Metadata metadata;
 
 
 int max_i32(int, int);
+int next_pow2(int n);
 
 ImageData * MakeImage(int width, int height, int depth)
 {
@@ -178,12 +180,75 @@ void push_frame(uint8_t* data, uint32_t byteLength) {
 		video->allocated = size;
 	}
 
-	video->frames[video->no_frames++] = data;
+	video->frames[video->no_frames] = data;
 
     if(envelopeBuilder)
     {
       	e_ProcessFrame(envelopeBuilder, &img, video->no_frames);
     }
+
+    video->no_frames++;
+}
+
+// Push a GIF file and decode all frames
+// Returns total duration in centiseconds, or -1 on error
+EMSCRIPTEN_KEEPALIVE
+int push_gif(uint8_t* data, uint32_t byteLength) {
+    GifDecoder* decoder = gif_init(data, byteLength);
+    if (!decoder) {
+        fprintf(stderr, "push_gif: failed to initialize GIF decoder\n");
+        return -1;
+    }
+
+    int width = gif_get_width(decoder);
+    int height = gif_get_height(decoder);
+    int frame_count = gif_get_frame_count(decoder);
+    int total_duration = gif_get_total_duration(decoder);
+
+    printf("push_gif: decoding %d frames (%dx%d), duration=%d cs\n",
+           frame_count, width, height, total_duration);
+
+    // Initialize processor if not already done
+    if (envelopeBuilder == NULL || video == NULL) {
+        initialize(width, height);
+    }
+
+    // Allocate frame buffer for decoding
+    uint32_t frame_size = width * height * 4;
+    uint8_t* frame_buffer = (uint8_t*)malloc(frame_size);
+    if (!frame_buffer) {
+        fprintf(stderr, "push_gif: failed to allocate frame buffer\n");
+        gif_free(decoder);
+        return -1;
+    }
+
+    // Decode and process each frame
+    int delay;
+    int frames_decoded = 0;
+    while (gif_decode_next_frame(decoder, frame_buffer, &delay)) {
+        // Allocate memory for this frame (will be stored in video->frames)
+        uint8_t* frame_copy = (uint8_t*)malloc(frame_size);
+        if (!frame_copy) {
+            fprintf(stderr, "push_gif: failed to allocate frame copy\n");
+            break;
+        }
+        memcpy(frame_copy, frame_buffer, frame_size);
+
+        // Push the frame using existing infrastructure
+        push_frame(frame_copy, frame_size);
+        frames_decoded++;
+    }
+
+    printf("push_gif: decoded %d frames\n", frames_decoded);
+
+    // Clean up
+    free(frame_buffer);
+    gif_free(decoder);
+
+    // Free the original GIF data since we've decoded it
+    free(data);
+
+    return total_duration/10;
 }
 
 EMSCRIPTEN_KEEPALIVE

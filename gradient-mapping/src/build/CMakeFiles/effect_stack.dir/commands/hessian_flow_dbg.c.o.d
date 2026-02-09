@@ -17,9 +17,13 @@ CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.c.o: \
   /usr/share/emscripten/cache/sysroot/include/emscripten/em_js.h \
   /usr/share/emscripten/cache/sysroot/include/emscripten/wget.h \
   /usr/share/emscripten/cache/sysroot/include/emscripten/version.h \
+  /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/laminarize_cmd.h \
+  /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/lic_stylize_cmd.h \
   /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/split_normals_cmd.h \
   /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/constrained_poisson_cmd.h \
   /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/debug_png.h \
+  /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/../utility.h \
+  /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/effect_stack_api.h \
   /usr/share/emscripten/cache/sysroot/include/compat/stdlib.h \
   /usr/share/emscripten/cache/sysroot/include/stdlib.h \
   /usr/share/emscripten/cache/sysroot/include/alloca.h \

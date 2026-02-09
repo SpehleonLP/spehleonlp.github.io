@@ -100,8 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const fadeInValue = document.getElementById('fadeInDurationValue');
     const fadeOutSlider = document.getElementById('fadeOutDuration');
     const fadeOutValue = document.getElementById('fadeOutDurationValue');
-    const transitionSlider = document.getElementById('transitionDuration');
-    const transitionValue = document.getElementById('transitionDurationValue');
     const lifetimeSlider = document.getElementById('lifetime');
     const lifetimeValue = document.getElementById('lifetimeValue');
     const rateSlider = document.getElementById('rate');
@@ -140,7 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
             u_gradient: gl.getUniformLocation(shaderProgram, 'u_gradient'),
             u_fadeInDuration: gl.getUniformLocation(shaderProgram, 'u_fadeInDuration'),
             u_fadeOutDuration: gl.getUniformLocation(shaderProgram, 'u_fadeOutDuration'),
-            u_transitionDuration: gl.getUniformLocation(shaderProgram, 'u_transitionDuration'),
             u_animationDuration: gl.getUniformLocation(shaderProgram, 'u_animationDuration'),
             u_time: gl.getUniformLocation(shaderProgram, 'u_time'),
         };
@@ -185,7 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // Get slider values
             const fadeInDuration = parseFloat(fadeInSlider.value);
             const fadeOutDuration = parseFloat(fadeOutSlider.value);
-            const transitionDuration = parseFloat(transitionSlider.value);
             const animationDuration = parseFloat(lifetimeSlider.value);
 
             // Update uniforms
@@ -200,7 +196,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             gl.uniform1f(uniformLocations.u_fadeInDuration, fadeInDuration);
             gl.uniform1f(uniformLocations.u_fadeOutDuration, fadeOutDuration);
-            gl.uniform1f(uniformLocations.u_transitionDuration, transitionDuration);
             gl.uniform1f(uniformLocations.u_animationDuration, animationDuration);
             gl.uniform1f(uniformLocations.u_time, time);
 

@@ -1,6 +1,7 @@
 #include <stdint.h>
 
 // Define the ImageData structure
+// make image pads the data so it can hold the next-power-2 up from the given size. 
 typedef struct ImageData {
     uint32_t width;
     uint32_t height;

@@ -1,7 +1,11 @@
 // worker.js
 
 // Import the Emscripten-generated script
-importScripts('video_processor.js');
+// Cache bust: v8
+importScripts('video_processor.js?v=8');
+
+// Import fflate for zipping debug files
+importScripts('https://unpkg.com/fflate@0.8.2/umd/index.js');
 
 // Wrapper class to manage WASM interactions
 class VideoProcessorWorker {
@@ -65,6 +69,7 @@ class VideoProcessorWorker {
 
         this.initialize = this.module.cwrap('initialize', null, ['number', 'number']);
         this.push_frame = this.module.cwrap('push_frame', null, ['number', 'number']);
+        this.push_gif = this.module.cwrap('push_gif', 'number', ['number', 'number']);
         this.finishPushingFrames = this.module.cwrap('finishPushingFrames', 'number', []);
         this.computeGradient = this.module.cwrap('computeGradient', null, []);
         this.get_image = this.module.cwrap('get_image', 'number', ['number']);
@@ -72,6 +77,7 @@ class VideoProcessorWorker {
         this.shutdownAndRelease = this.module.cwrap('shutdownAndRelease', null, []);
 
         console.log("push_frame function bound:", !!this.push_frame);
+        console.log("push_gif function bound:", !!this.push_gif);
         console.log("finishPushingFrames function bound:", !!this.finishPushingFrames);
         console.log("get_image function bound:", !!this.get_image);
         console.log("GetMetadata function bound:", !!this.GetMetadata);
@@ -107,8 +113,37 @@ class VideoProcessorWorker {
 	//	this.module._free(ptr);                    // Free allocated memory
 	}
 
-    finishPushingFrames() {
-        this.finishPushingFrames();
+    // Push a GIF file for decoding in C
+    // Returns { width, height, duration } where duration is in seconds
+    pushGif(gifDataBuffer) {
+        let data;
+        if (gifDataBuffer instanceof ArrayBuffer) {
+            data = new Uint8Array(gifDataBuffer);
+        } else if (gifDataBuffer instanceof Uint8Array) {
+            data = gifDataBuffer;
+        } else {
+            throw new Error('Expected an ArrayBuffer or Uint8Array.');
+        }
+
+        const numBytes = data.length;
+        const ptr = this.module._malloc(numBytes);
+        this.module.HEAPU8.set(data, ptr);
+
+        // push_gif returns duration in centiseconds, or -1 on error
+        const durationCs = this.push_gif(ptr, numBytes);
+        // Note: push_gif frees the data internally after decoding
+
+        if (durationCs < 0) {
+            throw new Error('Failed to decode GIF');
+        }
+
+        // Get dimensions from the erosion image (initialized by push_gif)
+        const imagePtr = this.get_image(0);
+        const width = this.module.getValue(imagePtr, 'i32');
+        const height = this.module.getValue(imagePtr + 4, 'i32');
+
+        const duration = durationCs / 100.0;  // Convert centiseconds to seconds
+        return { width, height, duration };
     }
 
     FetchMetadata() {
@@ -157,6 +192,48 @@ class VideoProcessorWorker {
     }
 }
 
+// Collect all debug files from WASM virtual filesystem and zip them
+function collectDebugFilesAsZip(module) {
+    const skipDirs = new Set(['dev', 'tmp', 'home', 'proc', '.', '..']);
+    const files = {};
+
+    try {
+        const entries = module.FS.readdir('/');
+
+        for (const name of entries) {
+            if (skipDirs.has(name)) continue;
+
+            try {
+                const stat = module.FS.stat('/' + name);
+                if (module.FS.isFile(stat.mode)) {
+                    const data = module.FS.readFile('/' + name);
+                    files[name] = data;
+                    module.FS.unlink('/' + name);  // cleanup
+                    console.log(`Collected debug file: ${name} (${data.length} bytes)`);
+                }
+            } catch (e) {
+                // Not a file or can't read, skip
+            }
+        }
+    } catch (e) {
+        console.log('Error enumerating VFS:', e);
+        return null;
+    }
+
+    const fileNames = Object.keys(files);
+    if (fileNames.length === 0) {
+        return null;
+    }
+
+    console.log(`Zipping ${fileNames.length} debug files...`);
+
+    // Use fflate to create zip
+    const zipData = fflate.zipSync(files);
+    console.log(`Created debug.zip (${zipData.length} bytes)`);
+
+    return zipData;
+}
+
 // Instantiate the processor
 const processor = new VideoProcessorWorker();
 
@@ -181,6 +258,12 @@ self.onmessage = function(e) {
                 processor.pushFrame(data.frameData);
                 self.postMessage({ id, type: 'framePushed' });
                 break;
+            case 'pushGif':
+            {
+                // Decode GIF entirely in C
+                const result = processor.pushGif(data.gifData);
+                self.postMessage({ id, type: 'gifPushed', data: result });
+            }   break;
             case 'finishPass':
                 processor.finishPass();
                 self.postMessage({ id, type: 'passFinished' });
@@ -191,7 +274,10 @@ self.onmessage = function(e) {
                 const erosionPtr = processor.get_image(0);
        		 	const erosion = processor.extractImageData(erosionPtr);
 
-                self.postMessage({ id, type: 'finished', data: erosion });
+                // Collect all debug files from WASM virtual filesystem and zip them
+                const debugZip = collectDebugFilesAsZip(processor.module);
+
+                self.postMessage({ id, type: 'finished', data: { erosion, debugZip } });
             }   break;
             case 'computeGradient':
             {

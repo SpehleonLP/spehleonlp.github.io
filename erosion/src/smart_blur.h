@@ -1,31 +1,31 @@
 #ifndef SMART_BLUR_H
 #define SMART_BLUR_H
 
+#include <stdint.h>
+
 // Smart blur context - diffuses values while respecting per-pixel constraints
+// Input is int16_t (-1 = transparent/no envelope), output is float
+// Constraints: min = input - 1, max = input
 typedef struct {
     int width;
     int height;
-    float* values;      // Current values
-    float* min_values;  // Minimum allowed value per pixel (error bar lower bound)
-    float* max_values;  // Maximum allowed value per pixel (error bar upper bound)
-    float* temp_values; // Temporary buffer for iteration
+    int16_t* input;     // Original input values (int16_t, -1 = transparent)
+    float* output;      // Current output values (float)
+    float* temp;        // Temporary buffer for iteration
 } SmartBlurContext;
 
 // Initialize smart blur context
 SmartBlurContext* sb_Initialize(int width, int height);
+void sb_Setup(SmartBlurContext*);
 
-// Set constraints for a pixel (min/max from error bars, initial value)
-void sb_SetConstraints(SmartBlurContext* ctx, int x, int y, float min_val, float max_val, float initial_val);
-
-// Perform one iteration of constrained blur
-// Returns the maximum change across all pixels
-float sb_Iterate(SmartBlurContext* ctx);
+// Set input value for a pixel (-1 = transparent/no envelope)
+void sb_SetValue(SmartBlurContext* ctx, int x, int y, int16_t val);
 
 // Run blur until convergence
 // Returns number of iterations performed
 int sb_RunUntilConverged(SmartBlurContext* ctx, float convergence_threshold, int max_iterations);
 
-// Get the value at a pixel
+// Get the output value at a pixel
 float sb_GetValue(SmartBlurContext* ctx, int x, int y);
 
 // Cleanup

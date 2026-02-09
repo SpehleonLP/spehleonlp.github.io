@@ -17,9 +17,6 @@ CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.c.o: \
   /usr/share/emscripten/cache/sysroot/include/emscripten/em_js.h \
   /usr/share/emscripten/cache/sysroot/include/emscripten/wget.h \
   /usr/share/emscripten/cache/sysroot/include/emscripten/version.h \
-  /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/fft_blur.h \
-  /usr/lib/llvm-15/lib/clang/15.0.7/include/float.h \
-  /usr/share/emscripten/cache/sysroot/include/float.h \
   /usr/share/emscripten/cache/sysroot/include/compat/stdlib.h \
   /usr/share/emscripten/cache/sysroot/include/stdlib.h \
   /usr/share/emscripten/cache/sysroot/include/alloca.h \

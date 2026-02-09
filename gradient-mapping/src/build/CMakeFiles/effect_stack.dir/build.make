@@ -69,424 +69,492 @@ include CMakeFiles/effect_stack.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/effect_stack.dir/flags.make
 
-CMakeFiles/effect_stack.dir/effect_stack_api.c.o: CMakeFiles/effect_stack.dir/flags.make
-CMakeFiles/effect_stack.dir/effect_stack_api.c.o: CMakeFiles/effect_stack.dir/includes_C.rsp
-CMakeFiles/effect_stack.dir/effect_stack_api.c.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/effect_stack_api.c
-CMakeFiles/effect_stack.dir/effect_stack_api.c.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/effect_stack.dir/effect_stack_api.c.o"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/effect_stack_api.c.o -MF CMakeFiles/effect_stack.dir/effect_stack_api.c.o.d -o CMakeFiles/effect_stack.dir/effect_stack_api.c.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/effect_stack_api.c
-
-CMakeFiles/effect_stack.dir/effect_stack_api.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/effect_stack.dir/effect_stack_api.c.i"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/effect_stack_api.c > CMakeFiles/effect_stack.dir/effect_stack_api.c.i
-
-CMakeFiles/effect_stack.dir/effect_stack_api.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/effect_stack.dir/effect_stack_api.c.s"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/effect_stack_api.c -o CMakeFiles/effect_stack.dir/effect_stack_api.c.s
-
-CMakeFiles/effect_stack.dir/erosion_pipeline.c.o: CMakeFiles/effect_stack.dir/flags.make
-CMakeFiles/effect_stack.dir/erosion_pipeline.c.o: CMakeFiles/effect_stack.dir/includes_C.rsp
-CMakeFiles/effect_stack.dir/erosion_pipeline.c.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/erosion_pipeline.c
-CMakeFiles/effect_stack.dir/erosion_pipeline.c.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/effect_stack.dir/erosion_pipeline.c.o"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/erosion_pipeline.c.o -MF CMakeFiles/effect_stack.dir/erosion_pipeline.c.o.d -o CMakeFiles/effect_stack.dir/erosion_pipeline.c.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/erosion_pipeline.c
-
-CMakeFiles/effect_stack.dir/erosion_pipeline.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/effect_stack.dir/erosion_pipeline.c.i"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/erosion_pipeline.c > CMakeFiles/effect_stack.dir/erosion_pipeline.c.i
-
-CMakeFiles/effect_stack.dir/erosion_pipeline.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/effect_stack.dir/erosion_pipeline.c.s"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/erosion_pipeline.c -o CMakeFiles/effect_stack.dir/erosion_pipeline.c.s
-
-CMakeFiles/effect_stack.dir/gradient_pipeline.c.o: CMakeFiles/effect_stack.dir/flags.make
-CMakeFiles/effect_stack.dir/gradient_pipeline.c.o: CMakeFiles/effect_stack.dir/includes_C.rsp
-CMakeFiles/effect_stack.dir/gradient_pipeline.c.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/gradient_pipeline.c
-CMakeFiles/effect_stack.dir/gradient_pipeline.c.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/effect_stack.dir/gradient_pipeline.c.o"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/gradient_pipeline.c.o -MF CMakeFiles/effect_stack.dir/gradient_pipeline.c.o.d -o CMakeFiles/effect_stack.dir/gradient_pipeline.c.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/gradient_pipeline.c
-
-CMakeFiles/effect_stack.dir/gradient_pipeline.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/effect_stack.dir/gradient_pipeline.c.i"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/gradient_pipeline.c > CMakeFiles/effect_stack.dir/gradient_pipeline.c.i
-
-CMakeFiles/effect_stack.dir/gradient_pipeline.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/effect_stack.dir/gradient_pipeline.c.s"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/gradient_pipeline.c -o CMakeFiles/effect_stack.dir/gradient_pipeline.c.s
-
-CMakeFiles/effect_stack.dir/utility.c.o: CMakeFiles/effect_stack.dir/flags.make
-CMakeFiles/effect_stack.dir/utility.c.o: CMakeFiles/effect_stack.dir/includes_C.rsp
-CMakeFiles/effect_stack.dir/utility.c.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/utility.c
-CMakeFiles/effect_stack.dir/utility.c.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/effect_stack.dir/utility.c.o"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/utility.c.o -MF CMakeFiles/effect_stack.dir/utility.c.o.d -o CMakeFiles/effect_stack.dir/utility.c.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/utility.c
-
-CMakeFiles/effect_stack.dir/utility.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/effect_stack.dir/utility.c.i"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/utility.c > CMakeFiles/effect_stack.dir/utility.c.i
-
-CMakeFiles/effect_stack.dir/utility.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/effect_stack.dir/utility.c.s"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/utility.c -o CMakeFiles/effect_stack.dir/utility.c.s
-
-CMakeFiles/effect_stack.dir/sources/curl_noise.c.o: CMakeFiles/effect_stack.dir/flags.make
-CMakeFiles/effect_stack.dir/sources/curl_noise.c.o: CMakeFiles/effect_stack.dir/includes_C.rsp
-CMakeFiles/effect_stack.dir/sources/curl_noise.c.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/curl_noise.c
-CMakeFiles/effect_stack.dir/sources/curl_noise.c.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/effect_stack.dir/sources/curl_noise.c.o"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/sources/curl_noise.c.o -MF CMakeFiles/effect_stack.dir/sources/curl_noise.c.o.d -o CMakeFiles/effect_stack.dir/sources/curl_noise.c.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/curl_noise.c
-
-CMakeFiles/effect_stack.dir/sources/curl_noise.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/effect_stack.dir/sources/curl_noise.c.i"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/curl_noise.c > CMakeFiles/effect_stack.dir/sources/curl_noise.c.i
-
-CMakeFiles/effect_stack.dir/sources/curl_noise.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/effect_stack.dir/sources/curl_noise.c.s"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/curl_noise.c -o CMakeFiles/effect_stack.dir/sources/curl_noise.c.s
-
-CMakeFiles/effect_stack.dir/sources/linear_gradient.c.o: CMakeFiles/effect_stack.dir/flags.make
-CMakeFiles/effect_stack.dir/sources/linear_gradient.c.o: CMakeFiles/effect_stack.dir/includes_C.rsp
-CMakeFiles/effect_stack.dir/sources/linear_gradient.c.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/linear_gradient.c
-CMakeFiles/effect_stack.dir/sources/linear_gradient.c.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building C object CMakeFiles/effect_stack.dir/sources/linear_gradient.c.o"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/sources/linear_gradient.c.o -MF CMakeFiles/effect_stack.dir/sources/linear_gradient.c.o.d -o CMakeFiles/effect_stack.dir/sources/linear_gradient.c.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/linear_gradient.c
-
-CMakeFiles/effect_stack.dir/sources/linear_gradient.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/effect_stack.dir/sources/linear_gradient.c.i"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/linear_gradient.c > CMakeFiles/effect_stack.dir/sources/linear_gradient.c.i
-
-CMakeFiles/effect_stack.dir/sources/linear_gradient.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/effect_stack.dir/sources/linear_gradient.c.s"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/linear_gradient.c -o CMakeFiles/effect_stack.dir/sources/linear_gradient.c.s
-
-CMakeFiles/effect_stack.dir/sources/noise.c.o: CMakeFiles/effect_stack.dir/flags.make
-CMakeFiles/effect_stack.dir/sources/noise.c.o: CMakeFiles/effect_stack.dir/includes_C.rsp
-CMakeFiles/effect_stack.dir/sources/noise.c.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/noise.c
-CMakeFiles/effect_stack.dir/sources/noise.c.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building C object CMakeFiles/effect_stack.dir/sources/noise.c.o"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/sources/noise.c.o -MF CMakeFiles/effect_stack.dir/sources/noise.c.o.d -o CMakeFiles/effect_stack.dir/sources/noise.c.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/noise.c
-
-CMakeFiles/effect_stack.dir/sources/noise.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/effect_stack.dir/sources/noise.c.i"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/noise.c > CMakeFiles/effect_stack.dir/sources/noise.c.i
-
-CMakeFiles/effect_stack.dir/sources/noise.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/effect_stack.dir/sources/noise.c.s"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/noise.c -o CMakeFiles/effect_stack.dir/sources/noise.c.s
-
-CMakeFiles/effect_stack.dir/sources/perlin_noise.c.o: CMakeFiles/effect_stack.dir/flags.make
-CMakeFiles/effect_stack.dir/sources/perlin_noise.c.o: CMakeFiles/effect_stack.dir/includes_C.rsp
-CMakeFiles/effect_stack.dir/sources/perlin_noise.c.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/perlin_noise.c
-CMakeFiles/effect_stack.dir/sources/perlin_noise.c.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building C object CMakeFiles/effect_stack.dir/sources/perlin_noise.c.o"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/sources/perlin_noise.c.o -MF CMakeFiles/effect_stack.dir/sources/perlin_noise.c.o.d -o CMakeFiles/effect_stack.dir/sources/perlin_noise.c.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/perlin_noise.c
-
-CMakeFiles/effect_stack.dir/sources/perlin_noise.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/effect_stack.dir/sources/perlin_noise.c.i"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/perlin_noise.c > CMakeFiles/effect_stack.dir/sources/perlin_noise.c.i
-
-CMakeFiles/effect_stack.dir/sources/perlin_noise.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/effect_stack.dir/sources/perlin_noise.c.s"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/perlin_noise.c -o CMakeFiles/effect_stack.dir/sources/perlin_noise.c.s
-
-CMakeFiles/effect_stack.dir/sources/worley_noise.c.o: CMakeFiles/effect_stack.dir/flags.make
-CMakeFiles/effect_stack.dir/sources/worley_noise.c.o: CMakeFiles/effect_stack.dir/includes_C.rsp
-CMakeFiles/effect_stack.dir/sources/worley_noise.c.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/worley_noise.c
-CMakeFiles/effect_stack.dir/sources/worley_noise.c.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building C object CMakeFiles/effect_stack.dir/sources/worley_noise.c.o"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/sources/worley_noise.c.o -MF CMakeFiles/effect_stack.dir/sources/worley_noise.c.o.d -o CMakeFiles/effect_stack.dir/sources/worley_noise.c.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/worley_noise.c
-
-CMakeFiles/effect_stack.dir/sources/worley_noise.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/effect_stack.dir/sources/worley_noise.c.i"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/worley_noise.c > CMakeFiles/effect_stack.dir/sources/worley_noise.c.i
-
-CMakeFiles/effect_stack.dir/sources/worley_noise.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/effect_stack.dir/sources/worley_noise.c.s"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/worley_noise.c -o CMakeFiles/effect_stack.dir/sources/worley_noise.c.s
-
-CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.c.o: CMakeFiles/effect_stack.dir/flags.make
-CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.c.o: CMakeFiles/effect_stack.dir/includes_C.rsp
-CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.c.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/constrained_poisson_cmd.c
-CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.c.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building C object CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.c.o"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.c.o -MF CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.c.o.d -o CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.c.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/constrained_poisson_cmd.c
-
-CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.c.i"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/constrained_poisson_cmd.c > CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.c.i
-
-CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.c.s"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/constrained_poisson_cmd.c -o CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.c.s
-
-CMakeFiles/effect_stack.dir/commands/debug_png.c.o: CMakeFiles/effect_stack.dir/flags.make
-CMakeFiles/effect_stack.dir/commands/debug_png.c.o: CMakeFiles/effect_stack.dir/includes_C.rsp
-CMakeFiles/effect_stack.dir/commands/debug_png.c.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/debug_png.c
-CMakeFiles/effect_stack.dir/commands/debug_png.c.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building C object CMakeFiles/effect_stack.dir/commands/debug_png.c.o"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/debug_png.c.o -MF CMakeFiles/effect_stack.dir/commands/debug_png.c.o.d -o CMakeFiles/effect_stack.dir/commands/debug_png.c.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/debug_png.c
-
-CMakeFiles/effect_stack.dir/commands/debug_png.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/effect_stack.dir/commands/debug_png.c.i"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/debug_png.c > CMakeFiles/effect_stack.dir/commands/debug_png.c.i
-
-CMakeFiles/effect_stack.dir/commands/debug_png.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/effect_stack.dir/commands/debug_png.c.s"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/debug_png.c -o CMakeFiles/effect_stack.dir/commands/debug_png.c.s
-
-CMakeFiles/effect_stack.dir/commands/eigen_cmd.c.o: CMakeFiles/effect_stack.dir/flags.make
-CMakeFiles/effect_stack.dir/commands/eigen_cmd.c.o: CMakeFiles/effect_stack.dir/includes_C.rsp
-CMakeFiles/effect_stack.dir/commands/eigen_cmd.c.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/eigen_cmd.c
-CMakeFiles/effect_stack.dir/commands/eigen_cmd.c.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building C object CMakeFiles/effect_stack.dir/commands/eigen_cmd.c.o"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/eigen_cmd.c.o -MF CMakeFiles/effect_stack.dir/commands/eigen_cmd.c.o.d -o CMakeFiles/effect_stack.dir/commands/eigen_cmd.c.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/eigen_cmd.c
-
-CMakeFiles/effect_stack.dir/commands/eigen_cmd.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/effect_stack.dir/commands/eigen_cmd.c.i"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/eigen_cmd.c > CMakeFiles/effect_stack.dir/commands/eigen_cmd.c.i
-
-CMakeFiles/effect_stack.dir/commands/eigen_cmd.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/effect_stack.dir/commands/eigen_cmd.c.s"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/eigen_cmd.c -o CMakeFiles/effect_stack.dir/commands/eigen_cmd.c.s
-
-CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.c.o: CMakeFiles/effect_stack.dir/flags.make
-CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.c.o: CMakeFiles/effect_stack.dir/includes_C.rsp
-CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.c.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/erosion_dijkstra.c
-CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.c.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building C object CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.c.o"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.c.o -MF CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.c.o.d -o CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.c.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/erosion_dijkstra.c
-
-CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.c.i"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/erosion_dijkstra.c > CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.c.i
-
-CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.c.s"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/erosion_dijkstra.c -o CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.c.s
-
-CMakeFiles/effect_stack.dir/commands/fft_blur.c.o: CMakeFiles/effect_stack.dir/flags.make
-CMakeFiles/effect_stack.dir/commands/fft_blur.c.o: CMakeFiles/effect_stack.dir/includes_C.rsp
-CMakeFiles/effect_stack.dir/commands/fft_blur.c.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/fft_blur.c
-CMakeFiles/effect_stack.dir/commands/fft_blur.c.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building C object CMakeFiles/effect_stack.dir/commands/fft_blur.c.o"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/fft_blur.c.o -MF CMakeFiles/effect_stack.dir/commands/fft_blur.c.o.d -o CMakeFiles/effect_stack.dir/commands/fft_blur.c.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/fft_blur.c
-
-CMakeFiles/effect_stack.dir/commands/fft_blur.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/effect_stack.dir/commands/fft_blur.c.i"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/fft_blur.c > CMakeFiles/effect_stack.dir/commands/fft_blur.c.i
-
-CMakeFiles/effect_stack.dir/commands/fft_blur.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/effect_stack.dir/commands/fft_blur.c.s"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/fft_blur.c -o CMakeFiles/effect_stack.dir/commands/fft_blur.c.s
-
-CMakeFiles/effect_stack.dir/commands/hessian_cmd.c.o: CMakeFiles/effect_stack.dir/flags.make
-CMakeFiles/effect_stack.dir/commands/hessian_cmd.c.o: CMakeFiles/effect_stack.dir/includes_C.rsp
-CMakeFiles/effect_stack.dir/commands/hessian_cmd.c.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_cmd.c
-CMakeFiles/effect_stack.dir/commands/hessian_cmd.c.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building C object CMakeFiles/effect_stack.dir/commands/hessian_cmd.c.o"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/hessian_cmd.c.o -MF CMakeFiles/effect_stack.dir/commands/hessian_cmd.c.o.d -o CMakeFiles/effect_stack.dir/commands/hessian_cmd.c.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_cmd.c
-
-CMakeFiles/effect_stack.dir/commands/hessian_cmd.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/effect_stack.dir/commands/hessian_cmd.c.i"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_cmd.c > CMakeFiles/effect_stack.dir/commands/hessian_cmd.c.i
-
-CMakeFiles/effect_stack.dir/commands/hessian_cmd.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/effect_stack.dir/commands/hessian_cmd.c.s"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_cmd.c -o CMakeFiles/effect_stack.dir/commands/hessian_cmd.c.s
-
-CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.c.o: CMakeFiles/effect_stack.dir/flags.make
-CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.c.o: CMakeFiles/effect_stack.dir/includes_C.rsp
-CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.c.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_flow_dbg.c
-CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.c.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building C object CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.c.o"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.c.o -MF CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.c.o.d -o CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.c.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_flow_dbg.c
-
-CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.c.i"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_flow_dbg.c > CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.c.i
-
-CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.c.s"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_flow_dbg.c -o CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.c.s
-
-CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.c.o: CMakeFiles/effect_stack.dir/flags.make
-CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.c.o: CMakeFiles/effect_stack.dir/includes_C.rsp
-CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.c.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_from_eigen_cmd.c
-CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.c.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building C object CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.c.o"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.c.o -MF CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.c.o.d -o CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.c.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_from_eigen_cmd.c
-
-CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.c.i"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_from_eigen_cmd.c > CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.c.i
-
-CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.c.s"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_from_eigen_cmd.c -o CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.c.s
-
-CMakeFiles/effect_stack.dir/commands/interp_quantized.c.o: CMakeFiles/effect_stack.dir/flags.make
-CMakeFiles/effect_stack.dir/commands/interp_quantized.c.o: CMakeFiles/effect_stack.dir/includes_C.rsp
-CMakeFiles/effect_stack.dir/commands/interp_quantized.c.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/interp_quantized.c
-CMakeFiles/effect_stack.dir/commands/interp_quantized.c.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building C object CMakeFiles/effect_stack.dir/commands/interp_quantized.c.o"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/interp_quantized.c.o -MF CMakeFiles/effect_stack.dir/commands/interp_quantized.c.o.d -o CMakeFiles/effect_stack.dir/commands/interp_quantized.c.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/interp_quantized.c
-
-CMakeFiles/effect_stack.dir/commands/interp_quantized.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/effect_stack.dir/commands/interp_quantized.c.i"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/interp_quantized.c > CMakeFiles/effect_stack.dir/commands/interp_quantized.c.i
-
-CMakeFiles/effect_stack.dir/commands/interp_quantized.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/effect_stack.dir/commands/interp_quantized.c.s"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/interp_quantized.c -o CMakeFiles/effect_stack.dir/commands/interp_quantized.c.s
-
-CMakeFiles/effect_stack.dir/commands/label_regions.c.o: CMakeFiles/effect_stack.dir/flags.make
-CMakeFiles/effect_stack.dir/commands/label_regions.c.o: CMakeFiles/effect_stack.dir/includes_C.rsp
-CMakeFiles/effect_stack.dir/commands/label_regions.c.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/label_regions.c
-CMakeFiles/effect_stack.dir/commands/label_regions.c.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building C object CMakeFiles/effect_stack.dir/commands/label_regions.c.o"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/label_regions.c.o -MF CMakeFiles/effect_stack.dir/commands/label_regions.c.o.d -o CMakeFiles/effect_stack.dir/commands/label_regions.c.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/label_regions.c
-
-CMakeFiles/effect_stack.dir/commands/label_regions.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/effect_stack.dir/commands/label_regions.c.i"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/label_regions.c > CMakeFiles/effect_stack.dir/commands/label_regions.c.i
-
-CMakeFiles/effect_stack.dir/commands/label_regions.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/effect_stack.dir/commands/label_regions.c.s"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/label_regions.c -o CMakeFiles/effect_stack.dir/commands/label_regions.c.s
-
-CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.c.o: CMakeFiles/effect_stack.dir/flags.make
-CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.c.o: CMakeFiles/effect_stack.dir/includes_C.rsp
-CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.c.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/normal_from_hessian_cmd.c
-CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.c.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building C object CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.c.o"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.c.o -MF CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.c.o.d -o CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.c.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/normal_from_hessian_cmd.c
-
-CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.c.i"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/normal_from_hessian_cmd.c > CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.c.i
-
-CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.c.s"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/normal_from_hessian_cmd.c -o CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.c.s
-
-CMakeFiles/effect_stack.dir/commands/sdf_layered.c.o: CMakeFiles/effect_stack.dir/flags.make
-CMakeFiles/effect_stack.dir/commands/sdf_layered.c.o: CMakeFiles/effect_stack.dir/includes_C.rsp
-CMakeFiles/effect_stack.dir/commands/sdf_layered.c.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/sdf_layered.c
-CMakeFiles/effect_stack.dir/commands/sdf_layered.c.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building C object CMakeFiles/effect_stack.dir/commands/sdf_layered.c.o"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/sdf_layered.c.o -MF CMakeFiles/effect_stack.dir/commands/sdf_layered.c.o.d -o CMakeFiles/effect_stack.dir/commands/sdf_layered.c.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/sdf_layered.c
-
-CMakeFiles/effect_stack.dir/commands/sdf_layered.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/effect_stack.dir/commands/sdf_layered.c.i"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/sdf_layered.c > CMakeFiles/effect_stack.dir/commands/sdf_layered.c.i
-
-CMakeFiles/effect_stack.dir/commands/sdf_layered.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/effect_stack.dir/commands/sdf_layered.c.s"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/sdf_layered.c -o CMakeFiles/effect_stack.dir/commands/sdf_layered.c.s
-
-CMakeFiles/effect_stack.dir/commands/split_normals_cmd.c.o: CMakeFiles/effect_stack.dir/flags.make
-CMakeFiles/effect_stack.dir/commands/split_normals_cmd.c.o: CMakeFiles/effect_stack.dir/includes_C.rsp
-CMakeFiles/effect_stack.dir/commands/split_normals_cmd.c.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/split_normals_cmd.c
-CMakeFiles/effect_stack.dir/commands/split_normals_cmd.c.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building C object CMakeFiles/effect_stack.dir/commands/split_normals_cmd.c.o"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/split_normals_cmd.c.o -MF CMakeFiles/effect_stack.dir/commands/split_normals_cmd.c.o.d -o CMakeFiles/effect_stack.dir/commands/split_normals_cmd.c.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/split_normals_cmd.c
-
-CMakeFiles/effect_stack.dir/commands/split_normals_cmd.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/effect_stack.dir/commands/split_normals_cmd.c.i"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/split_normals_cmd.c > CMakeFiles/effect_stack.dir/commands/split_normals_cmd.c.i
-
-CMakeFiles/effect_stack.dir/commands/split_normals_cmd.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/effect_stack.dir/commands/split_normals_cmd.c.s"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/split_normals_cmd.c -o CMakeFiles/effect_stack.dir/commands/split_normals_cmd.c.s
-
-CMakeFiles/effect_stack.dir/image_memo/create_envelopes.c.o: CMakeFiles/effect_stack.dir/flags.make
-CMakeFiles/effect_stack.dir/image_memo/create_envelopes.c.o: CMakeFiles/effect_stack.dir/includes_C.rsp
-CMakeFiles/effect_stack.dir/image_memo/create_envelopes.c.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/image_memo/create_envelopes.c
-CMakeFiles/effect_stack.dir/image_memo/create_envelopes.c.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Building C object CMakeFiles/effect_stack.dir/image_memo/create_envelopes.c.o"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/image_memo/create_envelopes.c.o -MF CMakeFiles/effect_stack.dir/image_memo/create_envelopes.c.o.d -o CMakeFiles/effect_stack.dir/image_memo/create_envelopes.c.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/image_memo/create_envelopes.c
-
-CMakeFiles/effect_stack.dir/image_memo/create_envelopes.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/effect_stack.dir/image_memo/create_envelopes.c.i"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/image_memo/create_envelopes.c > CMakeFiles/effect_stack.dir/image_memo/create_envelopes.c.i
-
-CMakeFiles/effect_stack.dir/image_memo/create_envelopes.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/effect_stack.dir/image_memo/create_envelopes.c.s"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/image_memo/create_envelopes.c -o CMakeFiles/effect_stack.dir/image_memo/create_envelopes.c.s
-
-CMakeFiles/effect_stack.dir/image_memo/image_memo.c.o: CMakeFiles/effect_stack.dir/flags.make
-CMakeFiles/effect_stack.dir/image_memo/image_memo.c.o: CMakeFiles/effect_stack.dir/includes_C.rsp
-CMakeFiles/effect_stack.dir/image_memo/image_memo.c.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/image_memo/image_memo.c
-CMakeFiles/effect_stack.dir/image_memo/image_memo.c.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building C object CMakeFiles/effect_stack.dir/image_memo/image_memo.c.o"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/image_memo/image_memo.c.o -MF CMakeFiles/effect_stack.dir/image_memo/image_memo.c.o.d -o CMakeFiles/effect_stack.dir/image_memo/image_memo.c.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/image_memo/image_memo.c
-
-CMakeFiles/effect_stack.dir/image_memo/image_memo.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/effect_stack.dir/image_memo/image_memo.c.i"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/image_memo/image_memo.c > CMakeFiles/effect_stack.dir/image_memo/image_memo.c.i
-
-CMakeFiles/effect_stack.dir/image_memo/image_memo.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/effect_stack.dir/image_memo/image_memo.c.s"
-	/usr/bin/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/image_memo/image_memo.c -o CMakeFiles/effect_stack.dir/image_memo/image_memo.c.s
+CMakeFiles/effect_stack.dir/debug_output.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/debug_output.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/debug_output.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/debug_output.cpp
+CMakeFiles/effect_stack.dir/debug_output.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/effect_stack.dir/debug_output.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/debug_output.cpp.o -MF CMakeFiles/effect_stack.dir/debug_output.cpp.o.d -o CMakeFiles/effect_stack.dir/debug_output.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/debug_output.cpp
+
+CMakeFiles/effect_stack.dir/debug_output.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/debug_output.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/debug_output.cpp > CMakeFiles/effect_stack.dir/debug_output.cpp.i
+
+CMakeFiles/effect_stack.dir/debug_output.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/debug_output.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/debug_output.cpp -o CMakeFiles/effect_stack.dir/debug_output.cpp.s
+
+CMakeFiles/effect_stack.dir/effect_stack_api.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/effect_stack_api.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/effect_stack_api.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/effect_stack_api.cpp
+CMakeFiles/effect_stack.dir/effect_stack_api.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/effect_stack.dir/effect_stack_api.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/effect_stack_api.cpp.o -MF CMakeFiles/effect_stack.dir/effect_stack_api.cpp.o.d -o CMakeFiles/effect_stack.dir/effect_stack_api.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/effect_stack_api.cpp
+
+CMakeFiles/effect_stack.dir/effect_stack_api.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/effect_stack_api.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/effect_stack_api.cpp > CMakeFiles/effect_stack.dir/effect_stack_api.cpp.i
+
+CMakeFiles/effect_stack.dir/effect_stack_api.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/effect_stack_api.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/effect_stack_api.cpp -o CMakeFiles/effect_stack.dir/effect_stack_api.cpp.s
+
+CMakeFiles/effect_stack.dir/erosion_pipeline.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/erosion_pipeline.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/erosion_pipeline.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/erosion_pipeline.cpp
+CMakeFiles/effect_stack.dir/erosion_pipeline.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/effect_stack.dir/erosion_pipeline.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/erosion_pipeline.cpp.o -MF CMakeFiles/effect_stack.dir/erosion_pipeline.cpp.o.d -o CMakeFiles/effect_stack.dir/erosion_pipeline.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/erosion_pipeline.cpp
+
+CMakeFiles/effect_stack.dir/erosion_pipeline.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/erosion_pipeline.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/erosion_pipeline.cpp > CMakeFiles/effect_stack.dir/erosion_pipeline.cpp.i
+
+CMakeFiles/effect_stack.dir/erosion_pipeline.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/erosion_pipeline.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/erosion_pipeline.cpp -o CMakeFiles/effect_stack.dir/erosion_pipeline.cpp.s
+
+CMakeFiles/effect_stack.dir/gradient_pipeline.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/gradient_pipeline.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/gradient_pipeline.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/gradient_pipeline.cpp
+CMakeFiles/effect_stack.dir/gradient_pipeline.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/effect_stack.dir/gradient_pipeline.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/gradient_pipeline.cpp.o -MF CMakeFiles/effect_stack.dir/gradient_pipeline.cpp.o.d -o CMakeFiles/effect_stack.dir/gradient_pipeline.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/gradient_pipeline.cpp
+
+CMakeFiles/effect_stack.dir/gradient_pipeline.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/gradient_pipeline.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/gradient_pipeline.cpp > CMakeFiles/effect_stack.dir/gradient_pipeline.cpp.i
+
+CMakeFiles/effect_stack.dir/gradient_pipeline.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/gradient_pipeline.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/gradient_pipeline.cpp -o CMakeFiles/effect_stack.dir/gradient_pipeline.cpp.s
+
+CMakeFiles/effect_stack.dir/utility.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/utility.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/utility.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/utility.cpp
+CMakeFiles/effect_stack.dir/utility.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/effect_stack.dir/utility.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/utility.cpp.o -MF CMakeFiles/effect_stack.dir/utility.cpp.o.d -o CMakeFiles/effect_stack.dir/utility.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/utility.cpp
+
+CMakeFiles/effect_stack.dir/utility.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/utility.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/utility.cpp > CMakeFiles/effect_stack.dir/utility.cpp.i
+
+CMakeFiles/effect_stack.dir/utility.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/utility.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/utility.cpp -o CMakeFiles/effect_stack.dir/utility.cpp.s
+
+CMakeFiles/effect_stack.dir/sources/curl_noise.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/sources/curl_noise.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/sources/curl_noise.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/curl_noise.cpp
+CMakeFiles/effect_stack.dir/sources/curl_noise.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/effect_stack.dir/sources/curl_noise.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/sources/curl_noise.cpp.o -MF CMakeFiles/effect_stack.dir/sources/curl_noise.cpp.o.d -o CMakeFiles/effect_stack.dir/sources/curl_noise.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/curl_noise.cpp
+
+CMakeFiles/effect_stack.dir/sources/curl_noise.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/sources/curl_noise.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/curl_noise.cpp > CMakeFiles/effect_stack.dir/sources/curl_noise.cpp.i
+
+CMakeFiles/effect_stack.dir/sources/curl_noise.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/sources/curl_noise.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/curl_noise.cpp -o CMakeFiles/effect_stack.dir/sources/curl_noise.cpp.s
+
+CMakeFiles/effect_stack.dir/sources/linear_gradient.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/sources/linear_gradient.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/sources/linear_gradient.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/linear_gradient.cpp
+CMakeFiles/effect_stack.dir/sources/linear_gradient.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/effect_stack.dir/sources/linear_gradient.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/sources/linear_gradient.cpp.o -MF CMakeFiles/effect_stack.dir/sources/linear_gradient.cpp.o.d -o CMakeFiles/effect_stack.dir/sources/linear_gradient.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/linear_gradient.cpp
+
+CMakeFiles/effect_stack.dir/sources/linear_gradient.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/sources/linear_gradient.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/linear_gradient.cpp > CMakeFiles/effect_stack.dir/sources/linear_gradient.cpp.i
+
+CMakeFiles/effect_stack.dir/sources/linear_gradient.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/sources/linear_gradient.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/linear_gradient.cpp -o CMakeFiles/effect_stack.dir/sources/linear_gradient.cpp.s
+
+CMakeFiles/effect_stack.dir/sources/noise.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/sources/noise.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/sources/noise.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/noise.cpp
+CMakeFiles/effect_stack.dir/sources/noise.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/effect_stack.dir/sources/noise.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/sources/noise.cpp.o -MF CMakeFiles/effect_stack.dir/sources/noise.cpp.o.d -o CMakeFiles/effect_stack.dir/sources/noise.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/noise.cpp
+
+CMakeFiles/effect_stack.dir/sources/noise.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/sources/noise.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/noise.cpp > CMakeFiles/effect_stack.dir/sources/noise.cpp.i
+
+CMakeFiles/effect_stack.dir/sources/noise.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/sources/noise.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/noise.cpp -o CMakeFiles/effect_stack.dir/sources/noise.cpp.s
+
+CMakeFiles/effect_stack.dir/sources/perlin_noise.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/sources/perlin_noise.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/sources/perlin_noise.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/perlin_noise.cpp
+CMakeFiles/effect_stack.dir/sources/perlin_noise.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/effect_stack.dir/sources/perlin_noise.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/sources/perlin_noise.cpp.o -MF CMakeFiles/effect_stack.dir/sources/perlin_noise.cpp.o.d -o CMakeFiles/effect_stack.dir/sources/perlin_noise.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/perlin_noise.cpp
+
+CMakeFiles/effect_stack.dir/sources/perlin_noise.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/sources/perlin_noise.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/perlin_noise.cpp > CMakeFiles/effect_stack.dir/sources/perlin_noise.cpp.i
+
+CMakeFiles/effect_stack.dir/sources/perlin_noise.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/sources/perlin_noise.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/perlin_noise.cpp -o CMakeFiles/effect_stack.dir/sources/perlin_noise.cpp.s
+
+CMakeFiles/effect_stack.dir/sources/worley_noise.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/sources/worley_noise.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/sources/worley_noise.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/worley_noise.cpp
+CMakeFiles/effect_stack.dir/sources/worley_noise.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/effect_stack.dir/sources/worley_noise.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/sources/worley_noise.cpp.o -MF CMakeFiles/effect_stack.dir/sources/worley_noise.cpp.o.d -o CMakeFiles/effect_stack.dir/sources/worley_noise.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/worley_noise.cpp
+
+CMakeFiles/effect_stack.dir/sources/worley_noise.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/sources/worley_noise.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/worley_noise.cpp > CMakeFiles/effect_stack.dir/sources/worley_noise.cpp.i
+
+CMakeFiles/effect_stack.dir/sources/worley_noise.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/sources/worley_noise.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/sources/worley_noise.cpp -o CMakeFiles/effect_stack.dir/sources/worley_noise.cpp.s
+
+CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/constrained_poisson_cmd.cpp
+CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.cpp.o -MF CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.cpp.o.d -o CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/constrained_poisson_cmd.cpp
+
+CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/constrained_poisson_cmd.cpp > CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.cpp.i
+
+CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/constrained_poisson_cmd.cpp -o CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.cpp.s
+
+CMakeFiles/effect_stack.dir/commands/debug_png.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/commands/debug_png.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/commands/debug_png.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/debug_png.cpp
+CMakeFiles/effect_stack.dir/commands/debug_png.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/effect_stack.dir/commands/debug_png.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/debug_png.cpp.o -MF CMakeFiles/effect_stack.dir/commands/debug_png.cpp.o.d -o CMakeFiles/effect_stack.dir/commands/debug_png.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/debug_png.cpp
+
+CMakeFiles/effect_stack.dir/commands/debug_png.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/commands/debug_png.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/debug_png.cpp > CMakeFiles/effect_stack.dir/commands/debug_png.cpp.i
+
+CMakeFiles/effect_stack.dir/commands/debug_png.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/commands/debug_png.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/debug_png.cpp -o CMakeFiles/effect_stack.dir/commands/debug_png.cpp.s
+
+CMakeFiles/effect_stack.dir/commands/eigen_cmd.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/commands/eigen_cmd.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/commands/eigen_cmd.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/eigen_cmd.cpp
+CMakeFiles/effect_stack.dir/commands/eigen_cmd.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/effect_stack.dir/commands/eigen_cmd.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/eigen_cmd.cpp.o -MF CMakeFiles/effect_stack.dir/commands/eigen_cmd.cpp.o.d -o CMakeFiles/effect_stack.dir/commands/eigen_cmd.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/eigen_cmd.cpp
+
+CMakeFiles/effect_stack.dir/commands/eigen_cmd.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/commands/eigen_cmd.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/eigen_cmd.cpp > CMakeFiles/effect_stack.dir/commands/eigen_cmd.cpp.i
+
+CMakeFiles/effect_stack.dir/commands/eigen_cmd.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/commands/eigen_cmd.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/eigen_cmd.cpp -o CMakeFiles/effect_stack.dir/commands/eigen_cmd.cpp.s
+
+CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/erosion_dijkstra.cpp
+CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.cpp.o -MF CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.cpp.o.d -o CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/erosion_dijkstra.cpp
+
+CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/erosion_dijkstra.cpp > CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.cpp.i
+
+CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/erosion_dijkstra.cpp -o CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.cpp.s
+
+CMakeFiles/effect_stack.dir/commands/fft_blur.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/commands/fft_blur.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/commands/fft_blur.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/fft_blur.cpp
+CMakeFiles/effect_stack.dir/commands/fft_blur.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/effect_stack.dir/commands/fft_blur.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/fft_blur.cpp.o -MF CMakeFiles/effect_stack.dir/commands/fft_blur.cpp.o.d -o CMakeFiles/effect_stack.dir/commands/fft_blur.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/fft_blur.cpp
+
+CMakeFiles/effect_stack.dir/commands/fft_blur.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/commands/fft_blur.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/fft_blur.cpp > CMakeFiles/effect_stack.dir/commands/fft_blur.cpp.i
+
+CMakeFiles/effect_stack.dir/commands/fft_blur.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/commands/fft_blur.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/fft_blur.cpp -o CMakeFiles/effect_stack.dir/commands/fft_blur.cpp.s
+
+CMakeFiles/effect_stack.dir/commands/hessian_cmd.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/commands/hessian_cmd.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/commands/hessian_cmd.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_cmd.cpp
+CMakeFiles/effect_stack.dir/commands/hessian_cmd.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/effect_stack.dir/commands/hessian_cmd.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/hessian_cmd.cpp.o -MF CMakeFiles/effect_stack.dir/commands/hessian_cmd.cpp.o.d -o CMakeFiles/effect_stack.dir/commands/hessian_cmd.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_cmd.cpp
+
+CMakeFiles/effect_stack.dir/commands/hessian_cmd.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/commands/hessian_cmd.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_cmd.cpp > CMakeFiles/effect_stack.dir/commands/hessian_cmd.cpp.i
+
+CMakeFiles/effect_stack.dir/commands/hessian_cmd.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/commands/hessian_cmd.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_cmd.cpp -o CMakeFiles/effect_stack.dir/commands/hessian_cmd.cpp.s
+
+CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_flow_dbg.cpp
+CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.cpp.o -MF CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.cpp.o.d -o CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_flow_dbg.cpp
+
+CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_flow_dbg.cpp > CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.cpp.i
+
+CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_flow_dbg.cpp -o CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.cpp.s
+
+CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_from_eigen_cmd.cpp
+CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.cpp.o -MF CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.cpp.o.d -o CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_from_eigen_cmd.cpp
+
+CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_from_eigen_cmd.cpp > CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.cpp.i
+
+CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/hessian_from_eigen_cmd.cpp -o CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.cpp.s
+
+CMakeFiles/effect_stack.dir/commands/interp_quantized.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/commands/interp_quantized.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/commands/interp_quantized.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/interp_quantized.cpp
+CMakeFiles/effect_stack.dir/commands/interp_quantized.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/effect_stack.dir/commands/interp_quantized.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/interp_quantized.cpp.o -MF CMakeFiles/effect_stack.dir/commands/interp_quantized.cpp.o.d -o CMakeFiles/effect_stack.dir/commands/interp_quantized.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/interp_quantized.cpp
+
+CMakeFiles/effect_stack.dir/commands/interp_quantized.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/commands/interp_quantized.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/interp_quantized.cpp > CMakeFiles/effect_stack.dir/commands/interp_quantized.cpp.i
+
+CMakeFiles/effect_stack.dir/commands/interp_quantized.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/commands/interp_quantized.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/interp_quantized.cpp -o CMakeFiles/effect_stack.dir/commands/interp_quantized.cpp.s
+
+CMakeFiles/effect_stack.dir/commands/label_regions.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/commands/label_regions.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/commands/label_regions.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/label_regions.cpp
+CMakeFiles/effect_stack.dir/commands/label_regions.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object CMakeFiles/effect_stack.dir/commands/label_regions.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/label_regions.cpp.o -MF CMakeFiles/effect_stack.dir/commands/label_regions.cpp.o.d -o CMakeFiles/effect_stack.dir/commands/label_regions.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/label_regions.cpp
+
+CMakeFiles/effect_stack.dir/commands/label_regions.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/commands/label_regions.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/label_regions.cpp > CMakeFiles/effect_stack.dir/commands/label_regions.cpp.i
+
+CMakeFiles/effect_stack.dir/commands/label_regions.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/commands/label_regions.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/label_regions.cpp -o CMakeFiles/effect_stack.dir/commands/label_regions.cpp.s
+
+CMakeFiles/effect_stack.dir/commands/laminarize_cmd.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/commands/laminarize_cmd.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/commands/laminarize_cmd.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/laminarize_cmd.cpp
+CMakeFiles/effect_stack.dir/commands/laminarize_cmd.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object CMakeFiles/effect_stack.dir/commands/laminarize_cmd.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/laminarize_cmd.cpp.o -MF CMakeFiles/effect_stack.dir/commands/laminarize_cmd.cpp.o.d -o CMakeFiles/effect_stack.dir/commands/laminarize_cmd.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/laminarize_cmd.cpp
+
+CMakeFiles/effect_stack.dir/commands/laminarize_cmd.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/commands/laminarize_cmd.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/laminarize_cmd.cpp > CMakeFiles/effect_stack.dir/commands/laminarize_cmd.cpp.i
+
+CMakeFiles/effect_stack.dir/commands/laminarize_cmd.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/commands/laminarize_cmd.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/laminarize_cmd.cpp -o CMakeFiles/effect_stack.dir/commands/laminarize_cmd.cpp.s
+
+CMakeFiles/effect_stack.dir/commands/lic_debug_cmd.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/commands/lic_debug_cmd.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/commands/lic_debug_cmd.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/lic_debug_cmd.cpp
+CMakeFiles/effect_stack.dir/commands/lic_debug_cmd.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object CMakeFiles/effect_stack.dir/commands/lic_debug_cmd.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/lic_debug_cmd.cpp.o -MF CMakeFiles/effect_stack.dir/commands/lic_debug_cmd.cpp.o.d -o CMakeFiles/effect_stack.dir/commands/lic_debug_cmd.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/lic_debug_cmd.cpp
+
+CMakeFiles/effect_stack.dir/commands/lic_debug_cmd.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/commands/lic_debug_cmd.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/lic_debug_cmd.cpp > CMakeFiles/effect_stack.dir/commands/lic_debug_cmd.cpp.i
+
+CMakeFiles/effect_stack.dir/commands/lic_debug_cmd.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/commands/lic_debug_cmd.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/lic_debug_cmd.cpp -o CMakeFiles/effect_stack.dir/commands/lic_debug_cmd.cpp.s
+
+CMakeFiles/effect_stack.dir/commands/lic_stylize_cmd.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/commands/lic_stylize_cmd.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/commands/lic_stylize_cmd.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/lic_stylize_cmd.cpp
+CMakeFiles/effect_stack.dir/commands/lic_stylize_cmd.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Building CXX object CMakeFiles/effect_stack.dir/commands/lic_stylize_cmd.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/lic_stylize_cmd.cpp.o -MF CMakeFiles/effect_stack.dir/commands/lic_stylize_cmd.cpp.o.d -o CMakeFiles/effect_stack.dir/commands/lic_stylize_cmd.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/lic_stylize_cmd.cpp
+
+CMakeFiles/effect_stack.dir/commands/lic_stylize_cmd.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/commands/lic_stylize_cmd.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/lic_stylize_cmd.cpp > CMakeFiles/effect_stack.dir/commands/lic_stylize_cmd.cpp.i
+
+CMakeFiles/effect_stack.dir/commands/lic_stylize_cmd.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/commands/lic_stylize_cmd.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/lic_stylize_cmd.cpp -o CMakeFiles/effect_stack.dir/commands/lic_stylize_cmd.cpp.s
+
+CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/normal_from_hessian_cmd.cpp
+CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.cpp.o -MF CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.cpp.o.d -o CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/normal_from_hessian_cmd.cpp
+
+CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/normal_from_hessian_cmd.cpp > CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.cpp.i
+
+CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/normal_from_hessian_cmd.cpp -o CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.cpp.s
+
+CMakeFiles/effect_stack.dir/commands/sdf_layered.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/commands/sdf_layered.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/commands/sdf_layered.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/sdf_layered.cpp
+CMakeFiles/effect_stack.dir/commands/sdf_layered.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Building CXX object CMakeFiles/effect_stack.dir/commands/sdf_layered.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/sdf_layered.cpp.o -MF CMakeFiles/effect_stack.dir/commands/sdf_layered.cpp.o.d -o CMakeFiles/effect_stack.dir/commands/sdf_layered.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/sdf_layered.cpp
+
+CMakeFiles/effect_stack.dir/commands/sdf_layered.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/commands/sdf_layered.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/sdf_layered.cpp > CMakeFiles/effect_stack.dir/commands/sdf_layered.cpp.i
+
+CMakeFiles/effect_stack.dir/commands/sdf_layered.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/commands/sdf_layered.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/sdf_layered.cpp -o CMakeFiles/effect_stack.dir/commands/sdf_layered.cpp.s
+
+CMakeFiles/effect_stack.dir/commands/split_normals_cmd.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/commands/split_normals_cmd.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/commands/split_normals_cmd.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/split_normals_cmd.cpp
+CMakeFiles/effect_stack.dir/commands/split_normals_cmd.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_26) "Building CXX object CMakeFiles/effect_stack.dir/commands/split_normals_cmd.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/commands/split_normals_cmd.cpp.o -MF CMakeFiles/effect_stack.dir/commands/split_normals_cmd.cpp.o.d -o CMakeFiles/effect_stack.dir/commands/split_normals_cmd.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/split_normals_cmd.cpp
+
+CMakeFiles/effect_stack.dir/commands/split_normals_cmd.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/commands/split_normals_cmd.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/split_normals_cmd.cpp > CMakeFiles/effect_stack.dir/commands/split_normals_cmd.cpp.i
+
+CMakeFiles/effect_stack.dir/commands/split_normals_cmd.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/commands/split_normals_cmd.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/commands/split_normals_cmd.cpp -o CMakeFiles/effect_stack.dir/commands/split_normals_cmd.cpp.s
+
+CMakeFiles/effect_stack.dir/image_memo/create_envelopes.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/image_memo/create_envelopes.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/image_memo/create_envelopes.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/image_memo/create_envelopes.cpp
+CMakeFiles/effect_stack.dir/image_memo/create_envelopes.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_27) "Building CXX object CMakeFiles/effect_stack.dir/image_memo/create_envelopes.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/image_memo/create_envelopes.cpp.o -MF CMakeFiles/effect_stack.dir/image_memo/create_envelopes.cpp.o.d -o CMakeFiles/effect_stack.dir/image_memo/create_envelopes.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/image_memo/create_envelopes.cpp
+
+CMakeFiles/effect_stack.dir/image_memo/create_envelopes.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/image_memo/create_envelopes.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/image_memo/create_envelopes.cpp > CMakeFiles/effect_stack.dir/image_memo/create_envelopes.cpp.i
+
+CMakeFiles/effect_stack.dir/image_memo/create_envelopes.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/image_memo/create_envelopes.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/image_memo/create_envelopes.cpp -o CMakeFiles/effect_stack.dir/image_memo/create_envelopes.cpp.s
+
+CMakeFiles/effect_stack.dir/image_memo/image_memo.cpp.o: CMakeFiles/effect_stack.dir/flags.make
+CMakeFiles/effect_stack.dir/image_memo/image_memo.cpp.o: CMakeFiles/effect_stack.dir/includes_CXX.rsp
+CMakeFiles/effect_stack.dir/image_memo/image_memo.cpp.o: /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/image_memo/image_memo.cpp
+CMakeFiles/effect_stack.dir/image_memo/image_memo.cpp.o: CMakeFiles/effect_stack.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_28) "Building CXX object CMakeFiles/effect_stack.dir/image_memo/image_memo.cpp.o"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/effect_stack.dir/image_memo/image_memo.cpp.o -MF CMakeFiles/effect_stack.dir/image_memo/image_memo.cpp.o.d -o CMakeFiles/effect_stack.dir/image_memo/image_memo.cpp.o -c /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/image_memo/image_memo.cpp
+
+CMakeFiles/effect_stack.dir/image_memo/image_memo.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/effect_stack.dir/image_memo/image_memo.cpp.i"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/image_memo/image_memo.cpp > CMakeFiles/effect_stack.dir/image_memo/image_memo.cpp.i
+
+CMakeFiles/effect_stack.dir/image_memo/image_memo.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/effect_stack.dir/image_memo/image_memo.cpp.s"
+	/usr/bin/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/image_memo/image_memo.cpp -o CMakeFiles/effect_stack.dir/image_memo/image_memo.cpp.s
 
 # Object files for target effect_stack
 effect_stack_OBJECTS = \
-"CMakeFiles/effect_stack.dir/effect_stack_api.c.o" \
-"CMakeFiles/effect_stack.dir/erosion_pipeline.c.o" \
-"CMakeFiles/effect_stack.dir/gradient_pipeline.c.o" \
-"CMakeFiles/effect_stack.dir/utility.c.o" \
-"CMakeFiles/effect_stack.dir/sources/curl_noise.c.o" \
-"CMakeFiles/effect_stack.dir/sources/linear_gradient.c.o" \
-"CMakeFiles/effect_stack.dir/sources/noise.c.o" \
-"CMakeFiles/effect_stack.dir/sources/perlin_noise.c.o" \
-"CMakeFiles/effect_stack.dir/sources/worley_noise.c.o" \
-"CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.c.o" \
-"CMakeFiles/effect_stack.dir/commands/debug_png.c.o" \
-"CMakeFiles/effect_stack.dir/commands/eigen_cmd.c.o" \
-"CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.c.o" \
-"CMakeFiles/effect_stack.dir/commands/fft_blur.c.o" \
-"CMakeFiles/effect_stack.dir/commands/hessian_cmd.c.o" \
-"CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.c.o" \
-"CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.c.o" \
-"CMakeFiles/effect_stack.dir/commands/interp_quantized.c.o" \
-"CMakeFiles/effect_stack.dir/commands/label_regions.c.o" \
-"CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.c.o" \
-"CMakeFiles/effect_stack.dir/commands/sdf_layered.c.o" \
-"CMakeFiles/effect_stack.dir/commands/split_normals_cmd.c.o" \
-"CMakeFiles/effect_stack.dir/image_memo/create_envelopes.c.o" \
-"CMakeFiles/effect_stack.dir/image_memo/image_memo.c.o"
+"CMakeFiles/effect_stack.dir/debug_output.cpp.o" \
+"CMakeFiles/effect_stack.dir/effect_stack_api.cpp.o" \
+"CMakeFiles/effect_stack.dir/erosion_pipeline.cpp.o" \
+"CMakeFiles/effect_stack.dir/gradient_pipeline.cpp.o" \
+"CMakeFiles/effect_stack.dir/utility.cpp.o" \
+"CMakeFiles/effect_stack.dir/sources/curl_noise.cpp.o" \
+"CMakeFiles/effect_stack.dir/sources/linear_gradient.cpp.o" \
+"CMakeFiles/effect_stack.dir/sources/noise.cpp.o" \
+"CMakeFiles/effect_stack.dir/sources/perlin_noise.cpp.o" \
+"CMakeFiles/effect_stack.dir/sources/worley_noise.cpp.o" \
+"CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.cpp.o" \
+"CMakeFiles/effect_stack.dir/commands/debug_png.cpp.o" \
+"CMakeFiles/effect_stack.dir/commands/eigen_cmd.cpp.o" \
+"CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.cpp.o" \
+"CMakeFiles/effect_stack.dir/commands/fft_blur.cpp.o" \
+"CMakeFiles/effect_stack.dir/commands/hessian_cmd.cpp.o" \
+"CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.cpp.o" \
+"CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.cpp.o" \
+"CMakeFiles/effect_stack.dir/commands/interp_quantized.cpp.o" \
+"CMakeFiles/effect_stack.dir/commands/label_regions.cpp.o" \
+"CMakeFiles/effect_stack.dir/commands/laminarize_cmd.cpp.o" \
+"CMakeFiles/effect_stack.dir/commands/lic_debug_cmd.cpp.o" \
+"CMakeFiles/effect_stack.dir/commands/lic_stylize_cmd.cpp.o" \
+"CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.cpp.o" \
+"CMakeFiles/effect_stack.dir/commands/sdf_layered.cpp.o" \
+"CMakeFiles/effect_stack.dir/commands/split_normals_cmd.cpp.o" \
+"CMakeFiles/effect_stack.dir/image_memo/create_envelopes.cpp.o" \
+"CMakeFiles/effect_stack.dir/image_memo/image_memo.cpp.o"
 
 # External object files for target effect_stack
 effect_stack_EXTERNAL_OBJECTS =
 
-/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/effect_stack_api.c.o
-/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/erosion_pipeline.c.o
-/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/gradient_pipeline.c.o
-/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/utility.c.o
-/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/sources/curl_noise.c.o
-/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/sources/linear_gradient.c.o
-/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/sources/noise.c.o
-/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/sources/perlin_noise.c.o
-/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/sources/worley_noise.c.o
-/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.c.o
-/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/debug_png.c.o
-/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/eigen_cmd.c.o
-/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.c.o
-/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/fft_blur.c.o
-/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/hessian_cmd.c.o
-/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.c.o
-/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.c.o
-/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/interp_quantized.c.o
-/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/label_regions.c.o
-/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.c.o
-/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/sdf_layered.c.o
-/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/split_normals_cmd.c.o
-/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/image_memo/create_envelopes.c.o
-/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/image_memo/image_memo.c.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/debug_output.cpp.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/effect_stack_api.cpp.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/erosion_pipeline.cpp.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/gradient_pipeline.cpp.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/utility.cpp.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/sources/curl_noise.cpp.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/sources/linear_gradient.cpp.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/sources/noise.cpp.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/sources/perlin_noise.cpp.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/sources/worley_noise.cpp.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/constrained_poisson_cmd.cpp.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/debug_png.cpp.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/eigen_cmd.cpp.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/erosion_dijkstra.cpp.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/fft_blur.cpp.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/hessian_cmd.cpp.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/hessian_flow_dbg.cpp.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/hessian_from_eigen_cmd.cpp.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/interp_quantized.cpp.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/label_regions.cpp.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/laminarize_cmd.cpp.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/lic_debug_cmd.cpp.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/lic_stylize_cmd.cpp.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/normal_from_hessian_cmd.cpp.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/sdf_layered.cpp.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/commands/split_normals_cmd.cpp.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/image_memo/create_envelopes.cpp.o
+/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/image_memo/image_memo.cpp.o
 /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/build.make
 /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/objects1.rsp
 /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js: CMakeFiles/effect_stack.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Linking C executable /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_29) "Linking CXX executable /home/anyuser/websites/spehleonlp.github.io/gradient-mapping/scripts/effect_stack.js"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/effect_stack.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

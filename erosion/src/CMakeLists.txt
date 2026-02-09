@@ -9,6 +9,21 @@ set(SOURCES
     create_envelopes.c
     create_gradient.c
     smart_blur.c
+    fluid_solver.c
+    fft_blur.c
+    normal_map.c
+    helmholtz.c
+    swirl.c
+    debug_png.c
+    flood_fill.c
+    contour_flow.c
+    chamfer.c
+    label_regions.c
+    contour_extract.c
+    contour_smooth.c
+    gif_decoder.c
+    sdf_layered.c
+    interp_quantized.c
 )
 
 # Header files (for IDE navigation)
@@ -16,6 +31,22 @@ set(HEADERS
     create_envelopes.h
     create_gradient.h
     smart_blur.h
+    fluid_solver.h
+    fft_blur.h
+    normal_map.h
+    helmholtz.h
+    swirl.h
+    debug_png.h
+    flood_fill.h
+    contour_flow.h
+    chamfer.h
+    label_regions.h
+    contour_extract.h
+    contour_smooth.h
+    gif_decoder.h
+    sdf_layered.h
+    interp_quantized.h
+    stb_image_write.h
 )
 
 # Emscripten-specific settings

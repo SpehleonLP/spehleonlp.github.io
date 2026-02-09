@@ -1,3 +1,0 @@
-/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles/effect_stack.dir
-/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles/edit_cache.dir
-/home/anyuser/websites/spehleonlp.github.io/gradient-mapping/src/build/CMakeFiles/rebuild_cache.dir

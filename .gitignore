@@ -1,3 +1,44 @@
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+*.bin
+*.out
+
+# Build directories (CMake, Make, Ninja)
+**/build/
+**/build_*/
+**/Build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+CTestTestfile.cmake
+Makefile
+
+# Ninja build system
+.ninja_deps
+.ninja_log
+build.ninja
+rules.ninja
+
+# Qt Creator
+.qtc/
+.qtc_clangd/
+*.user
+*.autosave
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+Testing/
+
 # Image formats
 *.jpg
 *.jpeg
@@ -34,10 +75,9 @@
 # dataset/
 # images/
 # videos/
-erosion/reference/
+
+# Project-specific output directories
+**/reference/
+**/debug_output/
 erosion-old/
-gradient-mapping/reference/
-gradient-mapping/debug_output/
-gradient-mapping/src/build/
-gradient-mapping/src/build_cli/
-gradient-mapping/src/.qtcreator/
+

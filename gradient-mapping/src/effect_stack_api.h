@@ -121,6 +121,8 @@ typedef enum {
     EFFECT_GRADIENTIFY          = 0x23,
     EFFECT_POISSON_SOLVE        = 0x24,
     EFFECT_LAMINARIZE           = 0x25,
+    EFFECT_ANISO_UNSHARP        = 0x26,
+    EFFECT_CURVATURE_ADVECT     = 0x27,
 
     /* Gradient stack specifics */
     EFFECT_COLOR_RAMP           = 0x30,
@@ -130,6 +132,7 @@ typedef enum {
     EFFECT_DEBUG_HESSIAN_FLOW   = 0x40,
     EFFECT_DEBUG_SPLIT_CHANNELS = 0x41,
     EFFECT_DEBUG_LIC            = 0x42,
+    EFFECT_DEBUG_LAPLACIAN      = 0x43,
 } EffectId;
 
 // parameters for erosion source
@@ -224,6 +227,19 @@ typedef struct
 	float blur_sigma; // Gaussian sigma for magnitude blur (0-5)
 } LaminarizeParams;
 
+/* Anisotropic unsharp mask along contour lines */
+typedef struct {
+    float kernel_length;
+    float step_size;
+    float strength;
+    float gradient_scale;
+} AnisoUnsharpParams;
+
+typedef struct {
+    float advect_strength;  // how far to shift curvature uphill in pixels
+    float mix;              // blend: 0=original, 1=fully advected
+} CurvatureAdvectParams;
+
 
 /* =========================================================================
  * Debug command parameter structs (CLI only)
@@ -242,6 +258,10 @@ typedef struct {
     float kernel_length;  // half-length in pixels
     float step_size;      // Euler step
 } DebugLicParams;
+
+typedef struct {
+    int kernel_size;  // 3 or 5 for Hessian stencil
+} DebugLaplacianParams;
 
 /* =========================================================================
  * Gradient parameter structs (one per effect type)
@@ -286,9 +306,12 @@ typedef struct {
         GradientifyParams   gradientify;
         PoissonSolveParams  poisson_solve;
         LaminarizeParams    laminarize;
+        AnisoUnsharpParams  aniso_unsharp;
+        CurvatureAdvectParams curvature_advect;
         /* Debug commands */
         DebugHessianFlowParams debug_hessian_flow;
         DebugLicParams         debug_lic;
+        DebugLaplacianParams   debug_laplacian;
         /* Gradient stack */
         ColorRamp           color_ramp;      /* note: stops is malloc'd */
         BlendModeParams     blend_mode;

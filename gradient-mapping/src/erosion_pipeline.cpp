@@ -7,8 +7,11 @@
 #include "commands/fft_blur.h"
 #include "commands/interp_quantized.h"
 #include "commands/lic_debug_cmd.h"
+#include "commands/aniso_unsharp_cmd.h"
+#include "commands/curvature_advect_cmd.h"
 #include "commands/debug_png.h"
 #include "commands/label_regions.h"
+#include "commands/laplacian_cmd.h"
 #include "debug_output.h"
 #include "utility.h"
 #include <stddef.h>
@@ -367,6 +370,9 @@ static int process_erosion_gradient_planar(float *normals, uint32_t W, uint32_t 
 
 		case EFFECT_DEBUG_HESSIAN_FLOW:
 		case EFFECT_DEBUG_LIC:
+		case EFFECT_DEBUG_LAPLACIAN:
+		case EFFECT_ANISO_UNSHARP:
+		case EFFECT_CURVATURE_ADVECT:
 			/* Not applicable in gradient space */
 			break;
 
@@ -378,7 +384,7 @@ static int process_erosion_gradient_planar(float *normals, uint32_t W, uint32_t 
 				float *nz = &normals[(c * 3 + 2) * N];
 				std::unique_ptr<vec3[]> packed(new vec3[N]);
 				for (size_t j = 0; j < N; j++) {
-					packed[j] = (vec3){ nx[j], ny[j], nz[j] };
+					packed[j] = scale_normal((vec3){ nx[j], ny[j], nz[j] }, 0.1f);
 				}
 				char buf[512], filename[64];
 				snprintf(filename, sizeof(filename), "normal_ch%d.png", c);
@@ -630,6 +636,30 @@ static void process_erosion_height_planar(float *dst, uint32_t W, uint32_t H, Ef
 			break;
 		}
 
+		case EFFECT_ANISO_UNSHARP: {
+			AnisoUnsharpCmd au = {0};
+			au.heights = dst;
+			au.W = W;
+			au.H = H;
+			au.kernel_length = effects[i].params.aniso_unsharp.kernel_length;
+			au.step_size = effects[i].params.aniso_unsharp.step_size;
+			au.strength = effects[i].params.aniso_unsharp.strength;
+			au.gradient_scale = effects[i].params.aniso_unsharp.gradient_scale;
+			aniso_unsharp_Execute(&au);
+			break;
+		}
+
+		case EFFECT_CURVATURE_ADVECT: {
+			CurvatureAdvectCmd ca = {0};
+			ca.heights = dst;
+			ca.W = W;
+			ca.H = H;
+			ca.advect_strength = effects[i].params.curvature_advect.advect_strength;
+			ca.mix = effects[i].params.curvature_advect.mix;
+			curvature_advect_Execute(&ca);
+			break;
+		}
+
 		case EFFECT_DEBUG_LIC: {
 			LicDebugCmd lic = {0};
 			lic.heights = dst;
@@ -639,6 +669,33 @@ static void process_erosion_height_planar(float *dst, uint32_t W, uint32_t H, Ef
 			lic.kernel_length = effects[i].params.debug_lic.kernel_length;
 			lic.step_size = effects[i].params.debug_lic.step_size;
 			lic_debug_Execute(&lic);
+			break;
+		}
+
+		case EFFECT_DEBUG_LAPLACIAN: {
+			size_t N = (size_t)W * H;
+			char buf[512];
+			for (int c = 0; c < 3; c++) {
+				LaplacianCmd lap{};
+				lap.heightmap = &dst[c * N];
+				lap.W = W;
+				lap.H = H;
+				lap.kernel_size = effects[i].params.debug_laplacian.kernel_size;
+				lap.border = HESSIAN_BORDER_CLAMP_EDGE;
+				lap.undefined_value = -1.f;
+				if (laplacian_Execute(&lap) == 0) {
+					char filename[64];
+					snprintf(filename, sizeof(filename), "laplacian_ch%d.png", c);
+					PngFloatCmd fc{};
+					fc.path = debug_path(filename, buf, sizeof(buf));
+					fc.data = lap.laplacian;
+					fc.width = W;
+					fc.height = H;
+					fc.auto_range = 1;
+					png_ExportFloat(&fc);
+				}
+				laplacian_Free(&lap);
+			}
 			break;
 		}
 

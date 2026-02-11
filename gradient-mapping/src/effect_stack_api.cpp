@@ -156,6 +156,24 @@ static int parse_laminarize(const uint8_t* p, int n, Effect* out) {
     return 1;
 }
 
+static int parse_aniso_unsharp(const uint8_t* p, int n, Effect* out) {
+    if (!validate_param_count(EFFECT_ANISO_UNSHARP, n, 4)) return 0;
+    out->effect_id = EFFECT_ANISO_UNSHARP;
+    out->params.aniso_unsharp.kernel_length = unpack_log_range(p[0], 1.0f, 100.0f);
+    out->params.aniso_unsharp.step_size = unpack_log_range(p[1], 0.1f, 2.0f);
+    out->params.aniso_unsharp.strength = unpack_linear_range(p[2], 0.0f, 5.0f);
+    out->params.aniso_unsharp.gradient_scale = unpack_log_range(p[3], 0.1f, 10.0f);
+    return 1;
+}
+
+static int parse_curvature_advect(const uint8_t* p, int n, Effect* out) {
+    if (!validate_param_count(EFFECT_CURVATURE_ADVECT, n, 2)) return 0;
+    out->effect_id = EFFECT_CURVATURE_ADVECT;
+    out->params.curvature_advect.advect_strength = unpack_log_range(p[0], 0.5f, 20.0f);
+    out->params.curvature_advect.mix = unpack_linear01(p[1]);
+    return 1;
+}
+
 /* --- Debug Commands --- */
 
 static int parse_debug_hessian_flow(const uint8_t* p, int n, Effect* out) {
@@ -178,6 +196,13 @@ static int parse_debug_lic(const uint8_t* p, int n, Effect* out) {
     out->params.debug_lic.vector_field = (LicVectorField)unpack_enum(p[0], 2);
     out->params.debug_lic.kernel_length = unpack_log_range(p[1], 1.0f, 50.0f);
     out->params.debug_lic.step_size = unpack_linear_range(p[2], 0.1f, 2.0f);
+    return 1;
+}
+
+static int parse_debug_laplacian(const uint8_t* p, int n, Effect* out) {
+    if (!validate_param_count(EFFECT_DEBUG_LAPLACIAN, n, 1)) return 0;
+    out->effect_id = EFFECT_DEBUG_LAPLACIAN;
+    out->params.debug_laplacian.kernel_size = unpack_enum(p[0], 1) == 0 ? 3 : 5;
     return 1;
 }
 
@@ -294,10 +319,13 @@ EXPORT void push_effect(int effect_id, const uint8_t* params, int param_count) {
         case EFFECT_GRADIENTIFY:     ok = parse_gradientify(params, param_count, e); break;
         case EFFECT_POISSON_SOLVE:   ok = parse_poisson_solve(params, param_count, e); break;
         case EFFECT_LAMINARIZE:      ok = parse_laminarize(params, param_count, e); break;
+        case EFFECT_ANISO_UNSHARP:   ok = parse_aniso_unsharp(params, param_count, e); break;
+        case EFFECT_CURVATURE_ADVECT: ok = parse_curvature_advect(params, param_count, e); break;
         /* Debug commands */
         case EFFECT_DEBUG_HESSIAN_FLOW:   ok = parse_debug_hessian_flow(params, param_count, e); break;
         case EFFECT_DEBUG_SPLIT_CHANNELS: ok = parse_debug_split_channels(params, param_count, e); break;
         case EFFECT_DEBUG_LIC:            ok = parse_debug_lic(params, param_count, e); break;
+        case EFFECT_DEBUG_LAPLACIAN:      ok = parse_debug_laplacian(params, param_count, e); break;
         /* Gradient stack */
         case EFFECT_COLOR_RAMP:      ok = parse_color_ramp(params, param_count, e); break;
         case EFFECT_BLEND_MODE:      ok = parse_blend_mode(params, param_count, e); break;
@@ -431,6 +459,10 @@ EXPORT void debug_print_effect(Effect * e)
 				   e->params.debug_lic.vector_field,
 				   e->params.debug_lic.kernel_length,
 				   e->params.debug_lic.step_size);
+			break;
+		case EFFECT_DEBUG_LAPLACIAN:
+			printf("DEBUG_LAPLACIAN: kernel_size=%d\n",
+				   e->params.debug_laplacian.kernel_size);
 			break;
 		default:
 			printf("UNKNOWN\n");

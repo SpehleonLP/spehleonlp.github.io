@@ -121,9 +121,6 @@ typedef enum {
     EFFECT_GRADIENTIFY          = 0x23,
     EFFECT_POISSON_SOLVE        = 0x24,
     EFFECT_LAMINARIZE           = 0x25,
-    EFFECT_ANISO_UNSHARP        = 0x26,
-    EFFECT_CURVATURE_ADVECT     = 0x27,
-
     /* Gradient stack specifics */
     EFFECT_COLOR_RAMP           = 0x30,
     EFFECT_BLEND_MODE           = 0x31,
@@ -227,19 +224,6 @@ typedef struct
 	float blur_sigma; // Gaussian sigma for magnitude blur (0-5)
 } LaminarizeParams;
 
-/* Anisotropic unsharp mask along contour lines */
-typedef struct {
-    float kernel_length;
-    float step_size;
-    float strength;
-    float gradient_scale;
-} AnisoUnsharpParams;
-
-typedef struct {
-    float advect_strength;  // how far to shift curvature uphill in pixels
-    float mix;              // blend: 0=original, 1=fully advected
-} CurvatureAdvectParams;
-
 
 /* =========================================================================
  * Debug command parameter structs (CLI only)
@@ -306,8 +290,6 @@ typedef struct {
         GradientifyParams   gradientify;
         PoissonSolveParams  poisson_solve;
         LaminarizeParams    laminarize;
-        AnisoUnsharpParams  aniso_unsharp;
-        CurvatureAdvectParams curvature_advect;
         /* Debug commands */
         DebugHessianFlowParams debug_hessian_flow;
         DebugLicParams         debug_lic;

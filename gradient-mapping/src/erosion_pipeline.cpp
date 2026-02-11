@@ -7,8 +7,6 @@
 #include "commands/fft_blur.h"
 #include "commands/interp_quantized.h"
 #include "commands/lic_debug_cmd.h"
-#include "commands/aniso_unsharp_cmd.h"
-#include "commands/curvature_advect_cmd.h"
 #include "commands/debug_png.h"
 #include "commands/label_regions.h"
 #include "commands/laplacian_cmd.h"
@@ -371,10 +369,6 @@ static int process_erosion_gradient_planar(float *normals, uint32_t W, uint32_t 
 		case EFFECT_DEBUG_HESSIAN_FLOW:
 		case EFFECT_DEBUG_LIC:
 		case EFFECT_DEBUG_LAPLACIAN:
-		case EFFECT_ANISO_UNSHARP:
-		case EFFECT_CURVATURE_ADVECT:
-			/* Not applicable in gradient space */
-			break;
 
 		case EFFECT_DEBUG_SPLIT_CHANNELS: {
 			/* Export 3 normal maps (one per height channel) */
@@ -633,30 +627,6 @@ static void process_erosion_height_planar(float *dst, uint32_t W, uint32_t H, Ef
 			fc.data = &dst[2*N];
 			fc.path = debug_path("softness.png", buf, sizeof(buf));
 			png_ExportFloat(&fc);
-			break;
-		}
-
-		case EFFECT_ANISO_UNSHARP: {
-			AnisoUnsharpCmd au = {0};
-			au.heights = dst;
-			au.W = W;
-			au.H = H;
-			au.kernel_length = effects[i].params.aniso_unsharp.kernel_length;
-			au.step_size = effects[i].params.aniso_unsharp.step_size;
-			au.strength = effects[i].params.aniso_unsharp.strength;
-			au.gradient_scale = effects[i].params.aniso_unsharp.gradient_scale;
-			aniso_unsharp_Execute(&au);
-			break;
-		}
-
-		case EFFECT_CURVATURE_ADVECT: {
-			CurvatureAdvectCmd ca = {0};
-			ca.heights = dst;
-			ca.W = W;
-			ca.H = H;
-			ca.advect_strength = effects[i].params.curvature_advect.advect_strength;
-			ca.mix = effects[i].params.curvature_advect.mix;
-			curvature_advect_Execute(&ca);
 			break;
 		}
 

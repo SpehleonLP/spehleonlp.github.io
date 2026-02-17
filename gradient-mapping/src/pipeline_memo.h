@@ -128,8 +128,12 @@ static inline void memo_save_layer(PipelineMemo* memo, int layer_idx,
 	    && effect->params.color_ramp.length > 0) {
 		size_t stops_bytes = (size_t)effect->params.color_ramp.length * sizeof(ColorStop);
 		layer->effect.params.color_ramp.stops = (ColorStop*)malloc(stops_bytes);
-		memcpy(layer->effect.params.color_ramp.stops,
-		       effect->params.color_ramp.stops, stops_bytes);
+		if (layer->effect.params.color_ramp.stops) {
+			memcpy(layer->effect.params.color_ramp.stops,
+			       effect->params.color_ramp.stops, stops_bytes);
+		} else {
+			layer->effect.params.color_ramp.length = 0;
+		}
 	}
 
 	/* Copy buffer if non-NULL */
@@ -163,6 +167,8 @@ static inline MemoResumePoint memo_find_resume(const PipelineMemo* memo,
 
 	int limit = memo->count < effect_count ? memo->count : effect_count;
 
+	int match_count = 0;
+
 	for (int i = 0; i < limit; i++) {
 		if (!effects_equal(&memo->layers[i].effect, &effects[i])) {
 			/* Mismatch — check if effect_id matches for state reuse */
@@ -171,13 +177,20 @@ static inline MemoResumePoint memo_find_resume(const PipelineMemo* memo,
 			break;
 		}
 
-		/* Match — advance resume point past this effect */
-		result.resume_from = i + 1;
+		match_count = i + 1;
 
 		/* Track latest snapshot */
 		if (memo->layers[i].buffer_snapshot)
 			result.snapshot_idx = i;
 	}
+
+	/* We can only skip up to the snapshot point + 1, since effects
+	 * between the snapshot and match_count have no saved buffer state.
+	 * Without a snapshot, we must reprocess from scratch. */
+	if (result.snapshot_idx >= 0)
+		result.resume_from = result.snapshot_idx + 1;
+	else
+		result.resume_from = 0;
 
 	return result;
 }

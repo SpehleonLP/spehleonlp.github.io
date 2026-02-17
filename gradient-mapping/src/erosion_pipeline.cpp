@@ -597,15 +597,19 @@ static void process_erosion_height_planar(float *dst, uint32_t W, uint32_t H, Ef
 			break;
 		}
 
-		case EFFECT_GRADIENTIFY: {
-			i = process_erosion_gradientify(dst, W, H, effects, effect_count, i);
-			break;
-		}
-
+		case EFFECT_GRADIENTIFY:
 		case EFFECT_LAMINARIZE: {
-			/* Implicitly enter gradient space for laminarize */
+			int start_i = i;
 			i = process_erosion_gradientify(dst, W, H, effects, effect_count, i);
-			break;
+			/* Save memo entries for all consumed effects in the sub-loop.
+			 * Intermediates get no snapshot; final effect gets one if expensive. */
+			for (int j = start_i; j <= i; j++) {
+				bool do_snap = (j == i) && should_memoize(effects[j].effect_id);
+				memo_save_layer(&g_erosion_memo, j, &effects[j],
+				                do_snap ? dst : NULL,
+				                do_snap ? buffer_bytes : 0);
+			}
+			continue; /* skip generic memo_save_layer at end of loop */
 		}
 
 		case EFFECT_POISSON_SOLVE:

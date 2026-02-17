@@ -266,6 +266,8 @@ static void extract_neighbor_distances(InterpolateQuantizedCmd *cmd, SDFContext 
 				if (lowa < V && found_val == lowa) {
 				    if (cmd->pixels[idx].dist_lower < 0) {
 					    cmd->pixels[idx].dist_lower = dist;
+					    cmd->pixels[idx].dx_lower = cell->dx;
+					    cmd->pixels[idx].dy_lower = cell->dy;
 #if DEBUG_IMG_OUT
                         match_lower_count++;
 #endif
@@ -277,6 +279,8 @@ static void extract_neighbor_distances(InterpolateQuantizedCmd *cmd, SDFContext 
 				} else if (uppa > V && found_val == uppa) {
 				    if (cmd->pixels[idx].dist_higher < 0) {
 					    cmd->pixels[idx].dist_higher = dist;
+					    cmd->pixels[idx].dx_higher = cell->dx;
+					    cmd->pixels[idx].dy_higher = cell->dy;
 #if DEBUG_IMG_OUT
                         match_higher_count++;
 #endif
@@ -390,7 +394,7 @@ static void interpolate(InterpolateQuantizedCmd *cmd) {
     }
 }
 
-int iq_Execute(InterpolateQuantizedCmd *cmd) {
+int iq_ExecuteSDF(InterpolateQuantizedCmd *cmd) {
     /* Initialize and run SDF */
     SDFContext sdf = {0};
     sdf.labels = cmd->labels;
@@ -438,10 +442,11 @@ int iq_Execute(InterpolateQuantizedCmd *cmd) {
     }
 #endif
 
-    /* Compute max distances per region */
-    compute_region_max_distances(cmd);
+    return 0;
+}
 
-    /* Perform interpolation */
+int iq_ExecuteFromDistances(InterpolateQuantizedCmd *cmd) {
+    compute_region_max_distances(cmd);
     interpolate(cmd);
 
 #if DEBUG_IMG_OUT
@@ -451,6 +456,12 @@ int iq_Execute(InterpolateQuantizedCmd *cmd) {
 #endif
 
     return 0;
+}
+
+int iq_Execute(InterpolateQuantizedCmd *cmd) {
+    if (iq_ExecuteSDF(cmd) != 0)
+        return -1;
+    return iq_ExecuteFromDistances(cmd);
 }
 
 void iq_Free(InterpolateQuantizedCmd *cmd) {

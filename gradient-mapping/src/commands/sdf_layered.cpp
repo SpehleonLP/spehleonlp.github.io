@@ -24,33 +24,27 @@
  * When chebyshev=1, min_comp becomes 0, so result = max_comp = Chebyshev distance.
  * When chebyshev=0, it's pure Minkowski.
  */
-float sdf_ComputeDistance(const SDFDistanceParams *params, int16_t dx, int16_t dy) {
-    float ax = fabsf((float)dx);
-    float ay = fabsf((float)dy);
+double sdf_ComputeDistance(const SDFDistanceParams *params, int16_t dx, int16_t dy) {
+	if(dx == 0 && dy == 0) return 0;
+
+    double ax = abs(dx) ;
+    double ay = abs(dy) ;
 
     /* Sort into min/max */
-    float min_comp = ax < ay ? ax : ay;
-    float max_comp = ax > ay ? ax : ay;
+    double min_comp = ax < ay ? ax : ay;
+    double max_comp = ax > ay ? ax : ay;
 
     /* Apply Chebyshev blend to min component */
     min_comp *= (1.0f - params->chebyshev);
 
-    /* Minkowski exponent: p = 2^minkowski */
-    float p = exp2f(params->minkowski);
+    /* Minkowski exponent: p = 2^minkowski (always >= 1 with exp2 encoding) */
+    double p = exp2((double)params->minkowski);
 
-    /* Handle special cases for numerical stability */
-    if (p < 0.01f) {
-        /* Very small p approaches 0-norm (count of non-zero) */
-        return (min_comp > 0.0001f ? 1.0f : 0.0f) + (max_comp > 0.0001f ? 1.0f : 0.0f);
-    }
-    if (p > 100.0f) {
-        /* Large p approaches infinity-norm (max) */
-        return max_comp;
-    }
-
-    /* General Minkowski: (|x|^p + |y|^p)^(1/p) */
-    float sum = powf(min_comp, p) + powf(max_comp, p);
-    return powf(sum, 1.0f / p);
+    /* Numerically stable Minkowski: factor out max_comp so inner pow
+     * operates on ratio in [0,1]. Handles p→∞ (Chebyshev) without overflow. */
+    if (min_comp <= 0.0) return max_comp;
+    double ratio = min_comp / max_comp;
+    return max_comp * pow(1.0 + pow(ratio, p), 1.0 / p);
 }
 
 /* ========== Debug PNG Export Helpers ========== */
@@ -554,7 +548,7 @@ int sdf_Run(SDFContext *ctx) {
 	return iterations;
 }
 
-float sdf_GetDistance(SDFContext *ctx, uint32_t x, uint32_t y) {
+double sdf_GetDistance(SDFContext *ctx, uint32_t x, uint32_t y) {
 	if (x >= ctx->W || y >= ctx->H)
 		return -1.0f;
 	SDFCell *cell = &ctx->cells[y * ctx->W + x];

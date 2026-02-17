@@ -8,6 +8,8 @@
 typedef struct {
     float dist_lower;    /* distance to V-1, -1 if none */
     float dist_higher;   /* distance to V+1, -1 if none */
+    int16_t dx_lower, dy_lower;   /* displacement to V-1 boundary pixel */
+    int16_t dx_higher, dy_higher; /* displacement to V+1 boundary pixel */
 } InterpPixel;
 
 /* Per-region interpolation data */
@@ -54,6 +56,21 @@ int iq_Initialize(InterpolateQuantizedCmd *cmd, const uint8_t *src, const uint8_
  * Returns 0 on success, -1 on error.
  */
 int iq_Execute(InterpolateQuantizedCmd *cmd);
+
+/*
+ * Run only the SDF flood fill, populating dx/dy displacements and
+ * dist_lower/dist_higher. Does NOT compute region max distances or
+ * interpolate — call iq_ExecuteFromDistances afterwards.
+ * Returns 0 on success, -1 on error.
+ */
+int iq_ExecuteSDF(InterpolateQuantizedCmd *cmd);
+
+/*
+ * Run only the max-distance and interpolation steps on pre-populated pixels.
+ * Caller must have already filled cmd->pixels[].dist_lower/dist_higher.
+ * Returns 0 on success, -1 on error.
+ */
+int iq_ExecuteFromDistances(InterpolateQuantizedCmd *cmd);
 
 /*
  * Free all allocated memory.

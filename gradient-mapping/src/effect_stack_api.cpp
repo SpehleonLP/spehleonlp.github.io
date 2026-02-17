@@ -188,6 +188,15 @@ static int parse_debug_laplacian(const uint8_t* p, int n, Effect* out) {
     return 1;
 }
 
+static int parse_debug_ridge_mesh(const uint8_t* p, int n, Effect* out) {
+    if (!validate_param_count(EFFECT_DEBUG_RIDGE_MESH, n, 3)) return 0;
+    out->effect_id = EFFECT_DEBUG_RIDGE_MESH;
+    out->params.debug_ridge_mesh.normal_scale = unpack_log_range(p[0], 0.001f, 100.0f);
+    out->params.debug_ridge_mesh.high_threshold = unpack_linear01(p[1]);
+    out->params.debug_ridge_mesh.low_threshold = unpack_linear01(p[2]);
+    return 1;
+}
+
 /* --- Gradient Stack --- */
 
 /*
@@ -252,11 +261,17 @@ EXPORT void set_source_path(int stack_type, const char* vfs_path) {
     g_stacks[stack_type].source_path[sizeof(g_stacks[stack_type].source_path) - 1] = '\0';
     g_stacks[stack_type].source_changed = 1;
     g_stacks[stack_type].source_path_changed = 1;
+    if (stack_type == STACK_EROSION) erosion_memo_clear();
+    if (stack_type == STACK_GRADIENT) gradient_memo_clear();
 }
 
 EXPORT void set_source_changed(int stack_type, int changed) {
     if (stack_type < 0 || stack_type > 1) return;
     g_stacks[stack_type].source_changed = changed;
+    if (changed) {
+        if (stack_type == STACK_EROSION) erosion_memo_clear();
+        if (stack_type == STACK_GRADIENT) gradient_memo_clear();
+    }
 }
 
 EXPORT void stack_begin(int stack_type) {
@@ -306,6 +321,7 @@ EXPORT void push_effect(int effect_id, const uint8_t* params, int param_count) {
         case EFFECT_DEBUG_SPLIT_CHANNELS: ok = parse_debug_split_channels(params, param_count, e); break;
         case EFFECT_DEBUG_LIC:            ok = parse_debug_lic(params, param_count, e); break;
         case EFFECT_DEBUG_LAPLACIAN:      ok = parse_debug_laplacian(params, param_count, e); break;
+        case EFFECT_DEBUG_RIDGE_MESH:    ok = parse_debug_ridge_mesh(params, param_count, e); break;
         /* Gradient stack */
         case EFFECT_COLOR_RAMP:      ok = parse_color_ramp(params, param_count, e); break;
         case EFFECT_BLEND_MODE:      ok = parse_blend_mode(params, param_count, e); break;
@@ -444,6 +460,12 @@ EXPORT void debug_print_effect(Effect * e)
 			printf("DEBUG_LAPLACIAN: kernel_size=%d\n",
 				   e->params.debug_laplacian.kernel_size);
 			break;
+		case EFFECT_DEBUG_RIDGE_MESH:
+			printf("DEBUG_RIDGE_MESH: normal_scale=%.3f high_thresh=%.4f low_thresh=%.4f\n",
+				   e->params.debug_ridge_mesh.normal_scale,
+				   e->params.debug_ridge_mesh.high_threshold,
+				   e->params.debug_ridge_mesh.low_threshold);
+			break;
 		default:
 			printf("UNKNOWN\n");
 			break;
@@ -529,6 +551,8 @@ EXPORT void analyze_source(int stack_type, const float* params, int param_count)
     }
 
     g_stacks[stack_type].source_changed = 0;
+	
+	return;
 	
     /* For erosion stack, send timing and recommend auto effects based on quantization */
     if (stack_type == STACK_EROSION

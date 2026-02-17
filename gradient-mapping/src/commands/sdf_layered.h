@@ -13,7 +13,7 @@ typedef struct {
 typedef struct {
     int16_t dx, dy;        /* -1,-1 = no result yet */
     int16_t source_value;  /* src value at the source pixel, 256 = invalid */
-    float distance;        /* computed distance using current metric */
+    double  distance;        /* computed distance using current metric */
 } SDFCell;
 
 /* Priority queue entry for flood fill corrections */
@@ -72,10 +72,10 @@ int sdf_Iterate(SDFContext *ctx);
 int sdf_Run(SDFContext *ctx);
 
 /* Get distance for a pixel (returns -1 if no result) */
-float sdf_GetDistance(SDFContext *ctx, uint32_t x, uint32_t y);
+double sdf_GetDistance(SDFContext *ctx, uint32_t x, uint32_t y);
 
 /* Compute distance using current metric parameters */
-float sdf_ComputeDistance(const SDFDistanceParams *params, int16_t dx, int16_t dy);
+double sdf_ComputeDistance(const SDFDistanceParams *params, int16_t dx, int16_t dy);
 
 /* Free all allocated memory */
 void sdf_Free(SDFContext *ctx);

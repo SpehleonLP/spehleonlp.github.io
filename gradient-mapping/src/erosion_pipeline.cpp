@@ -10,14 +10,23 @@
 #include "commands/debug_png.h"
 #include "commands/label_regions.h"
 #include "commands/laplacian_cmd.h"
+#include "commands/ridge_mesh_cmd.h"
+#include "commands/heightmap_ops.h"
 #include "debug_output.h"
 #include "utility.h"
+#include "pipeline_memo.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include <memory>
+
+static PipelineMemo g_erosion_memo = {};
+
+void erosion_memo_clear(void) {
+    memo_clear(&g_erosion_memo);
+}
 
 /* =============================================================================
  * Box Blur
@@ -74,17 +83,16 @@ static void box_blur_normals_planar(float *normals, uint32_t W, uint32_t H, int 
 
 	/* Renormalize */
 	for (size_t i = 0; i < N; i++) {
-		float x = nx[i], y = ny[i], z = nz[i];
-		float len = sqrtf(x * x + y * y + z * z);
+		vec3 n(nx[i], ny[i], nz[i]);
+		float len = glm::length(n);
 		if (len > 0.0001f) {
-			nx[i] = x / len;
-			ny[i] = y / len;
-			nz[i] = z / len;
+			n /= len;
 		} else {
-			nx[i] = 0;
-			ny[i] = 0;
-			nz[i] = 1;
+			n = vec3(0, 0, 1);
 		}
+		nx[i] = n.x;
+		ny[i] = n.y;
+		nz[i] = n.z;
 	}
 }
 
@@ -171,17 +179,16 @@ static void fft_filter_normals_planar(float *normals, uint32_t W, uint32_t H, fl
 
 	/* Renormalize */
 	for (size_t i = 0; i < N; i++) {
-		float x = nx[i], y = ny[i], z = nz[i];
-		float len = sqrtf(x * x + y * y + z * z);
+		vec3 n(nx[i], ny[i], nz[i]);
+		float len = glm::length(n);
 		if (len > 0.0001f) {
-			nx[i] = x / len;
-			ny[i] = y / len;
-			nz[i] = z / len;
+			n /= len;
 		} else {
-			nx[i] = 0;
-			ny[i] = 0;
-			nz[i] = 1;
+			n = vec3(0, 0, 1);
 		}
+		nx[i] = n.x;
+		ny[i] = n.y;
+		nz[i] = n.z;
 	}
 }
 
@@ -197,25 +204,17 @@ static void fft_filter_normals_planar(float *normals, uint32_t W, uint32_t H, fl
  * Out-of-bounds samples are 0 (GL_CLAMP_TO_BORDER). */
 static void height_to_normals_planar(float *nx, float *ny, float *nz,
                                       const float *heights, uint32_t W, uint32_t H, float scale) {
+	/* height_normal() uses scale as the z-component before normalization,
+	 * while the old code scaled the gradient by `scale` with z=1.
+	 * normalize(-gx*s, -gy*s, 1) == normalize(-gx, -gy, 1/s) */
+	float z_scale = 1.0f / scale;
 	for (uint32_t y = 0; y < H; y++) {
 		for (uint32_t x = 0; x < W; x++) {
 			size_t idx = y * W + x;
-
-			/* Sample neighbors: 0 outside border */
-			float hL = (x > 0)     ? heights[idx - 1] : 0.0f;
-			float hR = (x < W - 1) ? heights[idx + 1] : 0.0f;
-			float hD = (y > 0)     ? heights[idx - W] : 0.0f;
-			float hU = (y < H - 1) ? heights[idx + W] : 0.0f;
-
-			/* Gradient via central differences */
-			float gx = (hR - hL) * 0.5f * scale;
-			float gy = (hU - hD) * 0.5f * scale;
-
-			/* Normal from gradient: n = normalize(-gx, -gy, 1) */
-			float len = sqrtf(gx * gx + gy * gy + 1.0f);
-			nx[idx] = -gx / len;
-			ny[idx] = -gy / len;
-			nz[idx] = 1.0f / len;
+			vec3 n = height_normal(heights, x, y, W, H, z_scale);
+			nx[idx] = n.x;
+			ny[idx] = n.y;
+			nz[idx] = n.z;
 		}
 	}
 }
@@ -231,7 +230,7 @@ static void normals_to_height_planar(float *heights, const float *original_heigh
 	/* Pack planar normals into vec3 array for constrained_poisson */
 	std::unique_ptr<vec3[]> normals(new vec3[N]);
 	for (size_t i = 0; i < N; i++) {
-		normals[i] = (vec3){ nx[i], ny[i], nz[i] };
+		normals[i] = vec3(nx[i], ny[i], nz[i]);
 	}
 
 	ConstrainedPoissonCmd cmd{};
@@ -331,7 +330,7 @@ static int process_erosion_gradient_planar(float *normals, uint32_t W, uint32_t 
 				/* Convert planar (nx[], ny[], nz[]) to vec3 array */
 				std::unique_ptr<vec3[]> input(new vec3[N]);
 				for (size_t j = 0; j < N; j++) {
-					input[j] = (vec3){ nm[j], nm[N + j], nm[2 * N + j] };
+					input[j] = vec3(nm[j], nm[N + j], nm[2 * N + j]);
 				}
 				LaminarizeCmd lam{};
 				lam.normals = input.get();
@@ -369,6 +368,7 @@ static int process_erosion_gradient_planar(float *normals, uint32_t W, uint32_t 
 		case EFFECT_DEBUG_HESSIAN_FLOW:
 		case EFFECT_DEBUG_LIC:
 		case EFFECT_DEBUG_LAPLACIAN:
+		case EFFECT_DEBUG_RIDGE_MESH:
 
 		case EFFECT_DEBUG_SPLIT_CHANNELS: {
 			/* Export 3 normal maps (one per height channel) */
@@ -378,7 +378,7 @@ static int process_erosion_gradient_planar(float *normals, uint32_t W, uint32_t 
 				float *nz = &normals[(c * 3 + 2) * N];
 				std::unique_ptr<vec3[]> packed(new vec3[N]);
 				for (size_t j = 0; j < N; j++) {
-					packed[j] = scale_normal((vec3){ nx[j], ny[j], nz[j] }, 0.1f);
+					packed[j] = scale_normal(vec3(nx[j], ny[j], nz[j]), 0.1f);
 				}
 				char buf[512], filename[64];
 				snprintf(filename, sizeof(filename), "normal_ch%d.png", c);
@@ -546,7 +546,22 @@ static void run_dijkstra_reference(vec4 *dst, uint32_t W, uint32_t H, SDFDistanc
 /* Process effects on planar height field (3 channels stored as separate planes) */
 static void process_erosion_height_planar(float *dst, uint32_t W, uint32_t H, Effect const* effects, int effect_count)
 {
-	for (int i = 0; i < effect_count; ++i)
+	size_t buffer_bytes = (size_t)W * H * 3 * sizeof(float);
+
+	/* Find where we can resume from the memo cache */
+	MemoResumePoint resume = memo_find_resume(&g_erosion_memo, effects, effect_count, W, H);
+
+	/* Restore snapshot if we have a valid one */
+	if (resume.snapshot_idx >= 0) {
+		memcpy(dst, g_erosion_memo.layers[resume.snapshot_idx].buffer_snapshot, buffer_bytes);
+	}
+
+	/* Discard stale layers beyond the resume point */
+	memo_truncate(&g_erosion_memo, resume.resume_from);
+	g_erosion_memo.source_W = W;
+	g_erosion_memo.source_H = H;
+
+	for (int i = resume.resume_from; i < effect_count; ++i)
 	{
 		switch ((EffectId)effects[i].effect_id)
 		{
@@ -642,6 +657,19 @@ static void process_erosion_height_planar(float *dst, uint32_t W, uint32_t H, Ef
 			break;
 		}
 
+		case EFFECT_DEBUG_RIDGE_MESH: {
+			RidgeMeshCmd rm{};
+			rm.heightmap = &dst[W*H*1]; /* channel 1 (G) */
+			rm.W = W;
+			rm.H = H;
+			rm.normal_scale = effects[i].params.debug_ridge_mesh.normal_scale;
+			rm.high_threshold = effects[i].params.debug_ridge_mesh.high_threshold;
+			rm.low_threshold = effects[i].params.debug_ridge_mesh.low_threshold;
+			ridge_mesh_Execute(&rm);
+			ridge_mesh_DebugRender(&rm);
+			break;
+		}
+
 		case EFFECT_DEBUG_LAPLACIAN: {
 			size_t N = (size_t)W * H;
 			char buf[512];
@@ -673,6 +701,14 @@ static void process_erosion_height_planar(float *dst, uint32_t W, uint32_t H, Ef
 		case EFFECT_BLEND_MODE:
 			/* Invalid in erosion pipeline */
 			break;
+		}
+
+		/* Save memo layer after each effect */
+		{
+			bool do_snapshot = should_memoize(effects[i].effect_id);
+			memo_save_layer(&g_erosion_memo, i, &effects[i],
+			                do_snapshot ? dst : NULL,
+			                do_snapshot ? buffer_bytes : 0);
 		}
 	}
 }

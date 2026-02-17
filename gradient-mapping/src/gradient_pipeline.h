@@ -50,5 +50,6 @@ void gp_apply_color_ramp(GradientPipeline *ctx, const GPColorRamp *ramp);
 // Returns pointer to RGBA uint8 data (width * height * 4 bytes)
 uint8_t *gp_finalize(GradientPipeline *ctx);
 
+void gradient_memo_clear(void);
 
 #endif // GRADIENT_PIPELINE_H

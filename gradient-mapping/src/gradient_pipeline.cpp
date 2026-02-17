@@ -16,6 +16,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>  // DEBUG
+#include "pipeline_memo.h"
+
+static PipelineMemo g_gradient_memo = {};
+
+void gradient_memo_clear(void) {
+    memo_clear(&g_gradient_memo);
+}
 
 /* Gradient pipeline context */
 static GradientPipeline g_gradient_ctx = {0};
@@ -27,7 +34,7 @@ static int g_gradient_initialized = 0;
 
 static vec4 sample_ramp(const GPColorRamp *ramp, float t) {
     if (!ramp || ramp->stop_count == 0) {
-        return (vec4){ t, t, t, 1.0f };
+        return vec4( t, t, t, 1.0f );
     }
 
     t = clampf(t, 0.0f, 1.0f);
@@ -50,17 +57,17 @@ static vec4 sample_ramp(const GPColorRamp *ramp, float t) {
         if (t >= stops[i].position && t <= stops[i+1].position) {
             float range = stops[i+1].position - stops[i].position;
             float local_t = (range > 0.0001f) ? (t - stops[i].position) / range : 0.0f;
-            return (vec4){
+            return vec4(
                 lerpf(stops[i].color.x, stops[i+1].color.x, local_t),
                 lerpf(stops[i].color.y, stops[i+1].color.y, local_t),
                 lerpf(stops[i].color.z, stops[i+1].color.z, local_t),
                 lerpf(stops[i].color.w, stops[i+1].color.w, local_t)
-            };
+            );
         }
     }
 
     // Fallback
-    return (vec4){ t, t, t, 1.0f };
+    return vec4( t, t, t, 1.0f );
 }
 
 // -----------------------------------------------------------------------------
@@ -69,10 +76,7 @@ static vec4 sample_ramp(const GPColorRamp *ramp, float t) {
 
 static vec4 blend_colors(vec4 dst, vec4 src, int mode, float opacity) {
     // Pre-multiply source by opacity
-    src.x *= opacity;
-    src.y *= opacity;
-    src.z *= opacity;
-    src.w *= opacity;
+    src *= opacity;
 
     vec4 result;
 
@@ -404,6 +408,24 @@ uint8_t* process_gradient_stack(Effect const* effects, int effect_count, int* ou
         g_gradient_ctx.has_output = 1;
     }
     
+    /* Update memo dimensions */
+    g_gradient_memo.source_W = W;
+    g_gradient_memo.source_H = H;
+
+    /* Compare effect array against memo to find how far they match.
+     * No snapshots are stored yet (should_memoize returns false for all gradient effects),
+     * so this just tracks the matching prefix for future use. */
+    int memo_match_count = 0;
+    {
+        int walk_limit = (effect_count < g_gradient_memo.count) ? effect_count : g_gradient_memo.count;
+        for (int i = 0; i < walk_limit; i++) {
+            if (!effects_equal(&effects[i], &g_gradient_memo.layers[i].effect))
+                break;
+            memo_match_count = i + 1;
+        }
+    }
+    memo_truncate(&g_gradient_memo, memo_match_count);
+
     /* Process effects in order */
     int current_blend_mode = 0;
     float current_opacity = 1.0f;
@@ -432,6 +454,11 @@ uint8_t* process_gradient_stack(Effect const* effects, int effect_count, int* ou
             current_blend_mode = 0;
             current_opacity = 1.0f;
         }
+    }
+
+    /* Save memo layers for newly processed effects */
+    for (int i = memo_match_count; i < effect_count; i++) {
+        memo_save_layer(&g_gradient_memo, i, &effects[i], NULL, 0);
     }
 
     /* Finalize and get output */

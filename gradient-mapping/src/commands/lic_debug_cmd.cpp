@@ -1,4 +1,5 @@
 #include "lic_debug_cmd.h"
+#include "heightmap_ops.h"
 #include "../utility.h"
 #include <stdlib.h>
 #include <math.h>
@@ -108,35 +109,28 @@ static int lic_channel(float* heights, uint32_t W, uint32_t H,
 		for (uint32_t x = 0; x < W; x++) {
 			uint32_t idx = y * W + x;
 
-			float hL = (x > 0)     ? heights[idx - 1] : heights[idx];
-			float hR = (x < W - 1) ? heights[idx + 1] : heights[idx];
-			float hD = (y > 0)     ? heights[idx - W] : heights[idx];
-			float hU = (y < H - 1) ? heights[idx + W] : heights[idx];
-
-			float gx = (hR - hL) * 0.5f;
-			float gy = (hU - hD) * 0.5f;
-
-			float mag = sqrtf(gx * gx + gy * gy);
+			glm::vec2 g = height_gradient(heights, x, y, W, H);
+			float mag = glm::length(g);
 			grad_mag[idx] = mag;
 			if (mag > max_mag) max_mag = mag;
 
 			float vx, vy;
 			switch (vector_field) {
 			case LIC_FIELD_NORMAL:
-				vx = -gx;
-				vy = -gy;
+				vx = -g.x;
+				vy = -g.y;
 				break;
 			case LIC_FIELD_TANGENT:
-				vx = gx;
-				vy = gy;
+				vx = g.x;
+				vy = g.y;
 				break;
 			case LIC_FIELD_BITANGENT:
-				vx = -gy;
-				vy = gx;
+				vx = -g.y;
+				vy = g.x;
 				break;
 			default:
-				vx = -gx;
-				vy = -gy;
+				vx = -g.x;
+				vy = -g.y;
 				break;
 			}
 

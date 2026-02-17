@@ -35,7 +35,7 @@ void linear_gradient(vec3* dst, const vec3* src, int W, int H,
             t = (t * 0.5f + 0.5f);
 
             // Store in blue channel, zero for R and G
-            dst[idx] = vec3_make(t, t, t);
+            dst[idx] = vec3(t, t, t);
         }
     }
 }

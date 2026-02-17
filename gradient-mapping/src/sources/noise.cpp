@@ -43,7 +43,7 @@ static void noise_white(vec3* dst, const vec3* src, int W, int H, uint32_t seed)
     int size = W * H;
     for (int i = 0; i < size; i++) {
 		float r = pcg32_float(&rng);
-        dst[i] = vec3_make(r, pcg32_float(&rng), r);
+        dst[i] = vec3(r, pcg32_float(&rng), r);
     }
 }
 
@@ -138,7 +138,7 @@ static void noise_blue(vec3* dst, const vec3* src, int W, int H, uint32_t seed) 
             float dx = (v_xp - v_xm) * 0.25f;
             float dy = (v_yp - v_ym) * 0.25f;
 
-            dst[y * W + x] = vec3_make(dx, dy, clampf(v, 0.0f, 1.0f));
+            dst[y * W + x] = vec3(dx, dy, clampf(v, 0.0f, 1.0f));
         }
     }
 }
@@ -198,7 +198,7 @@ static void noise_value(vec3* dst, const vec3* src, int W, int H,
             float dvalue_dx = du * (vy1 - vy0);
             float dvalue_dy = dv * (vx1 - vx0);
 
-            dst[idx] = vec3_make(dvalue_dx * 0.5f, dvalue_dy * 0.5f, value);
+            dst[idx] = vec3(dvalue_dx * 0.5f, dvalue_dy * 0.5f, value);
         }
     }
 }

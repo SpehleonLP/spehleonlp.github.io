@@ -8,7 +8,7 @@
 
 static vec2 perlin_gradient_curl(int x, int y, uint32_t seed) {
     float angle = hash2d(x, y, seed) * 6.28318530718f;
-    return vec2_make(cosf(angle), sinf(angle));
+    return vec2(cosf(angle), sinf(angle));
 }
 
 static float perlin_single_curl(float x, float y, uint32_t seed) {
@@ -28,15 +28,15 @@ static float perlin_single_curl(float x, float y, uint32_t seed) {
     vec2 g01 = perlin_gradient_curl(x0, y1, seed);
     vec2 g11 = perlin_gradient_curl(x1, y1, seed);
 
-    vec2 d00 = vec2_make(fx, fy);
-    vec2 d10 = vec2_make(fx - 1.0f, fy);
-    vec2 d01 = vec2_make(fx, fy - 1.0f);
-    vec2 d11 = vec2_make(fx - 1.0f, fy - 1.0f);
+    vec2 d00 = vec2(fx, fy);
+    vec2 d10 = vec2(fx - 1.0f, fy);
+    vec2 d01 = vec2(fx, fy - 1.0f);
+    vec2 d11 = vec2(fx - 1.0f, fy - 1.0f);
 
-    float n00 = vec2_dot(g00, d00);
-    float n10 = vec2_dot(g10, d10);
-    float n01 = vec2_dot(g01, d01);
-    float n11 = vec2_dot(g11, d11);
+    float n00 = glm::dot(g00, d00);
+    float n10 = glm::dot(g10, d10);
+    float n01 = glm::dot(g01, d01);
+    float n11 = glm::dot(g11, d11);
 
     float nx0 = lerpf(n00, n10, u);
     float nx1 = lerpf(n01, n11, u);

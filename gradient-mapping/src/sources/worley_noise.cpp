@@ -64,7 +64,7 @@ void worley_noise(vec3* dst, const vec3* src, int W, int H,
                     float point_y = (float)oy + params.jitter * (rnd.y - 0.5f) + 0.5f;
 
                     // Distance to this point
-                    vec2 delta = { fx - point_x, fy - point_y };
+                    vec2 delta = vec2(fx - point_x, fy - point_y);
                     float dist = worley_distance(delta, params.metric);
 
                     // Update closest distances

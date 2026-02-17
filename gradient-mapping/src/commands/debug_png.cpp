@@ -68,27 +68,22 @@ int png_ExportVec2(PngVec2Cmd* cmd) {
 	if (!pixels) return -2;
 
 	for (uint32_t i = 0; i < N; i++) {
-		float nx = cmd->data[i].x / scale * 0.5f;
-		float ny = cmd->data[i].y / scale * 0.5f;
-		float nz = z_bias;
+		vec3 n(cmd->data[i].x / scale * 0.5f,
+		       cmd->data[i].y / scale * 0.5f,
+		       z_bias);
 
 		// Normalize
-		float mag = sqrtf(nx * nx + ny * ny + nz * nz);
+		float mag = glm::length(n);
 		if (mag > 1e-6f) {
-			float inv_mag = 1.0f / mag;
-			nx *= inv_mag;
-			ny *= inv_mag;
-			nz *= inv_mag;
+			n /= mag;
 		}
 
 		// Map [-1,1] to [0,1]
-		nx = nx * 0.5f + 0.5f;
-		ny = ny * 0.5f + 0.5f;
-		nz = nz * 0.5f + 0.5f;
+		n = n * 0.5f + 0.5f;
 
-		pixels[i * 3 + 0] = float_to_byte(nx);
-		pixels[i * 3 + 1] = float_to_byte(ny);
-		pixels[i * 3 + 2] = float_to_byte(nz);
+		pixels[i * 3 + 0] = float_to_byte(n.x);
+		pixels[i * 3 + 1] = float_to_byte(n.y);
+		pixels[i * 3 + 2] = float_to_byte(n.z);
 	}
 
 	int result = stbi_write_png(cmd->path, cmd->width, cmd->height, 3, pixels.get(), cmd->width * 3);
@@ -151,15 +146,14 @@ int png_ExportInterleaved(PngInterleavedCmd* cmd) {
 	}
 
 	// Export as grayscale
-	PngFloatCmd float_cmd = {
-		.path = cmd->path,
-		.data = extracted.get(),
-		.width = cmd->width,
-		.height = cmd->height,
-		.min_val = min_val,
-		.max_val = max_val,
-		.auto_range = 0
-	};
+	PngFloatCmd float_cmd{};
+	float_cmd.path = cmd->path;
+	float_cmd.data = extracted.get();
+	float_cmd.width = cmd->width;
+	float_cmd.height = cmd->height;
+	float_cmd.min_val = min_val;
+	float_cmd.max_val = max_val;
+	float_cmd.auto_range = 0;
 
 	int result = png_ExportFloat(&float_cmd);
 
@@ -221,16 +215,16 @@ static void render_tile(
 			for (uint32_t y = 0; y < h; y++) {
 				for (uint32_t x = 0; x < w; x++) {
 					uint32_t i = y * w + x;
-					float nx = data[i].x;
-					float ny = data[i].y;
-					float nz = sqrtf(max_f32(0, 1.0f - nx * nx - ny * ny)) * s;
-					float len = sqrtf(nx * nx + ny * ny + nz * nz);
-					if (len > 1e-8f) { nx /= len; ny /= len; nz /= len; }
+					vec3 n(data[i].x,
+					       data[i].y,
+					       sqrtf(max_f32(0, 1.0f - data[i].x * data[i].x - data[i].y * data[i].y)) * s);
+					float len = glm::length(n);
+					if (len > 1e-8f) { n /= len; }
 
 					uint8_t* p = dest + y * dest_stride + x * 3;
-					p[0] = float_to_ubyte(nx);
-					p[1] = float_to_ubyte(ny);
-					p[2] = float_to_ubyte(nz);
+					p[0] = float_to_ubyte(n.x);
+					p[1] = float_to_ubyte(n.y);
+					p[2] = float_to_ubyte(n.z);
 				}
 			}
 		}

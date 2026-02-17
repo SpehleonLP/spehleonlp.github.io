@@ -33,13 +33,13 @@ scripts/
   effect_stack.wasm # Compiled C processing (155KB)
   effect_catalog.json
 src/
-  effect_stack_api.h  # Public C API (all effect definitions)
-  effect_stack_api.c  # Catalog generation + stack execution
-  erosion_pipeline.c  # Erosion stack processing
-  gradient_pipeline.c # Gradient stack processing
-  smart_blur.c        # Key: constraint-based interpolation
+  effect_stack_api.h  # Public API (types, enums, WASM exports)
+  effect_stack_api.cpp # Catalog generation + stack execution
+  erosion_pipeline.cpp # Erosion stack processing
+  gradient_pipeline.cpp # Gradient stack processing
+  utility.h           # Shared scalar/vector helpers
   sources/            # Noise generators (Perlin, Worley, Curl)
-  commands/           # Image processing effects (10+ filters)
+  commands/           # Processing commands (one struct+function per file)
   image_memo/         # Frame caching + envelope detection
 ```
 
@@ -53,9 +53,36 @@ push_effect(int id, float* params, int n)   // Add effect to chain
 stack_end(int* w, int* h)                   // Process stack, return RGBA
 ```
 
+## Command Pattern (`src/commands/`)
+
+Commands are **functions with named arguments**. The struct is just the argument list + outputs, not an abstraction:
+
+```cpp
+// laminarize_cmd.h — one command per file for token optimization
+typedef struct {
+    /* Input (borrowed pointers, caller owns) */
+    const vec3* normals;
+    uint32_t W, H;
+    float scale;
+
+    /* Output (RAII, allocated by the function) */
+    std::unique_ptr<vec3[]> result_normals;
+} LaminarizeCmd;
+
+int laminarize_Execute(LaminarizeCmd* cmd);
+```
+
+Key rules:
+- Input fields are **raw borrowed pointers** (caller owns the data)
+- Output fields are **`std::unique_ptr`** (RAII, freed when struct goes out of scope)
+- One `.h`/`.cpp` pair per command — keeps context windows small
+- Function naming: `modulename_Execute(ModuleNameCmd* cmd)`
+- Shared utilities (e.g. `heightmap_ops.h`) go in `commands/` as header-only inlines
+
 ## Code Style
 
-- C code: C99, `-Wall -Wextra -Wpedantic`
+- C++20, `-Wall -Wextra -Wpedantic -fno-exceptions`
+- GLM for all vector math (`using glm::vec3;` etc. in `effect_stack_api.h`)
 - JS: ES6+, no build step, vanilla (no framework)
 - Shaders: GLSL ES 3.0 (WebGL 2)
 
@@ -78,5 +105,5 @@ No automated tests. Manual testing via:
 
 - `landing.md` - Public-facing introduction
 - `about.md` - Artist-friendly guide
-- `reference/STATUS.md` - Development roadmap
 - `reference/BUGS_FOUND.md` - Known issues
+- `reference/cli_interface.md` - **CLI effect IDs, param encoding, and usage** (read before invoking the CLI or modifying effect parsing; update when effects are added/changed)

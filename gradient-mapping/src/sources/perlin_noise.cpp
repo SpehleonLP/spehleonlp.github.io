@@ -7,7 +7,7 @@
 static vec2 perlin_gradient(int x, int y, uint32_t seed) {
     // Hash to get an angle
     float angle = hash2d(x, y, seed) * 6.28318530718f;  // 2*PI
-    return vec2_make(cosf(angle), sinf(angle));
+    return vec2(cosf(angle), sinf(angle));
 }
 
 // Single octave of Perlin noise with analytical derivatives
@@ -62,7 +62,7 @@ static vec3 perlin_single_with_deriv(float x, float y, uint32_t seed) {
     float dnx1_dy = lerpf(g01.y, g11.y, u);
     float dvalue_dy = lerpf(dnx0_dy, dnx1_dy, v) + dv * (nx1 - nx0);
 
-    return vec3_make(dvalue_dx, dvalue_dy, value);
+    return vec3(dvalue_dx, dvalue_dy, value);
 }
 
 void perlin_noise(vec3* dst, const vec3* src, int W, int H,
@@ -124,7 +124,7 @@ void perlin_noise(vec3* dst, const vec3* src, int W, int H,
             deriv_x = deriv_x * inv_max * 0.5f;
             deriv_y = deriv_y * inv_max * 0.5f;
 
-            dst[idx] = vec3_make(deriv_x, deriv_y, value);
+            dst[idx] = vec3(deriv_x, deriv_y, value);
         }
     }
 }

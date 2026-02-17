@@ -24,19 +24,24 @@
 #define EXPORT
 #endif
 
-#define VEC2_DEFINED
-typedef struct { float x, y; } vec2;
-#define VEC3_DEFINED
-typedef struct { float x,y,z; } vec3;
-typedef struct { float x,y,z,w; } vec4;
+#include <glm/glm.hpp>
+#include <glm/ext/vector_int2_sized.hpp>
+#include <glm/ext/vector_int3_sized.hpp>
+#include <glm/ext/vector_int4_sized.hpp>
+#include <glm/ext/vector_uint1_sized.hpp>
+#include <glm/ext/vector_uint2_sized.hpp>
+#include <glm/ext/vector_uint3_sized.hpp>
+#include <glm/ext/vector_uint4_sized.hpp>
 
-typedef struct { int16_t x, y; } i16vec2;
-typedef struct { int16_t x,y,z; } i16vec3;
-typedef struct { int16_t x,y,z,w; } i16vec4;
-	
-typedef struct { uint8_t x, y; } u8vec2;
-typedef struct { uint8_t x,y,z; } u8vec3;
-typedef struct { uint8_t x,y,z,w; } u8vec4;
+using glm::vec2;
+using glm::vec3;
+using glm::vec4;
+using glm::i16vec2;
+using glm::i16vec3;
+using glm::i16vec4;
+using glm::u8vec2;
+using glm::u8vec3;
+using glm::u8vec4;
 
 typedef struct { float position; vec4 color; } ColorStop;
 
@@ -130,6 +135,7 @@ typedef enum {
     EFFECT_DEBUG_SPLIT_CHANNELS = 0x41,
     EFFECT_DEBUG_LIC            = 0x42,
     EFFECT_DEBUG_LAPLACIAN      = 0x43,
+    EFFECT_DEBUG_RIDGE_MESH     = 0x44,
 } EffectId;
 
 // parameters for erosion source
@@ -247,6 +253,12 @@ typedef struct {
     int kernel_size;  // 3 or 5 for Hessian stencil
 } DebugLaplacianParams;
 
+typedef struct {
+    float normal_scale;    // F: scales normal.z (higher = thinner lines)
+    float high_threshold;  // vertex extraction threshold on normalized divergence
+    float low_threshold;   // walkable mask threshold for Dijkstra edges
+} DebugRidgeMeshParams;
+
 /* =========================================================================
  * Gradient parameter structs (one per effect type)
  * ========================================================================= */
@@ -294,6 +306,7 @@ typedef struct {
         DebugHessianFlowParams debug_hessian_flow;
         DebugLicParams         debug_lic;
         DebugLaplacianParams   debug_laplacian;
+        DebugRidgeMeshParams   debug_ridge_mesh;
         /* Gradient stack */
         ColorRamp           color_ramp;      /* note: stops is malloc'd */
         BlendModeParams     blend_mode;

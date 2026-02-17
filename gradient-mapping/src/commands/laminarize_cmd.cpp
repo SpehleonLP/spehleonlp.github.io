@@ -153,11 +153,10 @@ int laminarize_Execute(LaminarizeCmd* cmd) {
 	auto dir_y = std::unique_ptr<float[]>(new float[size]);
 
 	for (uint32_t i = 0; i < size; i++) {
-		float fx = -cmd->normals[i].x;
-		float fy = -cmd->normals[i].y;
-		mag[i] = sqrtf(fx * fx + fy * fy);
-		dir_x[i] = fx;
-		dir_y[i] = fy;
+		vec2 f(-cmd->normals[i].x, -cmd->normals[i].y);
+		mag[i] = glm::length(f);
+		dir_x[i] = f.x;
+		dir_y[i] = f.y;
 	}
 
 	// Step 2: Compute divergence of raw (-nx, -ny) field
@@ -170,13 +169,11 @@ int laminarize_Execute(LaminarizeCmd* cmd) {
 	auto L_target = std::unique_ptr<float[]>(new float[size]);
 
 	for (uint32_t i = 0; i < size; i++) {
-		float nx = cmd->normals[i].x;
-		float ny = cmd->normals[i].y;
-		float nz = cmd->normals[i].z * scale;
-		float len = sqrtf(nx * nx + ny * ny + nz * nz);
+		vec3 n(cmd->normals[i].x, cmd->normals[i].y, cmd->normals[i].z * scale);
+		float len = glm::length(n);
 		if (len > 1e-8f) {
-			scaled_fx[i] = -nx / len;
-			scaled_fy[i] = -ny / len;
+			scaled_fx[i] = -n.x / len;
+			scaled_fy[i] = -n.y / len;
 		} else {
 			scaled_fx[i] = 0.0f;
 			scaled_fy[i] = 0.0f;
@@ -270,18 +267,15 @@ int laminarize_Execute(LaminarizeCmd* cmd) {
 			float fy = cy * blurred_mag[idx];
 
 			// Reconstruct normal: n = (-fx, -fy, nz)
-			float nx = -fx;
-			float ny = -fy;
-			float xy_sq = nx * nx + ny * ny;
+			float xy_sq = fx * fx + fy * fy;
 			float nz = (xy_sq < 1.0f) ? sqrtf(1.0f - xy_sq) : 0.0f;
-			float len = sqrtf(xy_sq + nz * nz);
+			vec3 n(-fx, -fy, nz);
+			float len = glm::length(n);
 
 			if (len > 1e-8f) {
-				cmd->result_normals[idx].x = nx / len;
-				cmd->result_normals[idx].y = ny / len;
-				cmd->result_normals[idx].z = nz / len;
+				cmd->result_normals[idx] = n / len;
 			} else {
-				cmd->result_normals[idx] = (vec3){0, 0, 1};
+				cmd->result_normals[idx] = vec3(0, 0, 1);
 			}
 		}
 	}

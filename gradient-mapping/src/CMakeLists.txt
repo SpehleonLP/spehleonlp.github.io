@@ -18,6 +18,20 @@ file(GLOB EXPLORE_HEADERS "explore/*.h")
 list(APPEND SOURCES ${SOURCES_SUBDIR} ${COMMANDS_SOURCES} ${IMAGE_MEMO_SOURCES} ${EXPLORE_SOURCES})
 list(APPEND HEADERS ${HEADERS_SUBDIR} ${COMMANDS_HEADERS} ${IMAGE_MEMO_HEADERS} ${EXPLORE_HEADERS})
 
+# --- FetchContent dependencies (available to all targets) ---
+include(FetchContent)
+FetchContent_Declare(
+    cxxopts
+    GIT_REPOSITORY https://github.com/jarro2783/cxxopts.git
+    GIT_TAG        v3.1.1
+)
+FetchContent_Declare(
+    glm
+    GIT_REPOSITORY https://github.com/g-truc/glm.git
+    GIT_TAG        1.0.1
+)
+FetchContent_MakeAvailable(cxxopts glm)
+
 # Emscripten-specific settings
 if(EMSCRIPTEN)
     set(CMAKE_EXECUTABLE_SUFFIX ".js")
@@ -39,7 +53,7 @@ if(EMSCRIPTEN)
     list(JOIN EXPORTED_FUNCTIONS "," EXPORTED_FUNCTIONS_STR)
 
     # Emscripten compilation flags
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fstrict-aliasing")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fstrict-aliasing -fno-exceptions")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} \
         -s WASM=1 \
         -s MODULARIZE=1 \
@@ -65,6 +79,8 @@ if(EMSCRIPTEN)
         ${CMAKE_CURRENT_SOURCE_DIR}/image_memo
     )
 
+    target_link_libraries(effect_stack PRIVATE glm::glm)
+
     set_target_properties(effect_stack PROPERTIES
         OUTPUT_NAME "effect_stack"
         SUFFIX ".js"
@@ -85,17 +101,12 @@ else()
         -Wextra
         -Wpedantic
         -fstrict-aliasing
+        -fno-exceptions
     )
+
+    target_link_libraries(effect_stack_lib PRIVATE glm::glm)
 
     # --- Native CLI executable ---
-    include(FetchContent)
-    FetchContent_Declare(
-        cxxopts
-        GIT_REPOSITORY https://github.com/jarro2783/cxxopts.git
-        GIT_TAG        v3.1.1
-    )
-    FetchContent_MakeAvailable(cxxopts)
-
     add_executable(effect_stack_cli main.cpp)
 
     target_include_directories(effect_stack_cli PRIVATE
@@ -108,6 +119,7 @@ else()
     target_link_libraries(effect_stack_cli PRIVATE
         effect_stack_lib
         cxxopts::cxxopts
+        glm::glm
         m
     )
 endif()

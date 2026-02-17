@@ -1,4 +1,5 @@
 #include "hessian_flow_dbg.h"
+#include "heightmap_ops.h"
 #include "laminarize_cmd.h"
 #include "lic_stylize_cmd.h"
 #include "split_normals_cmd.h"
@@ -30,34 +31,27 @@ static void compute_divergence_from_normals(const vec3* normals, uint32_t W, uin
         return;
     }
 
+    // Zero vec3 used for clamp-to-border out-of-bounds reads
+    const vec3 zero(0.0f);
+
     for (uint32_t y = 0; y < H; y++) {
         for (uint32_t x = 0; x < W; x++) {
             uint32_t idx = y * W + x;
 
-            // Get neighboring normals with boundary clamping
-            uint32_t xm = (x > 0) ? x - 1 : 0;
-            uint32_t xp = (x < W - 1) ? x + 1 : W - 1;
-            uint32_t ym = (y > 0) ? y - 1 : 0;
-            uint32_t yp = (y < H - 1) ? y + 1 : H - 1;
+            // Get neighboring normals with clamp-to-border (0 for OOB)
+            const vec3& n_xm = (x > 0)     ? normals[y * W + (x - 1)] : zero;
+            const vec3& n_xp = (x < W - 1) ? normals[y * W + (x + 1)] : zero;
+            const vec3& n_ym = (y > 0)     ? normals[(y - 1) * W + x] : zero;
+            const vec3& n_yp = (y < H - 1) ? normals[(y + 1) * W + x] : zero;
 
             // Tangent field: T = (-nx, -ny) - direction of steepest ascent
-            float Tx_xm = -normals[y * W + xm].x;
-            float Tx_xp = -normals[y * W + xp].x;
-            float Ty_ym = -normals[ym * W + x].y;
-            float Ty_yp = -normals[yp * W + x].y;
-
-            float dTx_dx = (Tx_xp - Tx_xm) * 0.5f;
-            float dTy_dy = (Ty_yp - Ty_ym) * 0.5f;
+            float dTx_dx = (-n_xp.x - (-n_xm.x)) * 0.5f;
+            float dTy_dy = (-n_yp.y - (-n_ym.y)) * 0.5f;
             div_tangent[idx] = dTx_dx + dTy_dy;
 
             // Bitangent field: B = (ny, -nx) - perpendicular to tangent (90° CCW)
-            float Bx_xm = normals[y * W + xm].y;
-            float Bx_xp = normals[y * W + xp].y;
-            float By_ym = -normals[ym * W + x].x;
-            float By_yp = -normals[yp * W + x].x;
-
-            float dBx_dx = (Bx_xp - Bx_xm) * 0.5f;
-            float dBy_dy = (By_yp - By_ym) * 0.5f;
+            float dBx_dx = (n_xp.y - n_xm.y) * 0.5f;
+            float dBy_dy = (-n_yp.x - (-n_ym.x)) * 0.5f;
             div_bitangent[idx] = dBx_dx + dBy_dy;
         }
     }
@@ -67,7 +61,8 @@ static void compute_divergence_from_normals(const vec3* normals, uint32_t W, uin
 }
 
 /*
- * Compute normal map from heightmap using central differences
+ * Compute normal map from heightmap using central differences.
+ * Uses clamp-to-border (0.0f for out-of-bounds) via height_normal().
  */
 static std::unique_ptr<vec3[]> compute_normals_from_height(const float* height, uint32_t W, uint32_t H, float scale) {
     auto normals = std::unique_ptr<vec3[]>(new (std::nothrow) vec3[W * H]);
@@ -75,32 +70,7 @@ static std::unique_ptr<vec3[]> compute_normals_from_height(const float* height, 
 
     for (uint32_t y = 0; y < H; y++) {
         for (uint32_t x = 0; x < W; x++) {
-            uint32_t idx = y * W + x;
-
-            // Central differences with boundary clamping
-            float hL = (x > 0) ? height[idx - 1] : height[idx];
-            float hR = (x < W - 1) ? height[idx + 1] : height[idx];
-            float hD = (y > 0) ? height[idx - W] : height[idx];
-            float hU = (y < H - 1) ? height[idx + W] : height[idx];
-
-            float gx = (hR - hL) * 0.5f;
-            float gy = (hU - hD) * 0.5f;
-
-            // Normal = normalize(-gx, -gy, scale)
-            float nx = -gx;
-            float ny = -gy;
-            float nz = scale;
-            float len = sqrtf(nx * nx + ny * ny + nz * nz);
-
-            if (len > 1e-8f) {
-                normals[idx].x = nx / len;
-                normals[idx].y = ny / len;
-                normals[idx].z = nz / len;
-            } else {
-                normals[idx].x = 0.0f;
-                normals[idx].y = 0.0f;
-                normals[idx].z = 1.0f;
-            }
+            normals[y * W + x] = height_normal(height, x, y, W, H, scale);
         }
     }
 
@@ -211,7 +181,7 @@ int hessian_flow_init(HessianFlowDebugCmd* cmd) {
 	// orthoganalize major/minor
 	for (uint32_t i = 0; i < size; i++)
 	{
-		vec3 m = vec3_sub(cmd->original_normals[i], cmd->major_normals[i]);
+		vec3 m = cmd->original_normals[i] - cmd->major_normals[i];
 
 		// this broke round tripping but the output is visually uninterpretable without it.. how to fix?
 		m.z = sqrtf(1.f - clamp_f32(m.x*m.x + m.y*m.y, 0, 1));
@@ -314,20 +284,17 @@ int hessian_flow_init(HessianFlowDebugCmd* cmd) {
 		minor = from_tangent(cmd->major_normals[i], minor);
 
         // Blend all three components to preserve proportionality
-        float nx = major_w * cmd->major_normals[i].x + minor_w * minor.x;
-        float ny = major_w * cmd->major_normals[i].y + minor_w * minor.y;
-        float nz = major_w * cmd->major_normals[i].z;
+        vec3 blended(
+            major_w * cmd->major_normals[i].x + minor_w * minor.x,
+            major_w * cmd->major_normals[i].y + minor_w * minor.y,
+            major_w * cmd->major_normals[i].z);
 
         // Renormalize
-        float len = sqrtf(nx * nx + ny * ny + nz * nz);
+        float len = glm::length(blended);
         if (len > 1e-8f) {
-            cmd->remixed_normals[i].x = nx / len;
-            cmd->remixed_normals[i].y = ny / len;
-            cmd->remixed_normals[i].z = nz / len;
+            cmd->remixed_normals[i] = blended / len;
         } else {
-            cmd->remixed_normals[i].x = 0.0f;
-            cmd->remixed_normals[i].y = 0.0f;
-            cmd->remixed_normals[i].z = 1.0f;
+            cmd->remixed_normals[i] = vec3(0.0f, 0.0f, 1.0f);
         }
     }
 
@@ -392,10 +359,7 @@ int hessian_flow_init(HessianFlowDebugCmd* cmd) {
             o.x * cmd->major_normals[i].x +
             o.y * cmd->major_normals[i].y;
         cmd->dot_minor_original[i] = cmd->minor_normals[i].y;
-        cmd->dot_remixed_original[i] =
-            o.x * cmd->remixed_normals[i].x +
-            o.y * cmd->remixed_normals[i].y +
-            o.z * cmd->remixed_normals[i].z;
+        cmd->dot_remixed_original[i] = glm::dot(o, cmd->remixed_normals[i]);
     }
 
     return 0;

@@ -268,31 +268,23 @@ int normal_from_hessian_Execute(NormalFromHessianCmd* cmd) {
 
             /* Normalize major */
             {
-                float nmx = mx, nmy = my, nmz = 1.0f;
-                float len = sqrtf(nmx * nmx + nmy * nmy + nmz * nmz);
+                vec3 n(mx, my, 1.0f);
+                float len = glm::length(n);
                 if (len > 1e-8f) {
-                    cmd->major_normals[idx].x = nmx / len;
-                    cmd->major_normals[idx].y = nmy / len;
-                    cmd->major_normals[idx].z = nmz / len;
+                    cmd->major_normals[idx] = n / len;
                 } else {
-                    cmd->major_normals[idx].x = 0.0f;
-                    cmd->major_normals[idx].y = 0.0f;
-                    cmd->major_normals[idx].z = 1.0f;
+                    cmd->major_normals[idx] = vec3(0, 0, 1);
                 }
             }
 
             /* Normalize minor */
             {
-                float nnx = nx, nny = ny, nnz = 1.0f;
-                float len = sqrtf(nnx * nnx + nny * nny + nnz * nnz);
+                vec3 n(nx, ny, 1.0f);
+                float len = glm::length(n);
                 if (len > 1e-8f) {
-                    cmd->minor_normals[idx].x = nnx / len;
-                    cmd->minor_normals[idx].y = nny / len;
-                    cmd->minor_normals[idx].z = nnz / len;
+                    cmd->minor_normals[idx] = n / len;
                 } else {
-                    cmd->minor_normals[idx].x = 0.0f;
-                    cmd->minor_normals[idx].y = 0.0f;
-                    cmd->minor_normals[idx].z = 1.0f;
+                    cmd->minor_normals[idx] = vec3(0, 0, 1);
                 }
             }
         }

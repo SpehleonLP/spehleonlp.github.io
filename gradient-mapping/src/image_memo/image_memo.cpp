@@ -61,8 +61,8 @@ static void free_erosion_memo(void) {
     g_erosion_memo.animation_duration = -1;
     g_erosion_memo.maximum_quantization = 0;
     g_erosion_memo.minimum_quantization = 0;
-    g_erosion_memo.min_rgba = (u8vec4){0, 0, 0, 0};
-    g_erosion_memo.max_rgba = (u8vec4){0, 0, 0, 0};
+    g_erosion_memo.min_rgba = u8vec4(0, 0, 0, 0);
+    g_erosion_memo.max_rgba = u8vec4(0, 0, 0, 0);
     memset(g_erosion_memo.colors_used, 255, sizeof(g_erosion_memo.colors_used));
     g_erosion_path[0] = '\0';
 }
@@ -211,7 +211,7 @@ static i16vec4 used_color_flags_to_indices(ErosionImageMemo *ememo)
         }
     }
     
-    return (i16vec4){(int16_t)min_gap[0], (int16_t)min_gap[1], (int16_t)min_gap[2], (int16_t)min_gap[3]};
+    return i16vec4((int16_t)min_gap[0], (int16_t)min_gap[1], (int16_t)min_gap[2], (int16_t)min_gap[3]);
 }
 
 /*
@@ -235,8 +235,8 @@ static void analyze_quantization_single(ErosionImageMemo *ememo, float target_qu
     float step = 255.0f / (levels - 1);
 
     /* Initialize tracking */
-    ememo->min_rgba = (u8vec4){255, 255, 255, 255};
-    ememo->max_rgba = (u8vec4){0, 0, 0, 0};
+    ememo->min_rgba = u8vec4(255, 255, 255, 255);
+    ememo->max_rgba = u8vec4(0, 0, 0, 0);
     memset(ememo->colors_used, 0, sizeof(ememo->colors_used));
 
     /* Pass 1: Quantize pixels and mark used values */
@@ -258,8 +258,8 @@ static void analyze_quantization_single(ErosionImageMemo *ememo, float target_qu
             (&ememo->colors_used[c[j]].x)[j] = 1;
         }
 
-        ememo->min_rgba = min_u8vec4(ememo->min_rgba, *(u8vec4*)c);
-        ememo->max_rgba = max_u8vec4(ememo->max_rgba, *(u8vec4*)c);
+        ememo->min_rgba = glm::min(ememo->min_rgba, *(u8vec4*)c);
+        ememo->max_rgba = glm::max(ememo->max_rgba, *(u8vec4*)c);
     }
 
     /* Pass 2: Convert usage markers to "previous used value" links */
@@ -387,16 +387,16 @@ static int load_erosion_gif(const uint8_t *file_data, int file_size, float targe
 	g_erosion_memo.maximum_quantization = metadata.max_quantization;
 	
 	/* Set min/max rgba and colors_used based on the actual envelope output image */
-	g_erosion_memo.min_rgba = (u8vec4){255, 255, 255, 255};
-	g_erosion_memo.max_rgba = (u8vec4){0, 0, 0, 0};
+	g_erosion_memo.min_rgba = u8vec4(255, 255, 255, 255);
+	g_erosion_memo.max_rgba = u8vec4(0, 0, 0, 0);
 	memset(g_erosion_memo.colors_used, 0, sizeof(g_erosion_memo.colors_used));
 
 	uint32_t N = w*h;
 	for(uint32_t i = 0; i < N; ++i)
 	{
 		u8vec4 c = g_erosion_memo.image.colors[i];
-		g_erosion_memo.min_rgba = min_u8vec4(g_erosion_memo.min_rgba, c);
-		g_erosion_memo.max_rgba = max_u8vec4(g_erosion_memo.max_rgba, c);
+		g_erosion_memo.min_rgba = glm::min(g_erosion_memo.min_rgba, c);
+		g_erosion_memo.max_rgba = glm::max(g_erosion_memo.max_rgba, c);
 
 		/* Mark actual pixel values as used (same as analyze_quantization_single) */
 		g_erosion_memo.colors_used[c.x].x = 1;

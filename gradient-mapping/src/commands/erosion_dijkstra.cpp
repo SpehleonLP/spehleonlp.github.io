@@ -3,9 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* Access colors_used array - it's a u8vec4[256] */
-typedef struct { uint8_t x, y, z, w; } u8vec4_local;
-
 int ed_Initialize(ErosionDijkstraCmd *cmd, const uint8_t *src, uint32_t W, uint32_t H,
                   const SDFDistanceParams *params, int dbg) {
     memset(cmd, 0, sizeof(*cmd));

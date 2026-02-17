@@ -1,11 +1,18 @@
-BUILD_DIR = build
+BUILD_WASM = build
+BUILD_CLI  = build_cli
 
-all:
-	@mkdir -p $(BUILD_DIR)
-	@cd $(BUILD_DIR) && emcmake cmake .. -G "Unix Makefiles" && emmake make
+all: wasm cli
+
+wasm:
+	@mkdir -p $(BUILD_WASM)
+	@cd $(BUILD_WASM) && emcmake cmake .. -G "Unix Makefiles" && emmake make
+
+cli:
+	@mkdir -p $(BUILD_CLI)
+	@cd $(BUILD_CLI) && cmake .. && make -j$$(nproc)
 
 clean:
-	rm -rf $(BUILD_DIR)
+	rm -rf $(BUILD_WASM) $(BUILD_CLI)
 	rm -f ../scripts/effect_stack.js ../scripts/effect_stack.wasm
 
-.PHONY: all clean
+.PHONY: all wasm cli clean

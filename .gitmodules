@@ -1,0 +1,3 @@
+[submodule "gradient-mapping/lib/diamorse"]
+	path = gradient-mapping/lib/diamorse
+	url = https://github.com/AppliedMathematicsANU/diamorse.git

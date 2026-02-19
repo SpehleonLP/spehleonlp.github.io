@@ -57,24 +57,17 @@ static void render_energy_debug(
 			max_valley_e = he.energy;
 	}
 
-	/* Draw each half-edge individually.
-	 * Half-edges belonging to a closed feature (face >= 0) are offset
-	 * 1 px inward (left-hand normal of edge direction → face interior).
-	 * Half-edges on the infinite face (face < 0) draw on the edge itself. */
-	int32_t num_he = (int32_t)mesh.half_edges.size();
-	for (int32_t i = 0; i < num_he; i++) {
-		const DCELHalfEdge& he = mesh.half_edges[i];
-		float energy = he.energy;
-
+	/* Helper: compute color for a half-edge */
+	auto he_color = [&](const DCELHalfEdge& he) -> uint32_t {
 		uint8_t r, g, b;
 		if (he.type == DCEL_EDGE_RIDGE) {
-			float t = energy / max_ridge_e;
+			float t = he.energy / max_ridge_e;
 			r = (uint8_t)(80 + 175 * t);
 			g = (uint8_t)(30 + 200 * t);
 			b = 30;
 		} else {
-			if (energy > 0.0f) {
-				float t = energy / max_valley_e;
+			if (he.energy > 0.0f) {
+				float t = he.energy / max_valley_e;
 				r = 30;
 				g = (uint8_t)(60 + 195 * t);
 				b = (uint8_t)(120 + 135 * t);
@@ -82,38 +75,78 @@ static void render_energy_debug(
 				r = 60; g = 60; b = 100;
 			}
 		}
+		return (uint32_t)r | ((uint32_t)g << 8) | ((uint32_t)b << 16);
+	};
+
+	auto plot = [&](int x, int y, uint32_t color) {
+		if ((uint32_t)x < W && (uint32_t)y < H) {
+			uint32_t pi = (uint32_t)y * W + (uint32_t)x;
+			rgb[pi*3+0] = (uint8_t)(color);
+			rgb[pi*3+1] = (uint8_t)(color >> 8);
+			rgb[pi*3+2] = (uint8_t)(color >> 16);
+		}
+	};
+
+	/* Draw each undirected edge once as a 2px wide line.
+	 * At each Bresenham step, emit two adjacent pixels:
+	 * one for each half-edge, offset perpendicular to the edge.
+	 *
+	 * DCEL invariant: he.face is on the math-left of he's direction.
+	 * Math-left normal of (ex, ey) is (-ey, ex).
+	 * We pick a major-axis perpendicular for the offset pixel, then
+	 * check whether it points toward math-left or math-right to assign
+	 * he vs twin colors correctly. */
+	int32_t num_he = (int32_t)mesh.half_edges.size();
+	for (int32_t i = 0; i < num_he; i++) {
+		const DCELHalfEdge& he = mesh.half_edges[i];
+		if (he.twin < i) continue; /* each undirected edge once */
+
+		const DCELHalfEdge& tw = mesh.half_edges[he.twin];
 
 		const DCELVertex& v0 = mesh.vertices[he.origin];
 		int32_t dest = dcel_dest(mesh, i);
 		const DCELVertex& v1 = mesh.vertices[dest];
 
-		/* Compute 1px inward offset for closed features */
-		float ox = 0.0f, oy = 0.0f;
-		if (he.face >= 0 && he.face < (int32_t)mesh.features.size()
-		    && mesh.features[he.face].type == DCEL_FEATURE_CLOSED) {
-			float ex = v1.x - v0.x, ey = v1.y - v0.y;
-			float elen = sqrtf(ex * ex + ey * ey);
-			if (elen > 1e-6f) {
-				/* Left-hand normal points into the face (CCW winding) */
-				ox = -ey / elen;
-				oy =  ex / elen;
-			}
-		}
+		float ex = v1.x - v0.x, ey = v1.y - v0.y;
 
-		/* Bresenham line with offset */
-		int x0 = (int)(v0.x + ox), y0 = (int)(v0.y + oy);
-		int x1 = (int)(v1.x + ox), y1 = (int)(v1.y + oy);
+		/* Bresenham on the actual edge, with perpendicular expansion */
+		int x0 = (int)(v0.x + 0.5f), y0 = (int)(v0.y + 0.5f);
+		int x1 = (int)(v1.x + 0.5f), y1 = (int)(v1.y + 0.5f);
 		int adx = abs(x1 - x0), ady = abs(y1 - y0);
 		int sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
 		int err = adx - ady;
 
+		/* Major-axis perpendicular offset (always 1px, always adjacent) */
+		int perp_x, perp_y;
+		if (adx >= ady) {
+			perp_x = 0;
+			perp_y = 1;
+		} else {
+			perp_x = 1;
+			perp_y = 0;
+		}
+
+		/* Does perp point toward math-left of (ex, ey)?
+		 * Math-left normal is (-ey, ex).
+		 * dot(perp, math_left) = perp_x*(-ey) + perp_y*(ex) */
+		float dot = (float)perp_x * (-ey) + (float)perp_y * ex;
+
+		/* center pixel = he, offset pixel = twin when perp is math-right.
+		 * Swap if perp actually points toward math-left. */
+		uint32_t color_center, color_offset;
+		if (dot > 0) {
+			/* perp points toward math-left (he.face side) */
+			color_center = he_color(tw);
+			color_offset = he_color(he);
+		} else {
+			/* perp points toward math-right (tw.face side) */
+			color_center = he_color(he);
+			color_offset = he_color(tw);
+		}
+
 		for (;;) {
-			if ((uint32_t)x0 < W && (uint32_t)y0 < H) {
-				uint32_t pi = (uint32_t)y0 * W + (uint32_t)x0;
-				rgb[pi*3+0] = r;
-				rgb[pi*3+1] = g;
-				rgb[pi*3+2] = b;
-			}
+			plot(x0,          y0,          color_center);
+			plot(x0 + perp_x, y0 + perp_y, color_offset);
 			if (x0 == x1 && y0 == y1) break;
 			int e2 = 2 * err;
 			if (e2 > -ady) { err -= ady; x0 += sx; }

@@ -11,6 +11,7 @@
 #include "commands/label_regions.h"
 #include "commands/laplacian_cmd.h"
 #include "commands/ridge_mesh_cmd.h"
+#include "commands/morse_smale_cmd.h"
 #include "commands/heightmap_ops.h"
 #include "commands/dijkstra_state.h"
 #include "debug_output.h"
@@ -434,32 +435,27 @@ static int process_erosion_gradientify(float *height, uint32_t W, uint32_t H,
 	return i;
 }
                                             
-/* Dijkstra distance transform on planar height data.
- * state_io: if non-NULL, caches euclidean dx/dy displacements for reuse.
- *   Cold path (*state_io == NULL): runs full SDF, stores results in new DijkstraState.
- *   Warm path (*state_io != NULL && dimensions match): skips SDF, uses cached dx/dy. */
-static void run_dijkstra_planar(float *dst, uint32_t W, uint32_t H,
-                                SDFDistanceParams params,
-                                DijkstraState** state_io)
+/* Ensure *state_io points to a valid DijkstraState with populated dx/dy caches.
+ * If *state_io is NULL or dimensions mismatch, runs the full SDF (cold path)
+ * and stores the new state. Otherwise, no-op. */
+void dijkstra_state_ensure(DijkstraState** state_io, uint32_t W, uint32_t H)
 {
-	uint32_t N = W*H;
+	if (!state_io) return;
+
+	/* Already valid? */
+	DijkstraState* cached = *state_io;
+	if (cached && cached->W == W && cached->H == H) return;
+
+	uint32_t N = W * H;
 	ErosionImageMemo* memo = memo_get_erosion_mutable();
-	if (!memo || !memo->image.deinterleaved) {
-		return;
-	}
+	if (!memo || !memo->image.deinterleaved) return;
 
-	/* Check if we have a valid cached state */
-	DijkstraState* cached = state_io ? *state_io : nullptr;
-	bool warm = cached && cached->W == W && cached->H == H;
-
-	/* Compute and cache regions if not already done (cold path only) */
-	if (!warm && memo->regions == NULL)
+	/* Compute and cache regions if not already done */
+	if (memo->regions == NULL)
 	{
-		/* Allocate space for 3 channels worth of region labels */
 		uint32_t *regions = (uint32_t *)calloc(N * 3, sizeof(uint32_t));
 		if (!regions) return;
 
-		/* Run label_regions for each channel (RGB, not A) */
 		for (uint32_t i = 0; i < 3; ++i)
 		{
 			LabelRegionsCmd label_cmd = {
@@ -478,162 +474,150 @@ static void run_dijkstra_planar(float *dst, uint32_t W, uint32_t H,
 			}
 			memo->region_count[i] = label_cmd.num_regions;
 		}
-		memo->region_count[3] = 0;  /* Alpha channel unused */
+		memo->region_count[3] = 0;
 		memo->regions = regions;
 	}
 
-	/* Allocate new state for caching on cold path */
-	DijkstraState* new_state = nullptr;
-	if (!warm && state_io) {
-		new_state = (DijkstraState*)calloc(1, sizeof(DijkstraState));
-		if (!new_state) return;
-		new_state->W = W;
-		new_state->H = H;
-	}
+	/* Allocate new state */
+	DijkstraState* new_state = (DijkstraState*)calloc(1, sizeof(DijkstraState));
+	if (!new_state) return;
+	new_state->W = W;
+	new_state->H = H;
 
-	/* Run interpolation for each channel */
+	SDFDistanceParams euclidean_params;
+	euclidean_params.minkowski = 1.0f;  /* exp2(1) = 2 = Euclidean */
+	euclidean_params.chebyshev = 0.0f;
+
+	/* Run SDF for each channel */
 	for (int i = 0; i < 3; ++i)
 	{
 		uint8_t *channel_data = &memo->image.deinterleaved[N * i];
 		uint8_t colors_used[256];
 
 		for (int j = 0; j < 256; ++j)
-		{
 			colors_used[j] = ((uint8_t *)(&memo->colors_used[j].x))[i];
-		}
 
-		if (warm) {
-			/* Warm path: use cached labels and dx/dy */
-			DijkstraChannelState* ch = &cached->channels[i];
+		InterpolateQuantizedCmd iq = {};
+		iq.labels = (uint32_t *)&memo->regions[N * i];
+		iq.num_regions = memo->region_count[i];
 
-			InterpolateQuantizedCmd iq = {0};
-			iq.labels = ch->labels;
-			iq.num_regions = ch->num_regions;
-
-			if (iq_Initialize(&iq, channel_data, colors_used, W, H, nullptr, i==0) != 0) {
-				free(iq.pixels);
-				free(iq.regions);
-				free(iq.output);
-				return;
-			}
-
-			/* Populate pixels from cached dx/dy, recomputing distance via user metric.
-			 * dx=0,dy=0 is the sentinel for "no data" (minimum real displacement is 1). */
-			for (uint32_t j = 0; j < N; ++j) {
-				int16_t dxl = ch->dx_lower[j], dyl = ch->dy_lower[j];
-				int16_t dxh = ch->dx_higher[j], dyh = ch->dy_higher[j];
-				iq.pixels[j].dx_lower  = dxl;
-				iq.pixels[j].dy_lower  = dyl;
-				iq.pixels[j].dx_higher = dxh;
-				iq.pixels[j].dy_higher = dyh;
-				if (dxl | dyl)
-					iq.pixels[j].dist_lower = sdf_ComputeDistance(&params, dxl, dyl);
-				if (dxh | dyh)
-					iq.pixels[j].dist_higher = sdf_ComputeDistance(&params, dxh, dyh);
-			}
-
-			if (iq_ExecuteFromDistances(&iq) != 0) {
-				free(iq.pixels);
-				free(iq.regions);
-				free(iq.output);
-				return;
-			}
-
-			/* Copy interpolated results to output */
-			for (uint32_t j = 0; j < N; ++j)
-				dst[N * i + j] = iq.output[j] / 255.f;
-
-			/* Free per-channel allocations but NOT labels (owned by cached state) */
+		if (iq_Initialize(&iq, channel_data, colors_used, W, H, &euclidean_params, i==0) != 0) {
 			free(iq.pixels);
 			free(iq.regions);
 			free(iq.output);
-		} else {
-			/* Cold path: run SDF with Euclidean ordering, then apply user metric */
-			SDFDistanceParams euclidean_params;
-			euclidean_params.minkowski = 1.0f;  /* exp2(1) = 2 = Euclidean */
-			euclidean_params.chebyshev = 0.0f;
+			dijkstra_state_free(new_state);
+			return;
+		}
 
-			InterpolateQuantizedCmd iq = {0};
-			iq.labels = (uint32_t *)&memo->regions[N * i];
-			iq.num_regions = memo->region_count[i];
+		if (iq_ExecuteSDF(&iq) != 0) {
+			free(iq.pixels);
+			free(iq.regions);
+			free(iq.output);
+			dijkstra_state_free(new_state);
+			return;
+		}
 
-			if (iq_Initialize(&iq, channel_data, colors_used, W, H, &euclidean_params, i==0) != 0) {
-				free(iq.pixels);
-				free(iq.regions);
-				free(iq.output);
-				if (new_state) dijkstra_state_free(new_state);
-				return;
-			}
+		/* Cache labels and dx/dy displacements */
+		DijkstraChannelState* ch = &new_state->channels[i];
 
-			if (iq_ExecuteSDF(&iq) != 0) {
-				free(iq.pixels);
-				free(iq.regions);
-				free(iq.output);
-				if (new_state) dijkstra_state_free(new_state);
-				return;
-			}
+		ch->labels = (uint32_t*)malloc(N * sizeof(uint32_t));
+		if (ch->labels)
+			memcpy(ch->labels, iq.labels, N * sizeof(uint32_t));
+		ch->num_regions = iq.num_regions;
 
-			/* Cache dx/dy displacements for this channel */
-			if (new_state) {
-				DijkstraChannelState* ch = &new_state->channels[i];
-
-				/* Copy labels */
-				ch->labels = (uint32_t*)malloc(N * sizeof(uint32_t));
-				if (ch->labels)
-					memcpy(ch->labels, iq.labels, N * sizeof(uint32_t));
-				ch->num_regions = iq.num_regions;
-
-				/* Allocate dx/dy arrays (calloc zeros = sentinel for "no data") */
-				ch->dx_lower  = (int16_t*)calloc(N, sizeof(int16_t));
-				ch->dy_lower  = (int16_t*)calloc(N, sizeof(int16_t));
-				ch->dx_higher = (int16_t*)calloc(N, sizeof(int16_t));
-				ch->dy_higher = (int16_t*)calloc(N, sizeof(int16_t));
-				if (ch->dx_lower && ch->dy_lower && ch->dx_higher && ch->dy_higher) {
-					for (uint32_t j = 0; j < N; ++j) {
-						if (iq.pixels[j].dist_lower >= 0) {
-							ch->dx_lower[j] = iq.pixels[j].dx_lower;
-							ch->dy_lower[j] = iq.pixels[j].dy_lower;
-						}
-						if (iq.pixels[j].dist_higher >= 0) {
-							ch->dx_higher[j] = iq.pixels[j].dx_higher;
-							ch->dy_higher[j] = iq.pixels[j].dy_higher;
-						}
-					}
+		ch->dx_lower   = (int16_t*)calloc(N, sizeof(int16_t));
+		ch->dy_lower   = (int16_t*)calloc(N, sizeof(int16_t));
+		ch->dx_higher  = (int16_t*)calloc(N, sizeof(int16_t));
+		ch->dy_higher  = (int16_t*)calloc(N, sizeof(int16_t));
+		ch->has_lower  = (uint8_t*)calloc(N, sizeof(uint8_t));
+		ch->has_higher = (uint8_t*)calloc(N, sizeof(uint8_t));
+		if (ch->dx_lower && ch->dy_lower && ch->dx_higher && ch->dy_higher
+		    && ch->has_lower && ch->has_higher) {
+			for (uint32_t j = 0; j < N; ++j) {
+				if (iq.pixels[j].dist_lower >= 0) {
+					ch->dx_lower[j] = iq.pixels[j].dx_lower;
+					ch->dy_lower[j] = iq.pixels[j].dy_lower;
+					ch->has_lower[j] = 1;
+				}
+				if (iq.pixels[j].dist_higher >= 0) {
+					ch->dx_higher[j] = iq.pixels[j].dx_higher;
+					ch->dy_higher[j] = iq.pixels[j].dy_higher;
+					ch->has_higher[j] = 1;
 				}
 			}
+		}
 
-			/* Recompute distances using user's metric (SDF used Euclidean ordering) */
-			for (uint32_t j = 0; j < N; ++j) {
-				int16_t dxl = iq.pixels[j].dx_lower, dyl = iq.pixels[j].dy_lower;
-				int16_t dxh = iq.pixels[j].dx_higher, dyh = iq.pixels[j].dy_higher;
-				if (iq.pixels[j].dist_lower >= 0)
-					iq.pixels[j].dist_lower = sdf_ComputeDistance(&params, dxl, dyl);
-				if (iq.pixels[j].dist_higher >= 0)
-					iq.pixels[j].dist_higher = sdf_ComputeDistance(&params, dxh, dyh);
-			}
+		free(iq.pixels);
+		free(iq.regions);
+		free(iq.output);
+	}
 
-			if (iq_ExecuteFromDistances(&iq) != 0) {
-				free(iq.pixels);
-				free(iq.regions);
-				free(iq.output);
-				if (new_state) dijkstra_state_free(new_state);
-				return;
-			}
+	/* Free old state if replaced, store new one */
+	if (cached) dijkstra_state_free(cached);
+	*state_io = new_state;
+}
 
-			/* Copy interpolated results to output */
-			for (uint32_t j = 0; j < N; ++j)
-				dst[N * i + j] = iq.output[j] / 255.f;
+/* Dijkstra distance transform on planar height data.
+ * Requires a valid DijkstraState (call dijkstra_state_ensure first).
+ * Uses cached dx/dy displacements and recomputes distances via user metric. */
+static void run_dijkstra_planar(float *dst, uint32_t W, uint32_t H,
+                                SDFDistanceParams params,
+                                DijkstraState* state)
+{
+	if (!state) return;
 
-			/* Free per-channel allocations but NOT labels (owned by memo) */
+	uint32_t N = W * H;
+	ErosionImageMemo* memo = memo_get_erosion_mutable();
+	if (!memo || !memo->image.deinterleaved) return;
+
+	for (int i = 0; i < 3; ++i)
+	{
+		uint8_t *channel_data = &memo->image.deinterleaved[N * i];
+		uint8_t colors_used[256];
+
+		for (int j = 0; j < 256; ++j)
+			colors_used[j] = ((uint8_t *)(&memo->colors_used[j].x))[i];
+
+		DijkstraChannelState* ch = &state->channels[i];
+
+		InterpolateQuantizedCmd iq = {};
+		iq.labels = ch->labels;
+		iq.num_regions = ch->num_regions;
+
+		if (iq_Initialize(&iq, channel_data, colors_used, W, H, nullptr, i==0) != 0) {
 			free(iq.pixels);
 			free(iq.regions);
 			free(iq.output);
+			return;
 		}
-	}
 
-	/* Store new state for caller */
-	if (new_state && state_io)
-		*state_io = new_state;
+		/* Populate pixels from cached dx/dy, recomputing distance via user metric. */
+		for (uint32_t j = 0; j < N; ++j) {
+			iq.pixels[j].dx_lower  = ch->dx_lower[j];
+			iq.pixels[j].dy_lower  = ch->dy_lower[j];
+			iq.pixels[j].dx_higher = ch->dx_higher[j];
+			iq.pixels[j].dy_higher = ch->dy_higher[j];
+			if (ch->has_lower[j])
+				iq.pixels[j].dist_lower = sdf_ComputeDistance(&params, ch->dx_lower[j], ch->dy_lower[j]);
+			if (ch->has_higher[j])
+				iq.pixels[j].dist_higher = sdf_ComputeDistance(&params, ch->dx_higher[j], ch->dy_higher[j]);
+		}
+
+		if (iq_ExecuteFromDistances(&iq) != 0) {
+			free(iq.pixels);
+			free(iq.regions);
+			free(iq.output);
+			return;
+		}
+
+		for (uint32_t j = 0; j < N; ++j)
+			dst[N * i + j] = iq.output[j] / 255.f;
+
+		/* Free per-channel allocations but NOT labels (owned by state) */
+		free(iq.pixels);
+		free(iq.regions);
+		free(iq.output);
+	}
 }
 
 #if 0
@@ -708,15 +692,15 @@ static void process_erosion_height_planar(float *dst, uint32_t W, uint32_t H, Ef
 				params.minkowski = exp2(effects[i].params.dijkstra.Minkowski);
 				params.chebyshev = effects[i].params.dijkstra.Chebyshev;
 
-				/* Check for cached state from memo (type match, params differ) */
+				/* Recover cached state from memo if available */
 				DijkstraState* cached_state = nullptr;
 				if (resume.reusable_state &&
 				    resume.resume_from == i) {
 					cached_state = (DijkstraState*)resume.reusable_state;
 				}
 
-				DijkstraState* state_io = cached_state;
-				run_dijkstra_planar(dst, W, H, params, &state_io);
+				dijkstra_state_ensure(&cached_state, W, H);
+				run_dijkstra_planar(dst, W, H, params, cached_state);
 
 				/* Save memo layer, then attach state */
 				bool do_snapshot = should_memoize(effects[i].effect_id);
@@ -724,15 +708,7 @@ static void process_erosion_height_planar(float *dst, uint32_t W, uint32_t H, Ef
 				                do_snapshot ? dst : nullptr,
 				                do_snapshot ? buffer_bytes : 0);
 
-				/* Attach the DijkstraState to the new memo layer */
-				if (state_io) {
-					g_erosion_memo.layers[i].effect_state = state_io;
-					g_erosion_memo.layers[i].free_state = dijkstra_state_free;
-					/* If cold path produced a new state, free the old cached one */
-					if (cached_state && state_io != cached_state)
-						dijkstra_state_free(cached_state);
-				} else if (cached_state) {
-					/* run_dijkstra_planar didn't produce state; re-attach cached */
+				if (cached_state) {
 					g_erosion_memo.layers[i].effect_state = cached_state;
 					g_erosion_memo.layers[i].free_state = dijkstra_state_free;
 				}
@@ -809,7 +785,7 @@ static void process_erosion_height_planar(float *dst, uint32_t W, uint32_t H, Ef
 		}
 
 		case EFFECT_DEBUG_LIC: {
-			LicDebugCmd lic = {0};
+			LicDebugCmd lic = {};
 			lic.heights = dst;
 			lic.W = W;
 			lic.H = H;
@@ -821,6 +797,16 @@ static void process_erosion_height_planar(float *dst, uint32_t W, uint32_t H, Ef
 		}
 
 		case EFFECT_DEBUG_RIDGE_MESH: {
+			/* Run Morse-Smale complex first for comparison debug output */
+			{
+				MorseSmaleCmd ms{};
+				ms.heightmap = &dst[W*H*1]; /* channel 1 (G), same as ridge mesh */
+				ms.W = W;
+				ms.H = H;
+				morse_smale_Execute(&ms);
+				morse_smale_DebugRender(&ms);
+			}
+
 			RidgeMeshCmd rm{};
 			rm.heightmap = &dst[W*H*1]; /* channel 1 (G) */
 			rm.W = W;

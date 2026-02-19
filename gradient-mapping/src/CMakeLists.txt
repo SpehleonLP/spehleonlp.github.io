@@ -94,6 +94,7 @@ else()
         ${CMAKE_CURRENT_SOURCE_DIR}/sources
         ${CMAKE_CURRENT_SOURCE_DIR}/commands
         ${CMAKE_CURRENT_SOURCE_DIR}/image_memo
+        ${CMAKE_CURRENT_SOURCE_DIR}/../lib/diamorse/src/lib
     )
 
     target_compile_options(effect_stack_lib PRIVATE
@@ -102,6 +103,11 @@ else()
         -Wpedantic
         -fstrict-aliasing
         -fno-exceptions
+    )
+
+    # diamorse uses throw — enable exceptions for the bridge file
+    set_source_files_properties(commands/morse_smale_cmd.cpp
+        PROPERTIES COMPILE_OPTIONS "-fexceptions"
     )
 
     target_link_libraries(effect_stack_lib PRIVATE glm::glm)
@@ -114,6 +120,7 @@ else()
         ${CMAKE_CURRENT_SOURCE_DIR}/sources
         ${CMAKE_CURRENT_SOURCE_DIR}/commands
         ${CMAKE_CURRENT_SOURCE_DIR}/image_memo
+        ${CMAKE_CURRENT_SOURCE_DIR}/../lib/diamorse/src/lib
     )
 
     target_link_libraries(effect_stack_cli PRIVATE

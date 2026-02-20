@@ -9,9 +9,14 @@
 #include "VertexMap.hpp"
 #include "vectorFieldExtraction.hpp"
 #include "traversals.hpp"
+#include "chainComplexExtraction.hpp"
+#include "persistence.hpp"
+#include "SimpleComplex.hpp"
 
 #include <stdio.h>
 #include <math.h>
+#include <algorithm>
+#include <map>
 #include <memory>
 
 using namespace anu_am::diamorse;
@@ -73,6 +78,76 @@ int morse_smale_Execute(MorseSmaleCmd* cmd)
 	Field field(complex);
 	fillMorseVectorField(complex, scalars, field);
 
+	/* --- 2b. Compute persistence pairing --- */
+	{
+		/* Cell value: max scalar over vertices of cell */
+		auto cell_value = [&](Cell c) -> float {
+			float val = scalars.get(vertices(c, 0));
+			for (int i = 1; i < vertices.count(c); i++)
+				val = std::max(val, scalars.get(vertices(c, i)));
+			return val;
+		};
+
+		/* Collect and sort critical cells by value (ascending) */
+		std::vector<Cell> sources;
+		for (Cell c = 0; c < complex.cellIdLimit(); ++c)
+			if (complex.isCell(c) && field.isCritical(c))
+				sources.push_back(c);
+
+		std::stable_sort(sources.begin(), sources.end(),
+			[&](Cell a, Cell b) {
+				float va = cell_value(a), vb = cell_value(b);
+				return va < vb || (va == vb && complex.cellDimension(a) < complex.cellDimension(b));
+			});
+
+		/* Build SimpleComplex for persistence algorithm */
+		size_t n = sources.size();
+		std::map<Cell, size_t> cell_to_idx;
+		for (size_t i = 0; i < n; i++)
+			cell_to_idx[sources[i]] = i;
+
+		typedef std::vector<std::pair<Cell, int>> Boundary;
+		std::map<Cell, Boundary> chains = chainComplex(complex, field);
+
+		std::vector<unsigned int> dims;
+		std::vector<float> values;
+		std::vector<std::vector<Cell>> faceLists;
+
+		for (size_t i = 0; i < n; i++) {
+			Cell c = sources[i];
+			dims.push_back(complex.cellDimension(c));
+			values.push_back(cell_value(c));
+
+			Boundary const& bnd = chains[c];
+			std::vector<Cell> faces;
+			for (auto& p : bnd)
+				for (int k = 0; k < p.second; k++)
+					faces.push_back(cell_to_idx[p.first]);
+			faceLists.push_back(faces);
+		}
+
+		SimpleComplex simple(dims, values, faceLists);
+		auto pairs = persistencePairing(simple);
+
+		/* Build Cell → persistence map */
+		cmd->persistence_map.clear();
+		int n_paired = 0;
+		for (size_t i = 0; i < pairs.size(); i++) {
+			size_t j = pairs[i].partner;
+			float pers;
+			if (j >= n) {
+				pers = INFINITY; /* unpaired = permanent cycle */
+			} else {
+				pers = fabsf(pairs[j].value - pairs[i].value);
+				n_paired++;
+			}
+			cmd->persistence_map[sources[i]] = pers;
+		}
+
+		fprintf(stderr, "[morse_smale] Persistence: %zu critical cells, %d paired, %zu unpaired\n",
+				n, n_paired, n - n_paired);
+	}
+
 	/* Helper: check if a cell touches any no-data pixel */
 	auto cell_touches_nodata = [&](Cell c) -> bool {
 		int nv = vertices.count(c);
@@ -132,6 +207,8 @@ int morse_smale_Execute(MorseSmaleCmd* cmd)
 		cp.y = pos[1];
 		cp.dimension = dim;
 		cp.value = val;
+		auto pit = cmd->persistence_map.find(c);
+		cp.persistence = (pit != cmd->persistence_map.end()) ? pit->second : INFINITY;
 		cmd->critical_points.push_back(cp);
 
 		if (dim == 1)
@@ -145,44 +222,66 @@ int morse_smale_Execute(MorseSmaleCmd* cmd)
 	fprintf(stderr, "[morse_smale] %ux%u: %d maxima (dim-0), %d saddles (dim-1), %d minima (dim-2), %d skipped (no-data)\n",
 			W, H, n_max, n_saddle, n_min, n_skip);
 
+	/* Log persistence distribution for saddles */
+	{
+		std::vector<float> saddle_pers;
+		for (auto& cp : cmd->critical_points)
+			if (cp.dimension == 1 && cp.persistence < INFINITY)
+				saddle_pers.push_back(cp.persistence);
+		std::sort(saddle_pers.begin(), saddle_pers.end());
+		fprintf(stderr, "[morse_smale] Saddle persistence (sorted):");
+		for (float p : saddle_pers)
+			fprintf(stderr, " %.4f", p);
+		fprintf(stderr, "\n");
+	}
+
 	/* --- 4. Trace separatrices to build skeleton masks --- */
-	cmd->ridge_mask.assign(N, 0);
-	cmd->valley_mask.assign(N, 0);
+	cmd->ridge_mask.assign(N, 0.f);
+	cmd->valley_mask.assign(N, 0.f);
 
 	Field::Vectors V = field.V();    /* descending (toward minima) */
 	Field::Vectors coV = field.coV(); /* ascending (toward maxima) */
 
-	auto mark_pixels = [&](Cell c, std::vector<uint8_t>& mask) {
+	/* Mark pixels with the persistence of the saddle that spawned them.
+	 * If multiple separatrices overlap, keep max persistence. */
+	auto mark_pixels = [&](Cell c, std::vector<float>& mask, float pers) {
 		int nv = vertices.count(c);
 		for (int i = 0; i < nv; i++) {
 			Cell v = vertices(c, i);
 			uint32_t x = complex.cellX(v);
 			uint32_t y = complex.cellY(v);
 			if (x < W && y < H && !nodata[y * W + x])
-				mask[y * W + x] = 1;
+				if (pers > mask[y * W + x])
+					mask[y * W + x] = pers;
 		}
 	};
 
 	for (Cell saddle : saddles) {
+		/* Look up this saddle's persistence */
+		auto pit = cmd->persistence_map.find(saddle);
+		float pers = (pit != cmd->persistence_map.end()) ? pit->second : 0.f;
+		/* Clamp nodata-border persistence to a visible but distinct value */
+		if (pers > 1e5f) pers = 1e5f;
+
 		/* Descending flow: saddle → minima = valley lines */
 		{
 			auto trail = flowTraversal(saddle, V, I);
-			mark_pixels(saddle, cmd->valley_mask);
+			mark_pixels(saddle, cmd->valley_mask, pers);
 			for (auto& step : trail) {
 				Cell paired = V(step.second);
-				mark_pixels(step.second, cmd->valley_mask);
-				mark_pixels(paired, cmd->valley_mask);
+				mark_pixels(step.second, cmd->valley_mask, pers);
+				mark_pixels(paired, cmd->valley_mask, pers);
 			}
 		}
 
 		/* Ascending flow: saddle → maxima = ridge lines */
 		{
 			auto trail = flowTraversal(saddle, coV, coI);
-			mark_pixels(saddle, cmd->ridge_mask);
+			mark_pixels(saddle, cmd->ridge_mask, pers);
 			for (auto& step : trail) {
 				Cell paired = coV(step.second);
-				mark_pixels(step.second, cmd->ridge_mask);
-				mark_pixels(paired, cmd->ridge_mask);
+				mark_pixels(step.second, cmd->ridge_mask, pers);
+				mark_pixels(paired, cmd->ridge_mask, pers);
 			}
 		}
 	}
@@ -193,7 +292,6 @@ int morse_smale_Execute(MorseSmaleCmd* cmd)
 		for (uint32_t x = 0; x < W; x++) {
 			uint32_t idx = y * W + x;
 			if (nodata[idx]) continue;
-			/* Check 4-connected neighbors for no-data */
 			bool on_boundary = false;
 			if (x == 0 || x == W-1 || y == 0 || y == H-1)
 				on_boundary = true;
@@ -201,8 +299,8 @@ int morse_smale_Execute(MorseSmaleCmd* cmd)
 				on_boundary = nodata[idx-1] || nodata[idx+1]
 				           || nodata[idx-W] || nodata[idx+W];
 			}
-			if (on_boundary && !cmd->ridge_mask[idx]) {
-				cmd->ridge_mask[idx] = 1;
+			if (on_boundary && cmd->ridge_mask[idx] == 0.f) {
+				cmd->ridge_mask[idx] = -1.f; /* negative = boundary, not a separatrix */
 				boundary_px++;
 			}
 		}
@@ -210,8 +308,8 @@ int morse_smale_Execute(MorseSmaleCmd* cmd)
 
 	int ridge_px = 0, valley_px = 0;
 	for (uint32_t i = 0; i < N; i++) {
-		ridge_px += cmd->ridge_mask[i];
-		valley_px += cmd->valley_mask[i];
+		ridge_px += (cmd->ridge_mask[i] != 0.f) ? 1 : 0;
+		valley_px += (cmd->valley_mask[i] != 0.f) ? 1 : 0;
 	}
 	fprintf(stderr, "[morse_smale] Skeleton: %d ridge pixels (%d boundary), %d valley pixels\n",
 			ridge_px, boundary_px, valley_px);
@@ -234,6 +332,25 @@ int morse_smale_DebugRender(const MorseSmaleCmd* cmd)
 
 	auto rgb = std::unique_ptr<uint8_t[]>(new uint8_t[N * 3]);
 
+	/* Find max finite persistence for log-scale normalization */
+	float max_pers = 0.001f;
+	for (uint32_t i = 0; i < N; i++) {
+		float rp = cmd->ridge_mask[i], vp = cmd->valley_mask[i];
+		if (rp > 0 && rp < 1e5f && rp > max_pers) max_pers = rp;
+		if (vp > 0 && vp < 1e5f && vp > max_pers) max_pers = vp;
+	}
+	/* log scale: t = log(1 + pers) / log(1 + max_pers), maps [0,max] → [0,1] */
+	float log_denom = logf(1.f + max_pers);
+
+	fprintf(stderr, "[morse_smale] DebugRender: max persistence = %.4f\n", max_pers);
+
+	/* Persistence → [0,1] via log scale */
+	auto pers_to_t = [&](float p) -> float {
+		if (p <= 0.f) return 0.f;
+		if (p >= 1e5f) return 1.f; /* nodata-border saddles */
+		return logf(1.f + p) / log_denom;
+	};
+
 	/* Background: heightmap as dark gray */
 	for (uint32_t i = 0; i < N; i++) {
 		uint8_t gray = (uint8_t)(cmd->heightmap[i] * 100.0f);
@@ -242,21 +359,30 @@ int morse_smale_DebugRender(const MorseSmaleCmd* cmd)
 		rgb[i*3+2] = gray;
 	}
 
-	/* Draw valley lines (blue) */
+	/* Draw valley lines: low persistence = dark blue, high = bright cyan */
 	for (uint32_t i = 0; i < N; i++) {
-		if (cmd->valley_mask[i]) {
-			rgb[i*3+0] = 40;
-			rgb[i*3+1] = 80;
-			rgb[i*3+2] = 220;
+		float vp = cmd->valley_mask[i];
+		if (vp > 0.f) {
+			float t = pers_to_t(vp);
+			rgb[i*3+0] = (uint8_t)(30 + 30 * t);
+			rgb[i*3+1] = (uint8_t)(40 + 180 * t);
+			rgb[i*3+2] = (uint8_t)(80 + 175 * t);
 		}
 	}
 
-	/* Draw ridge lines (yellow/orange — drawn after valleys so ridges are visible) */
+	/* Draw ridge lines: low persistence = dark red, high = bright yellow */
 	for (uint32_t i = 0; i < N; i++) {
-		if (cmd->ridge_mask[i]) {
-			rgb[i*3+0] = 255;
-			rgb[i*3+1] = 200;
-			rgb[i*3+2] = 30;
+		float rp = cmd->ridge_mask[i];
+		if (rp > 0.f) {
+			float t = pers_to_t(rp);
+			rgb[i*3+0] = (uint8_t)(80 + 175 * t);
+			rgb[i*3+1] = (uint8_t)(30 + 200 * t);
+			rgb[i*3+2] = (uint8_t)(10 + 20 * t);
+		} else if (rp < 0.f) {
+			/* Boundary pixels: dim gray */
+			rgb[i*3+0] = 100;
+			rgb[i*3+1] = 100;
+			rgb[i*3+2] = 100;
 		}
 	}
 
@@ -268,22 +394,18 @@ int morse_smale_DebugRender(const MorseSmaleCmd* cmd)
 		uint8_t r, g, b;
 		int radius;
 		if (cp.dimension == 0) {
-			/* dim-0 = maximum: bright red dot */
 			r = 255; g = 0; b = 0;
 			radius = 2;
 		} else if (cp.dimension == 2) {
-			/* dim-2 = minimum: bright green dot */
 			r = 0; g = 255; b = 0;
 			radius = 2;
 		} else {
-			/* dim-1 = saddle: white cross */
 			r = 255; g = 255; b = 255;
 			radius = 1;
 		}
 
 		for (int dy = -radius; dy <= radius; dy++) {
 			for (int dx = -radius; dx <= radius; dx++) {
-				/* For saddles draw a cross, for extrema a filled circle */
 				if (cp.dimension == 1 && dx != 0 && dy != 0)
 					continue;
 				int px = cx + dx, py = cy + dy;
